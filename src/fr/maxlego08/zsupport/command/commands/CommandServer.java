@@ -24,7 +24,7 @@ public class CommandServer extends VCommand {
 		builder.setFooter("2020 - " + guild.getName(), guild.getIconUrl());
 
 		builder.addField("Nom du discord", guild.getName(), true);
-		builder.addField("Fondateur du discord", "Maxlego08#2020", true);
+		builder.addField("Fondateur du discord", guild.getOwner().getAsMention(), true);
 		builder.addField("Date de création", guild.getTimeCreated().toString(), false);
 		builder.addField("Nombre de catégories", guild.getCategories().size() + "", true);
 		builder.addField("Nombre de salons textuels", guild.getTextChannels().size() + "", true);
