@@ -1,0 +1,14 @@
+{
+  "tickets": [
+    {
+      "type": "FR",
+      "channelId": 0,
+      "guildId": 511516467615760405,
+      "userId": 522359210844094479,
+      "isWaiting": true,
+      "isPaypal": false,
+      "pluginEmoteId": 0,
+      "name": "ticket-#0140"
+    }
+  ]
+}
