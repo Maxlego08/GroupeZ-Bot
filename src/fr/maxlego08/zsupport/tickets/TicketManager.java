@@ -75,7 +75,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 		} else {
 
 			ticket = new Ticket(type, guild.getIdLong(), user.getIdLong());
-			ticket.build(user, getTicketFormat());
+			ticket.build(user, guild, getTicketFormat());
 			tickets.add(ticket);
 			ZSupport.instance.save();
 

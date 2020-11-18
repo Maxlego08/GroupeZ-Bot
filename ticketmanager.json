@@ -2,13 +2,13 @@
   "tickets": [
     {
       "type": "FR",
-      "channelId": 0,
+      "channelId": 778639351110172674,
       "guildId": 511516467615760405,
       "userId": 522359210844094479,
-      "isWaiting": true,
+      "isWaiting": false,
       "isPaypal": false,
-      "pluginEmoteId": 0,
-      "name": "ticket-#0140"
+      "pluginEmoteId": 712307096607129611,
+      "name": "ticket-#0141"
     }
   ]
 }

@@ -35,8 +35,6 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 		Message message = event.getMessage();
 		String command = message.getContentDisplay();
 
-		System.out.println(command + " -- " + user);
-		
 		if (command.startsWith(COMMAND_PREFIX)) {
 
 			command = command.replaceFirst(COMMAND_PREFIX, "");

@@ -2,7 +2,6 @@ package fr.maxlego08.zsupport.tickets;
 
 import java.awt.Color;
 import java.time.OffsetDateTime;
-import java.util.Optional;
 
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
@@ -136,27 +135,10 @@ public class Ticket extends ZUtils {
 	/**
 	 * Création du ticket
 	 */
-	public void build(User user, String ticketName) {
+	public void build(User user, Guild guild, String ticketName) {
 
 		this.name = ticketName;
-		Guild guild = ZSupport.instance.getJda().getGuildById(511516467615760405l);
-
-		System.out.println(guild.getMembers().size() + " alors ?");
-		Optional<Member> optional = guild.getMembers().stream().filter(m -> {
-			System.out.println(m.getId() + " -- " + user.getId() + " -- " + m.getNickname());
-			return m.getIdLong() == user.getIdLong();
-		}).findFirst();
-
-		if (!optional.isPresent()) {
-			System.out.println("Impossible de trouver le member pour créer le ticket, " + user + ", " + guild);
-			return;
-		}
-		Member member = optional.get();
-
-		if (member == null) {
-			System.out.println("Impossible de trouver le member pour créer le ticket, " + user + ", " + guild);
-			return;
-		}
+		Member member = guild.getMember(user);
 
 		TextChannel channel = guild.getCategoryById(Config.ticketCategoryId).createTextChannel(ticketName).complete();
 
@@ -292,7 +274,7 @@ public class Ticket extends ZUtils {
 			message2.addReaction("✅").queue();
 			message2.addReaction("❌").queue();
 
-			channel.sendMessage(guild.getJDA().getUserById(485461361439145984l).getAsMention())
+			channel.sendMessage(guild.getJDA().getUserById(522359210844094479l).getAsMention())
 					.queue(c -> c.delete().queue());
 
 			channel.putPermissionOverride(user).setAllow(Permission.MESSAGE_READ).queue();
