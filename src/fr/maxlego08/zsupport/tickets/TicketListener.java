@@ -3,6 +3,7 @@ package fr.maxlego08.zsupport.tickets;
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.utils.Request;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -56,11 +57,12 @@ public class TicketListener extends ListenerAdapter {
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
 
-		if (event.getMessage().getCategory().getIdLong() == Config.ticketCategoryId) {
+		Message message = event.getMessage();
+		if (message == null || message.getCategory() == null)
+			return;
 
-			manager.onPlayerMessage(event.getGuild(), event.getMember(), event.getMessage(), event.getTextChannel());
-
-		}
+		if (message.getCategory().getIdLong() == Config.ticketCategoryId)
+			manager.onPlayerMessage(event.getGuild(), event.getMember(), message, event.getTextChannel());
 
 	}
 

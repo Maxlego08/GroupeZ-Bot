@@ -28,6 +28,8 @@ public class Config implements Saveable {
 		plugins.add(new Plugin("zKoth", 712307144502018098l, 694224301653491782l));
 		plugins.add(new Plugin("zTotem", 712306940323037185l, 613374798243823616l));
 		plugins.add(new Plugin("zHopper", 712307379320127488l, 700417649229955154l));
+		plugins.add(new Plugin("zTournament", 731802368152174622l, 730685641972645950l));
+		plugins.add(new Plugin("zFactionRanking", 731802322211962881l, 729365118609129472l));
 		
 	}
 	
