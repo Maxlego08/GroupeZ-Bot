@@ -2,11 +2,11 @@ package fr.maxlego08.zsupport.utils;
 
 public enum Message {
 
-	COMMAND_NOT_FOUND(":x: Impossible de trouver la commande demandÃ©."),
-	COMMAND_NO_CONSOLE(":x: Vous devez Ãªtre un joueur pour pouvoir Ã©xecuter cette commande."),
-	COMMAND_NO_PLAYER(":x: Seul la console peut Ã©xecuter cette commande."),
-	COMMAND_NO_PERMISSION(":x: Vous n'avez pas la permission d'Ã©xecuter cette commande."),
-	COMMAND_SYNTAXE_ERROR(":x: Vous devez exÃ©cuter la commande comme ceci: %s"),
+	COMMAND_NOT_FOUND(":x: Impossible de trouver la commande demandé."),
+	COMMAND_NO_CONSOLE(":x: Vous devez être un joueur pour pouvoir éxecuter cette commande."),
+	COMMAND_NO_PLAYER(":x: Seul la console peut éxecuter cette commande."),
+	COMMAND_NO_PERMISSION(":x: Vous n'avez pas la permission d'éxecuter cette commande."),
+	COMMAND_SYNTAXE_ERROR(":x: Vous devez exécuter la commande comme ceci: %s"),
 	
 	;
 

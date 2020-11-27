@@ -53,8 +53,15 @@ public class MemberListener extends ListenerAdapter implements Constant {
 
 		Message message = event.getMessage();
 		Member member = event.getMember();
-		Guild guild = event.getGuild();
-
+		Guild guild = null;
+		try {
+			guild = event.getGuild();
+		} catch (Exception e) {
+		}
+		
+		if (guild == null)
+			return;
+		
 		int roleMentionned = message.getMentionedRoles().size();
 		int memberMentionned = message.getMentionedMembers().size();
 
@@ -76,7 +83,7 @@ public class MemberListener extends ListenerAdapter implements Constant {
 		RoleManager manager = RoleManager.getInstance();
 		manager.addRole(member, roles);
 	}
-	
+
 	@Override
 	public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
 		Member member = event.getMember();

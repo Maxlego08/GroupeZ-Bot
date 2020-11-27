@@ -23,13 +23,17 @@ public class CommandServer extends VCommand {
 		builder.setColor(Color.getHSBColor(45, 45, 45));
 		builder.setFooter("2020 - " + guild.getName(), guild.getIconUrl());
 
-		builder.addField("Nom du discord", guild.getName(), true);
-		builder.addField("Fondateur du discord", guild.getOwner().getAsMention(), true);
-		builder.addField("Date de création", guild.getTimeCreated().toString(), false);
-		builder.addField("Nombre de catégories", guild.getCategories().size() + "", true);
-		builder.addField("Nombre de salons textuels", guild.getTextChannels().size() + "", true);
-		builder.addField("Nombre de salons vocaux", guild.getVoiceChannels().size() + "", true);
-		builder.addField("Membres", guild.getMemberCount() + "", true);
+		builder.addField("Name of discord", guild.getName(), true);
+		builder.addField("Founder of discord", guild.getMemberById(522359210844094479l).getAsMention(), true);
+		builder.addField("Creation date", guild.getTimeCreated().toString(), false);
+		builder.addField("Number of categories", guild.getCategories().size() + "", true);
+		builder.addField("Number of text channel", guild.getTextChannels().size() + "", true);
+		builder.addField("Number of voice channel", guild.getVoiceChannels().size() + "", true);
+		builder.addField("Membres", guild.getMemberCount() + "", false);
+		
+		builder.addField("SIRET", "887 617 496 00013", true);
+		builder.addField("E-mail", "contact@groupez.dev", true);
+		builder.addField("Phone", "+33 07.82.60.90.13", false);
 
 		textChannel.sendTyping().queue();
 		textChannel.sendMessage(builder.build()).complete();

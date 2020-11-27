@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.maxlego08.zsupport.ZSupport;
+import fr.maxlego08.zsupport.command.commands.CommandClear;
 import fr.maxlego08.zsupport.command.commands.CommandServer;
 import fr.maxlego08.zsupport.command.commands.CommandStop;
 import fr.maxlego08.zsupport.command.commands.tickets.CommandTicketSet;
@@ -27,6 +28,7 @@ public class CommandManager extends ZUtils implements Constant {
 		registetCommand("stop", new CommandStop(this), "end");
 		registetCommand("ticketset", new CommandTicketSet(this));
 		registetCommand("server", new CommandServer(this));
+		registetCommand("clear", new CommandClear(this));
 	}
 
 	public VCommand addCommand(VCommand command) {
