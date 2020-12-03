@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
@@ -58,10 +59,10 @@ public class MemberListener extends ListenerAdapter implements Constant {
 			guild = event.getGuild();
 		} catch (Exception e) {
 		}
-		
+
 		if (guild == null)
 			return;
-		
+
 		int roleMentionned = message.getMentionedRoles().size();
 		int memberMentionned = message.getMentionedMembers().size();
 
@@ -103,6 +104,19 @@ public class MemberListener extends ListenerAdapter implements Constant {
 		Date date = new Date();
 		OffsetDateTime offsetDateTime = date.toInstant().atOffset(ZoneOffset.UTC);
 
+		PrivateChannel channel = member.getUser().openPrivateChannel().complete();
+
+		// https://youtu.be/UDd8h5yX4BM
+
+		String buy = ":flag_fr: Comment acheter ?\n"
+				+ "Pour acheter les plugins vous devez vous rendre sur https://groupez.xyz/, vous sélectionnez ensuite le plugin que vous souhaitez acheter. Vous devez fournir votre pseudo spigot et ensuite de payer par carte bancaire sur stripe. Vous allez ensuite recevoir l'accès au plugin acheté de quelques minutes à quelques heures.\n\n"
+				+ ":flag_us: How to buy ?\n"
+				+ "To buy the plugins you have to go to https://groupez.xyz/, then you select the plugin you want to buy. You must provide your spigot nickname and then pay by credit card on stripe. You will then receive access to the purchased plugin from a few minutes to a few hours."
+				+ "\n\n"
+				+"https://youtu.be/UDd8h5yX4BM";
+
+		channel.sendMessage(buy).complete();
+
 		RoleManager manager = RoleManager.getInstance();
 		if (!manager.giveRoles(guild, member, guild.getRoleById(ROLE_NOT_ROBOT)))
 			if (Math.abs(offsetDateTime.getYear() - dateTime.getYear()) >= 1) {
@@ -112,6 +126,7 @@ public class MemberListener extends ListenerAdapter implements Constant {
 					public void run() {
 						Role role = guild.getRoleById(ROLE_NOT_ROBOT);
 						guild.addRoleToMember(member, role).complete();
+
 					}
 				}, 1000);
 			}

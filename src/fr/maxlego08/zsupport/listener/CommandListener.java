@@ -44,7 +44,11 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 			String[] args = command.length() != 0 ? get(command.split(" ")) : new String[0];
 			PlayerSender sender = new DiscordPlayer(user, member, event.getTextChannel());
 			instance.getCommandManager().onCommand(sender, commands, args, event);
-			event.getMessage().delete().queue();
+			try {
+				event.getMessage().delete().queue();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 		}
 
 	}
