@@ -35,4 +35,10 @@ public class DiscordConsoleSender implements ConsoleSender {
 	public boolean hasPermission(Permission permission) {
 		return true;
 	}
+
+	@Override
+	public void sendEmbed(Message message, boolean delete) {
+		this.sendMessage(message, delete);
+	}
+
 }

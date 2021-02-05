@@ -13,6 +13,7 @@ public class CommandServer extends VCommand {
 	public CommandServer(CommandManager commandManager) {
 		super(commandManager);
 		consoleCanUse = false;
+		onlyInCommandChannel = true;
 	}
 
 	@Override

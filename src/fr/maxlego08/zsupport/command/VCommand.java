@@ -34,6 +34,7 @@ public abstract class VCommand extends Arguments implements Constant {
 	protected boolean playerCanUse = true;
 	protected boolean ignoreParent = false;
 	protected boolean ignoreArgs = false;
+	protected boolean onlyInCommandChannel = false;
 	protected boolean DEBUG = true;
 	protected Sender sender;
 	protected PlayerSender player;
@@ -48,6 +49,10 @@ public abstract class VCommand extends Arguments implements Constant {
 	protected TextChannel textChannel;
 	protected Guild guild;
 
+	public boolean isOnlyInCommandChannel() {
+		return onlyInCommandChannel;
+	}
+	
 	/**
 	 * Permet de savoir le nombre de parent de façon récursive
 	 * 

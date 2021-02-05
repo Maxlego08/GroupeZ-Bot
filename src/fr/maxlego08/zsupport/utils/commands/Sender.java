@@ -18,4 +18,6 @@ public interface Sender extends Constant{
 
 	boolean hasPermission(Permission permission);
 	
+	void sendEmbed(Message message, boolean delete);
+	
 }

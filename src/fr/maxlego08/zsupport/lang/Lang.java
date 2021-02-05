@@ -34,7 +34,7 @@ public class Lang {
 		frMessage.put(Message.TICKET_PLUGIN_ROLE,
 				"Vous avez déjà confirmé l'achat du plugin, vous pouvez directement poser votre question.");
 		frMessage.put(Message.TICKET_PLUGIN_ROLE_ERROR,
-				"Vous n'avez pas confirmé l'achat du plugin, pour confirmer l'achat vous devez donner l'identifiant de la transaction Paypal.");
+				"Vous n'avez pas confirmé l'achat du plugin. Une verification est en cours.");
 		frMessage.put(Message.TICKET_PLUGIN_ROLE_ERROR_ID,
 				"Vous devez envoyer **uniquement** l'id de la transaction pour qu'une vérification soit faite.");
 		frMessage.put(Message.TICKET_PLUGIN_ROLE_ID_SUCCESS,
@@ -53,7 +53,7 @@ public class Lang {
 		usMessage.put(Message.TICKET_PLUGIN_ROLE,
 				"You have already confirmed the purchase of the plugin, you can directly ask your question.");
 		usMessage.put(Message.TICKET_PLUGIN_ROLE_ERROR,
-				"You have not confirmed the purchase of the plugin, to confirm the purchase you must give the identifier of the Paypal transaction.");
+				"You have not confirmed the purchase of the plugin, A check is in progress.");
 		usMessage.put(Message.TICKET_PLUGIN_ROLE_ERROR_ID,
 				"You must send **only** the transaction id for a verification to be made.");
 		usMessage.put(Message.TICKET_PLUGIN_ROLE_ID_SUCCESS,

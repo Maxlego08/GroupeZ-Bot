@@ -1,5 +1,6 @@
 package fr.maxlego08.zsupport.command;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.command.commands.CommandClear;
 import fr.maxlego08.zsupport.command.commands.CommandServer;
 import fr.maxlego08.zsupport.command.commands.CommandStop;
+import fr.maxlego08.zsupport.command.commands.CommandVerify;
 import fr.maxlego08.zsupport.command.commands.tickets.CommandTicketSet;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.Message;
@@ -14,6 +16,8 @@ import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.utils.commands.ConsoleSender;
 import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import fr.maxlego08.zsupport.utils.commands.Sender;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class CommandManager extends ZUtils implements Constant {
@@ -24,11 +28,12 @@ public class CommandManager extends ZUtils implements Constant {
 	public CommandManager(ZSupport support) {
 		super();
 		this.support = support;
-		
+
 		registetCommand("stop", new CommandStop(this), "end");
 		registetCommand("ticketset", new CommandTicketSet(this));
 		registetCommand("server", new CommandServer(this));
 		registetCommand("clear", new CommandClear(this));
+		registetCommand("verify", new CommandVerify(this));
 	}
 
 	public VCommand addCommand(VCommand command) {
@@ -44,6 +49,14 @@ public class CommandManager extends ZUtils implements Constant {
 		return command;
 	}
 
+	/**
+	 * 
+	 * @param sender
+	 * @param cmd
+	 * @param args
+	 * @param event
+	 * @return
+	 */
 	public boolean onCommand(Sender sender, String cmd, String[] args, MessageReceivedEvent event) {
 		for (VCommand command : commands) {
 			if (command.getSubCommands().contains(cmd.toLowerCase())) {
@@ -59,7 +72,7 @@ public class CommandManager extends ZUtils implements Constant {
 					return true;
 			}
 		}
-		sender.sendMessage(Message.COMMAND_NOT_FOUND, true);
+		sender.sendEmbed(Message.COMMAND_NOT_FOUND, true);
 		return true;
 	}
 
@@ -115,16 +128,31 @@ public class CommandManager extends ZUtils implements Constant {
 			return CommandType.DEFAULT;
 		}
 		if (!(sender instanceof ConsoleSender) && !command.isPlayerCanUse()) {
-			sender.sendMessage(Message.COMMAND_NO_PLAYER, true);
+			sender.sendEmbed(Message.COMMAND_NO_PLAYER, true);
 			return CommandType.DEFAULT;
 		}
+		if (sender instanceof PlayerSender && command.isOnlyInCommandChannel()) {
+
+			TextChannel channel = event.getTextChannel();
+
+			if (channel.getIdLong() != CHANNEL_COMMAND) {
+				EmbedBuilder builder = new EmbedBuilder();
+				builder.setColor(Color.RED);
+				builder.setDescription(":x: You can not execute a command here !");
+				net.dv8tion.jda.api.entities.Message message = channel.sendMessage(builder.build()).complete();
+				schedule(1000 * 10, () -> message.delete().complete());
+				return CommandType.DEFAULT;
+			}
+
+		}
+
 		if (command.getPermission() == null || sender.hasPermission(command.getPermission())) {
 			CommandType returnType = command.prePerform(support, sender, strings, event);
 			if (returnType == CommandType.SYNTAX_ERROR)
 				sender.sendMessage(Message.COMMAND_SYNTAXE_ERROR, true, command.getSyntaxe());
 			return returnType;
 		}
-		sender.sendMessage(Message.COMMAND_NO_PERMISSION);
+		sender.sendEmbed(Message.COMMAND_NO_PERMISSION, true);
 		return CommandType.DEFAULT;
 	}
 

@@ -5,17 +5,20 @@ public class Plugin {
 	private final String name;
 	private final long emoteId;
 	private final long role;
+	private final int plugin_id;
 
 	/**
 	 * @param name
 	 * @param emoteId
 	 * @param role
+	 * @param plugin_id
 	 */
-	public Plugin(String name, long emoteId, long role) {
+	public Plugin(String name, long emoteId, long role, int plugin_id) {
 		super();
 		this.name = name;
 		this.emoteId = emoteId;
 		this.role = role;
+		this.plugin_id = plugin_id;
 	}
 
 	/**
@@ -23,6 +26,13 @@ public class Plugin {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * @return the plugin_id
+	 */
+	public int getPlugin_id() {
+		return plugin_id;
 	}
 
 	/**
@@ -37,16 +47,6 @@ public class Plugin {
 	 */
 	public long getRole() {
 		return role;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "Plugin [name=" + name + ", emoteId=" + emoteId + ", role=" + role + "]";
 	}
 
 }

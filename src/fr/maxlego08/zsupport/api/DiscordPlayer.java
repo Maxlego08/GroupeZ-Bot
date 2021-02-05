@@ -1,9 +1,12 @@
 package fr.maxlego08.zsupport.api;
 
+import java.awt.Color;
+
 import fr.maxlego08.zsupport.exception.ChannelNullException;
 import fr.maxlego08.zsupport.utils.Message;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.utils.commands.PlayerSender;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -72,6 +75,16 @@ public class DiscordPlayer extends ZUtils implements PlayerSender {
 	@Override
 	public boolean hasPermission(Permission permission) {
 		return member.hasPermission(permission);
+	}
+
+	@Override
+	public void sendEmbed(Message message, boolean delete) {
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setColor(Color.RED);
+		builder.setDescription(message.getMessage());
+		net.dv8tion.jda.api.entities.Message discordMessage = channel.sendMessage(builder.build()).complete();
+		if (delete)
+			schedule(1000 * 10, () -> discordMessage.delete().complete());
 	}
 
 }

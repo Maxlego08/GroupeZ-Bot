@@ -7,12 +7,10 @@ import java.util.List;
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.utils.Constant;
-import fr.maxlego08.zsupport.utils.Request;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.utils.storage.Persist;
 import fr.maxlego08.zsupport.utils.storage.Saveable;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 
@@ -136,38 +134,6 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 			}
 
 		}
-	}
-
-	public void onPlayerMessage(Guild guild, Member user, net.dv8tion.jda.api.entities.Message message,
-			TextChannel channel) {
-
-		Ticket ticket = getByUser(user.getUser());
-		// Le joueur a déjà un ticket
-		if (ticket != null && ticket.isPaypal()) {
-
-			ticket.paypalMessage(guild, user, message, channel);
-
-		}
-
-	}
-
-	/**
-	 * 
-	 * @param guild
-	 * @param member
-	 * @param channel
-	 * @param request
-	 */
-	public void payment(Guild guild, Member member, TextChannel channel, Request request) {
-
-		Ticket ticket = getByChannel(channel);
-		// Le joueur a déjà un ticket
-		if (ticket != null && ticket.isPaypal()) {
-
-			ticket.payment(guild, member, channel, request);
-
-		}
-
 	}
 
 }

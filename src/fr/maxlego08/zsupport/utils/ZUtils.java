@@ -1,6 +1,7 @@
 package fr.maxlego08.zsupport.utils;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,7 +22,7 @@ public class ZUtils {
 			}
 		}, delay);
 	}
-	
+
 	/**
 	 * 
 	 * @param items
@@ -60,7 +61,7 @@ public class ZUtils {
 	protected double percentNum(double total, double percent) {
 		return (double) (total * (percent / 100));
 	}
-	
+
 	/**
 	 * 
 	 * @param type
@@ -71,8 +72,30 @@ public class ZUtils {
 		return Lang.getInstance().getMessage(type, message);
 	}
 
-	protected boolean hasRole(Member member, long id){
+	protected boolean hasRole(Member member, long id) {
 		return member.getRoles().stream().filter(role -> role.getIdLong() == id).findAny().isPresent();
 	}
-	
+
+	/**
+	 * @param list
+	 * @param color
+	 * @param color2
+	 * @return
+	 */
+	protected String toList(List<String> list) {
+		if (list == null || list.size() == 0)
+			return null;
+		if (list.size() == 1)
+			return list.get(0);
+		String str = "";
+		for (int a = 0; a != list.size(); a++) {
+			if (a == list.size() - 1 && a != 0)
+				str += " and ";
+			else if (a != 0)
+				str += ", ";
+			str += list.get(a);
+		}
+		return str;
+	}
+
 }

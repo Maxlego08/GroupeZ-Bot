@@ -5,9 +5,11 @@ import java.time.OffsetDateTime;
 
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
+import fr.maxlego08.zsupport.api.DiscordPlayer;
 import fr.maxlego08.zsupport.lang.Message;
-import fr.maxlego08.zsupport.utils.Request;
 import fr.maxlego08.zsupport.utils.ZUtils;
+import fr.maxlego08.zsupport.utils.commands.PlayerSender;
+import fr.maxlego08.zsupport.verify.VerifyManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
@@ -15,6 +17,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 public class Ticket extends ZUtils {
 
@@ -23,8 +26,6 @@ public class Ticket extends ZUtils {
 	private final long guildId;
 	private final long userId;
 	private boolean isWaiting = true;
-	private boolean isPaypal = false;
-	private long pluginEmoteId;
 	private String name;
 
 	/**
@@ -144,13 +145,16 @@ public class Ticket extends ZUtils {
 
 		this.channelId = channel.getIdLong();
 
-		channel.createPermissionOverride(member).setAllow(Permission.MESSAGE_READ).queue();
+		// Gestion des permissions
+		PermissionOverrideAction permissionOverrideAction1 = channel.createPermissionOverride(member);
+		permissionOverrideAction1.setAllow(Permission.MESSAGE_READ).complete();
+
 		channel.sendMessage(user.getAsMention()).queue((message) -> message.delete().queue());
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("GroupeZ - Support");
 		builder.setColor(Color.getHSBColor(45, 45, 45));
-		builder.setFooter("2020 - " + guild.getName(), guild.getIconUrl());
+		builder.setFooter("2021 - " + guild.getName(), guild.getIconUrl());
 		builder.setTimestamp(OffsetDateTime.now());
 
 		StringBuilder stringBuilder = new StringBuilder();
@@ -193,7 +197,8 @@ public class Ticket extends ZUtils {
 		Member member = guild.getMember(user);
 		TextChannel channel = guild.getTextChannelById(channelId);
 
-		channel.putPermissionOverride(member).setAllow(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue();
+		PermissionOverrideAction permissionOverrideAction = channel.putPermissionOverride(member);
+		permissionOverrideAction.setAllow(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue();
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("GroupeZ - Support");
@@ -213,12 +218,14 @@ public class Ticket extends ZUtils {
 
 		if (!hasRole(member, plugin.getRole())) {
 			message += getMessage(Message.TICKET_PLUGIN_ROLE_ERROR);
-			message += "\n";
-			message += getMessage(Message.TICKET_PLUGIN_ROLE_ERROR_ID);
-			builder.setImage("http://img.groupez.xyz/paypal.png");
-			this.isPaypal = true;
-		} else
-			message += getMessage(Message.TICKET_PLUGIN_ROLE);
+
+			PlayerSender sender = new DiscordPlayer(user, member, channel);
+			VerifyManager manager = VerifyManager.getInstance();
+			manager.submitData(user, channel, sender, false);
+
+		}
+
+		message += getMessage(Message.TICKET_PLUGIN_ROLE);
 
 		stringBuilder.append(message);
 
@@ -226,98 +233,7 @@ public class Ticket extends ZUtils {
 		channel.sendMessage(builder.build()).queue();
 
 		this.isWaiting = false;
-		this.pluginEmoteId = plugin.getEmoteId();
-	}
 
-	public boolean isPaypal() {
-		return isPaypal;
-	}
-
-	public void paypalMessage(Guild guild, Member user, net.dv8tion.jda.api.entities.Message message,
-			TextChannel channel) {
-
-		if (!isPaypal())
-			return;
-
-		String content = message.getContentRaw();
-
-		if (content.length() != 17) {
-
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("GroupeZ - Support");
-			builder.setColor(Color.getHSBColor(45, 45, 45));
-			builder.setFooter("Hébergeur minecraft: https://minestrator.com/?ref=1640");
-			builder.setTimestamp(OffsetDateTime.now());
-
-			String msg = getMessage(type, Message.TICKET_PLUGIN_ROLE_ERROR_ID);
-			builder.setImage("http://img.groupez.xyz/paypal.png");
-			builder.setDescription(msg);
-
-			message.delete().complete();
-			net.dv8tion.jda.api.entities.Message discordMessage = channel.sendMessage(builder.build()).complete();
-			schedule(1000 * 10, () -> {
-				if (discordMessage != null)
-					discordMessage.delete().complete();
-			});
-
-		} else {
-
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("GroupeZ - Support");
-			builder.setColor(Color.getHSBColor(45, 45, 45));
-			builder.setFooter("Hébergeur minecraft: https://minestrator.com/?ref=1640");
-			builder.setTimestamp(OffsetDateTime.now());
-
-			String msg = getMessage(type, Message.TICKET_PLUGIN_ROLE_ID_SUCCESS);
-			builder.setDescription(msg);
-			net.dv8tion.jda.api.entities.Message message2 = channel.sendMessage(builder.build()).complete();
-			message2.addReaction("✅").queue();
-			message2.addReaction("❌").queue();
-
-			channel.sendMessage(guild.getJDA().getUserById(522359210844094479l).getAsMention())
-					.queue(c -> c.delete().queue());
-
-			channel.putPermissionOverride(user).setAllow(Permission.MESSAGE_READ).queue();
-
-		}
-
-	}
-
-	/**
-	 * 
-	 * @param guild
-	 * @param member
-	 * @param channel
-	 * @param request
-	 */
-	public void payment(Guild guild, Member member, TextChannel channel, Request request) {
-
-		if (!isPaypal)
-			return;
-
-		isPaypal = false;
-		Member currentMember = guild.getMemberById(userId);
-		channel.putPermissionOverride(currentMember).setAllow(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ)
-				.queue();
-
-		Plugin plugin = Config.plugins.stream().filter(pl -> pl.getEmoteId() == pluginEmoteId).findAny().orElse(null);
-		if (plugin == null)
-			return;
-
-		if (request.equals(Request.VALID)) {
-
-			guild.addRoleToMember(currentMember, guild.getJDA().getRoleById(plugin.getRole())).complete();
-
-			String message = getMessage(Message.TICKET_PLUGIN_ROLE_SUCCESS);
-			message = message.replace("%plugin%", plugin.getName());
-			channel.sendMessage(message).complete();
-
-		} else {
-
-			String message = getMessage(Message.TICKET_PLUGIN_ROLE_ERROR_GIVE);
-			message = message.replace("%plugin%", plugin.getName());
-			channel.sendMessage(message).complete();
-		}
 	}
 
 }
