@@ -9,52 +9,28 @@
       "name": "ticket-#0429"
     },
     {
-      "type": "FR",
-      "channelId": 804053742231355462,
-      "guildId": 511516467615760405,
-      "userId": 295515087731556362,
-      "isWaiting": false,
-      "name": "ticket-#0437"
-    },
-    {
       "type": "US",
-      "channelId": 804362386991087647,
+      "channelId": 808811297423622144,
       "guildId": 511516467615760405,
-      "userId": 311545571938664449,
-      "isWaiting": true,
-      "name": "ticket-#0440"
+      "userId": 677141533547560963,
+      "isWaiting": false,
+      "name": "ticket-#0471"
     },
     {
       "type": "FR",
-      "channelId": 806116324950540318,
-      "guildId": 511516467615760405,
-      "userId": 276431648378322944,
-      "isWaiting": false,
-      "name": "ticket-#0451"
-    },
-    {
-      "type": "US",
-      "channelId": 806231551872204842,
-      "guildId": 511516467615760405,
-      "userId": 766795560274493440,
-      "isWaiting": false,
-      "name": "ticket-#0452"
-    },
-    {
-      "type": "US",
-      "channelId": 806795070790434836,
-      "guildId": 511516467615760405,
-      "userId": 413002874168279042,
-      "isWaiting": false,
-      "name": "ticket-#0455"
-    },
-    {
-      "type": "FR",
-      "channelId": 807226135532142644,
+      "channelId": 828921530309541928,
       "guildId": 511516467615760405,
       "userId": 441309324703432714,
       "isWaiting": false,
-      "name": "ticket-#0461"
+      "name": "ticket-#0482"
+    },
+    {
+      "type": "US",
+      "channelId": 828922328247304222,
+      "guildId": 511516467615760405,
+      "userId": 522359210844094479,
+      "isWaiting": true,
+      "name": "ticket-#0483"
     }
   ]
 }

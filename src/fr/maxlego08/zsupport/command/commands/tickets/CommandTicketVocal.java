@@ -1,21 +1,20 @@
-package fr.maxlego08.zsupport.command.commands;
+package fr.maxlego08.zsupport.command.commands.tickets;
 
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.command.CommandManager;
 import fr.maxlego08.zsupport.command.CommandType;
 import fr.maxlego08.zsupport.command.VCommand;
 
-public class CommandStop extends VCommand {
+public class CommandTicketVocal extends VCommand {
 
-	public CommandStop(CommandManager commandManager) {
+	public CommandTicketVocal(CommandManager commandManager) {
 		super(commandManager);
-		playerCanUse = false;
+		this.consoleCanUse = false;
 	}
 
 	@Override
 	protected CommandType perform(ZSupport main) {
-		sender.sendMessage("Désactivation du bot.");
-		main.getCommandListener().onDisable();
+		main.getTicketManager().createVocal(player, textChannel, guild);
 		return CommandType.SUCCESS;
 	}
 

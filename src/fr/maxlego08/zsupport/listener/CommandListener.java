@@ -60,13 +60,15 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 		return test.toArray(new String[0]);
 	}
 
-	public void setRunning(boolean isRunning) {
-		this.isRunning = isRunning;
+	public void onDisable() {
+		instance.onDisable();
+		this.isRunning = false;
 	}
 
 	@Override
 	public void run() {
 		isRunning = true;
+		
 		while (isRunning) {
 			if (scanner.hasNextLine()) {
 
@@ -79,8 +81,8 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 				instance.getCommandManager().onCommand(sender, commande, args, null);
 			}
 		}
+		
 		scanner.close();
-		instance.onDisable();
 
 		System.out.println(PREFIX_CONSOLE + "Disconnect !");
 		System.exit(0);

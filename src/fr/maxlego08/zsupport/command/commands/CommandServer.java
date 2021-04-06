@@ -22,7 +22,7 @@ public class CommandServer extends VCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Server Info");
 		builder.setColor(Color.getHSBColor(45, 45, 45));
-		builder.setFooter("2020 - " + guild.getName(), guild.getIconUrl());
+		builder.setFooter("2021 - " + guild.getName(), guild.getIconUrl());
 
 		builder.addField("Name of discord", guild.getName(), true);
 		builder.addField("Founder of discord", guild.getMemberById(522359210844094479l).getAsMention(), true);

@@ -8,11 +8,16 @@ import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.ZUtils;
+import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import fr.maxlego08.zsupport.utils.storage.Persist;
 import fr.maxlego08.zsupport.utils.storage.Saveable;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 public class TicketManager extends ZUtils implements Constant, Saveable {
 
@@ -134,6 +139,27 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 			}
 
 		}
+	}
+
+	public void createVocal(PlayerSender player, TextChannel textChannel, Guild guild) {
+		if (player.hasPermission(Permission.MANAGE_CHANNEL)) {
+
+			Ticket ticket = getByChannel(textChannel);
+			if (ticket == null) {
+				System.out.println("Impossible de trouver le ticket.");
+				return;
+			}
+
+			Member member = guild.getMemberById(ticket.getUserId());
+
+			VoiceChannel channel = guild.getCategoryById(Config.ticketCategoryId)
+					.createVoiceChannel("vocal-" + ticket.getName()).complete();
+			PermissionOverrideAction permissionOverrideAction = channel.createPermissionOverride(member);
+			permissionOverrideAction.setAllow(Permission.VOICE_CONNECT, Permission.VOICE_SPEAK, Permission.MESSAGE_READ)
+					.complete();
+
+		} else
+			player.sendMessage("You don't have permission");
 	}
 
 }

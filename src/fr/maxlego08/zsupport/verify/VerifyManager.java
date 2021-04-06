@@ -9,7 +9,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -153,7 +152,7 @@ public class VerifyManager extends ZUtils {
 
 		builder.setTitle("GroupeZ - " + user.getAsTag());
 		builder.setColor(Color.getHSBColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
-		builder.setFooter("2020 - " + guild.getName(), guild.getIconUrl());
+		builder.setFooter("2021 - " + guild.getName(), guild.getIconUrl());
 
 		if (roles.size() == 1) {
 			builder.setDescription("You just got the role: " + roles.get(0).getAsMention());

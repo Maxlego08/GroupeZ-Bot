@@ -6,10 +6,13 @@ import java.util.List;
 
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.command.commands.CommandClear;
+import fr.maxlego08.zsupport.command.commands.CommandDocumentation;
+import fr.maxlego08.zsupport.command.commands.CommandRoles;
 import fr.maxlego08.zsupport.command.commands.CommandServer;
 import fr.maxlego08.zsupport.command.commands.CommandStop;
 import fr.maxlego08.zsupport.command.commands.CommandVerify;
 import fr.maxlego08.zsupport.command.commands.tickets.CommandTicketSet;
+import fr.maxlego08.zsupport.command.commands.tickets.CommandTicketVocal;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.Message;
 import fr.maxlego08.zsupport.utils.ZUtils;
@@ -31,7 +34,10 @@ public class CommandManager extends ZUtils implements Constant {
 
 		registetCommand("stop", new CommandStop(this), "end");
 		registetCommand("ticketset", new CommandTicketSet(this));
+		registetCommand("vocal", new CommandTicketVocal(this));
 		registetCommand("server", new CommandServer(this));
+		registetCommand("roles", new CommandRoles(this));
+		registetCommand("documentation", new CommandDocumentation(this), "d", "doc", "docs");
 		registetCommand("clear", new CommandClear(this));
 		registetCommand("verify", new CommandVerify(this));
 	}

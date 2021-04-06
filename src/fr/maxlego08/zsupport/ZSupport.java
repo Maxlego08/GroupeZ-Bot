@@ -3,6 +3,8 @@ package fr.maxlego08.zsupport;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.security.auth.login.LoginException;
 
@@ -71,14 +73,14 @@ public class ZSupport implements Constant {
 		System.out.println(PREFIX_CONSOLE + "Chargement du bot");
 
 		List<GatewayIntent> list = new ArrayList<>();
-		
+
 		list.add(GatewayIntent.GUILD_MEMBERS);
 		list.add(GatewayIntent.GUILD_EMOJIS);
 		list.add(GatewayIntent.DIRECT_MESSAGES);
 		list.add(GatewayIntent.GUILD_MESSAGE_REACTIONS);
 		list.add(GatewayIntent.GUILD_MESSAGES);
 		list.add(GatewayIntent.GUILD_MESSAGE_TYPING);
-		
+
 		JDABuilder builder = JDABuilder.create(Config.botToken, list);
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
 		jda = builder.build();
@@ -90,6 +92,14 @@ public class ZSupport implements Constant {
 
 		System.out.println(PREFIX_CONSOLE + "Bot lancé avec succès !");
 
+		Timer timer = new Timer();
+		long period = 1000 * 60 * 30;
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				saveables.forEach(save -> save.save(persist));
+			}
+		}, period, period);
 	}
 
 	public GsonBuilder getGsonBuilder() {
@@ -110,9 +120,12 @@ public class ZSupport implements Constant {
 	}
 
 	public void onDisable() {
+		this.saveables.forEach(save -> {
+			System.out.println("Sauvegarde de " + save.getClass().getName());
+			save.save(persist);
+		});
+		System.out.println("Shutdown de JDA");
 		jda.shutdownNow();
-
-		this.saveables.forEach(save -> save.save(persist));
 	}
 
 	public CommandListener getCommandListener() {
