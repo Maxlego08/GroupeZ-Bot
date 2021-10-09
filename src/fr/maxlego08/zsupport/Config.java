@@ -10,7 +10,7 @@ import fr.maxlego08.zsupport.utils.storage.Saveable;
 
 public class Config implements Saveable {
 
-	public static String botToken = "NTExNTM0MjAxMTcxMDgzMjY0.XsPn1w.PUUZDNkzDqAK8l2cWtdyCFWVFiY";
+	public static String botToken = "groupez.dev.token.secret";
 	public static int ticketNumber = 1;
 	public static Long ticketCategoryId = 511517312067829766l;
 	public static long ticketChannel = 712305238748692572l;
