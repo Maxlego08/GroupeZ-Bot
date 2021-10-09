@@ -1,0 +1,9 @@
+# Don't track content of these folders
+target/
+bin/
+.settings/
+.classpath
+.project
+config.json
+roles.json
+ticketmanager.json
