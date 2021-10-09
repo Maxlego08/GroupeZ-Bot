@@ -8,7 +8,7 @@ public enum Message {
 	COMMAND_NO_PERMISSION(":x: You do not have permission to execute this command.."),
 	COMMAND_SYNTAXE_ERROR(":x: You have to execute the command like this: %s"),
 	
-	VERIFY_ERROR(":x: Unable to find you on https://groupez.xyz. Please check if your discord is correct."),
+	VERIFY_ERROR(":x: Unable to find you on https://groupez.dev. Please check if your discord is correct."),
 	VERIFY_ERROR_EMPTY(":x: You have not purchased any plugin."),
 	VERIFY_ERROR_ALREADY(":x: You already have roles from your purchased plugins."),
 	

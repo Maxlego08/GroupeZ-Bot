@@ -23,9 +23,12 @@ public class CommandDocumentation extends VCommand {
 		builder.setTitle("Server Info");
 		builder.setColor(Color.getHSBColor(45, 45, 45));
 		builder.setFooter("2021 - " + guild.getName(), guild.getIconUrl());
-		builder.setDescription("zAuctionHouse documentation: https://zauctionhouse.groupez.xyz/"
+		builder.setDescription("zAuctionHouse documentation: https://zauctionhouse.groupez.dev"
 				+"\n"
-				+"zShop documentation: https://github.com/Maxlego08/zShop-API/wiki");
+				+"zShop documentation: https://github.com/Maxlego08/zShop-API/wiki"
+				+"\n"
+				+"GroupeZ website documentation: https://docs.groupez.dev"
+				);
 
 		textChannel.sendTyping().queue();
 		textChannel.sendMessage(builder.build()).complete();

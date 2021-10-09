@@ -73,7 +73,7 @@ public class VerifyManager extends ZUtils {
 	private void sendData(User user, TextChannel textChannel, PlayerSender sender, boolean delete)
 			throws Exception {
 
-		String url = "https://groupez.xyz/api/discord";
+		String url = "https://groupez.dev/api/v1/discord";
 		URL obj = new URL(url);
 		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
