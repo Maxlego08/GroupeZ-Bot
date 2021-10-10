@@ -70,10 +70,17 @@ public class VerifyManager extends ZUtils {
 		}).start();
 	}
 
-	private void sendData(User user, TextChannel textChannel, PlayerSender sender, boolean delete)
-			throws Exception {
+	/**
+	 * 
+	 * @param user
+	 * @param textChannel
+	 * @param sender
+	 * @param delete
+	 * @throws Exception
+	 */
+	private void sendData(User user, TextChannel textChannel, PlayerSender sender, boolean delete) throws Exception {
 
-		String url = "https://groupez.dev/api/v1/discord";
+		String url = "https://groupez.dev/api/v1/discord/" + user.getIdLong();
 		URL obj = new URL(url);
 		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
@@ -82,12 +89,9 @@ public class VerifyManager extends ZUtils {
 		con.setRequestProperty("User-Agent", USER__AGENT);
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-		String urlParameters = "discord=" + user.getAsTag();
-
 		// Send post request
 		con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-		wr.writeBytes(urlParameters);
 		wr.flush();
 		wr.close();
 
