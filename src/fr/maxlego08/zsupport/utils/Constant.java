@@ -9,4 +9,5 @@ public interface Constant {
 	final long CHANNEL_COMMAND = 714518716943171605l;
 	final long ROLE_NOT_ROBOT = 527778142421647360l; /* IRobot */
 	final long ROLE_DEFAULT = 511544747572330506l; /* Simple Parleur */
+	long SUGGEST_CHANNEL = 722008369355030588L;
 }

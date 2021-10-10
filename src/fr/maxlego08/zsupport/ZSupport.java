@@ -14,6 +14,7 @@ import com.google.gson.GsonBuilder;
 import fr.maxlego08.zsupport.command.CommandManager;
 import fr.maxlego08.zsupport.listener.CommandListener;
 import fr.maxlego08.zsupport.listener.MemberListener;
+import fr.maxlego08.zsupport.listener.SuggestListener;
 import fr.maxlego08.zsupport.role.RoleManager;
 import fr.maxlego08.zsupport.tickets.TicketListener;
 import fr.maxlego08.zsupport.tickets.TicketManager;
@@ -36,6 +37,7 @@ public class ZSupport implements Constant {
 	private final Persist persist;
 	private final TicketManager ticketManager;
 	private final TicketListener ticketListener;
+	private final SuggestListener suggestListener;
 	private final MemberListener memberListener;
 	public static ZSupport instance;
 	// private final XpListener xpListener;
@@ -59,6 +61,7 @@ public class ZSupport implements Constant {
 		memberListener = new MemberListener();
 		ticketManager = new TicketManager(this);
 		ticketListener = new TicketListener(ticketManager);
+		this.suggestListener = new SuggestListener();
 		// xpListener = new XpListener(this);
 
 		this.saveables.add(Config.getInstance());
@@ -88,9 +91,10 @@ public class ZSupport implements Constant {
 		jda.addEventListener(commandListener);
 		jda.addEventListener(ticketListener);
 		jda.addEventListener(memberListener);
+		jda.addEventListener(suggestListener);
 		// jda.addEventListener(xpListener);
 
-		System.out.println(PREFIX_CONSOLE + "Bot lancé avec succès !");
+		System.out.println(PREFIX_CONSOLE + "Bot lancÃ© avec succÃ¨s !");
 
 		Timer timer = new Timer();
 		long period = 1000 * 60 * 30;
