@@ -26,7 +26,7 @@ public class TicketListener extends ListenerAdapter {
 			if (emote.toString().equals("RE:U+1f1ebU+1f1f7"))
 				langType = LangType.FR;
 
-			manager.createTicket(event.getUser(), event.getGuild(), langType);
+			manager.createTicket(event.getUser(), event.getGuild(), langType, event.getChannel());
 			event.getReaction().removeReaction(event.getUser()).queue();
 
 		} else {

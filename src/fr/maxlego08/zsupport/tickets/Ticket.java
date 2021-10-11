@@ -2,6 +2,7 @@ package fr.maxlego08.zsupport.tickets;
 
 import java.awt.Color;
 import java.time.OffsetDateTime;
+import java.util.function.Consumer;
 
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
@@ -134,48 +135,57 @@ public class Ticket extends ZUtils {
 	}
 
 	/**
-	 * Création du ticket
+	 * 
+	 * @param user
+	 * @param guild
+	 * @param ticketName
 	 */
-	public void build(User user, Guild guild, String ticketName) {
+	public void build(User user, Guild guild, String ticketName, Consumer<TextChannel> consumer) {
 
 		this.name = ticketName;
 		Member member = guild.getMember(user);
 
-		TextChannel channel = guild.getCategoryById(Config.ticketCategoryId).createTextChannel(ticketName).complete();
+		guild.getCategoryById(Config.ticketCategoryId).createTextChannel(ticketName).queue(channel -> {
 
-		this.channelId = channel.getIdLong();
+			this.channelId = channel.getIdLong();
 
-		// Gestion des permissions
-		PermissionOverrideAction permissionOverrideAction1 = channel.createPermissionOverride(member);
-		permissionOverrideAction1.setAllow(Permission.MESSAGE_READ).complete();
+			channel.sendMessage(user.getAsMention()).queue(message -> message.delete().queue());
 
-		channel.sendMessage(user.getAsMention()).queue((message) -> message.delete().queue());
+			// Gestion des permissions
+			PermissionOverrideAction permissionOverrideAction1 = channel.createPermissionOverride(member);
+			permissionOverrideAction1.setAllow(Permission.MESSAGE_READ).queue();
 
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle("GroupeZ - Support");
-		builder.setColor(Color.getHSBColor(45, 45, 45));
-		builder.setFooter("2021 - " + guild.getName(), guild.getIconUrl());
-		builder.setTimestamp(OffsetDateTime.now());
+			channel.sendMessage(user.getAsMention()).queue((message) -> message.delete().queue());
 
-		StringBuilder stringBuilder = new StringBuilder();
+			EmbedBuilder builder = new EmbedBuilder();
+			builder.setTitle("GroupeZ - Support");
+			builder.setColor(Color.getHSBColor(45, 45, 45));
+			builder.setFooter("2021 - " + guild.getName(), guild.getIconUrl());
+			builder.setTimestamp(OffsetDateTime.now());
 
-		stringBuilder.append(getMessage(type, Message.TICKET_DESC));
-		stringBuilder.append("\n");
-		stringBuilder.append("\n");
-		stringBuilder.append(getMessage(type, Message.TICKET_PLUGIN_CHOOSE));
-		stringBuilder.append("\n");
+			StringBuilder stringBuilder = new StringBuilder();
 
-		for (Plugin plugin : Config.plugins) {
-
-			stringBuilder.append(guild.getEmoteById(plugin.getEmoteId()).getAsMention() + " " + plugin.getName());
+			stringBuilder.append(getMessage(type, Message.TICKET_DESC));
 			stringBuilder.append("\n");
-		}
+			stringBuilder.append("\n");
+			stringBuilder.append(getMessage(type, Message.TICKET_PLUGIN_CHOOSE));
+			stringBuilder.append("\n");
 
-		builder.setDescription(stringBuilder.toString());
+			for (Plugin plugin : Config.plugins) {
 
-		net.dv8tion.jda.api.entities.Message message = channel.sendMessage(builder.build()).complete();
-		for (Plugin plugin : Config.plugins)
-			message.addReaction(guild.getEmoteById(plugin.getEmoteId())).queue();
+				stringBuilder.append(guild.getEmoteById(plugin.getEmoteId()).getAsMention() + " " + plugin.getName());
+				stringBuilder.append("\n");
+			}
+
+			builder.setDescription(stringBuilder.toString());
+
+			channel.sendMessage(builder.build()).queue(message -> {
+				for (Plugin plugin : Config.plugins)
+					message.addReaction(guild.getEmoteById(plugin.getEmoteId())).queue();
+			});
+			
+			consumer.accept(channel);
+		});
 
 	}
 

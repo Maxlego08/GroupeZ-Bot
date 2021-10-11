@@ -3,6 +3,7 @@ package fr.maxlego08.zsupport.verify;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -68,6 +69,48 @@ public class VerifyManager extends ZUtils {
 				}
 			}
 		}).start();
+	}
+
+	/**
+	 * Permet de vérifier si l'utilisateur peut créer un ticket
+	 * 
+	 * @param user
+	 * @param runnableSuccess
+	 * @param runnableError
+	 */
+	public void userIsLink(User user, Runnable runnableSuccess, Runnable runnableError) {
+		try {
+			String url = "https://groupez.dev/api/v1/discord/" + user.getIdLong();
+			URL obj = new URL(url);
+			HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
+
+			// add reuqest header
+			con.setRequestMethod("POST");
+			con.setRequestProperty("User-Agent", USER__AGENT);
+			con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+			// Send post request
+			con.setDoOutput(true);
+			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+			wr.flush();
+			wr.close();
+
+			int responseCode;
+			responseCode = con.getResponseCode();
+
+			// System.out.println("\nSending 'POST' request to URL : " + url);
+			// System.out.println("Post parameters : " + urlParameters);
+			// System.out.println("Response Code : " + responseCode);
+
+			if (responseCode != 200) {
+				runnableError.run();
+				return;
+			}
+
+			runnableSuccess.run();
+		} catch (IOException e) {
+			runnableError.run();
+		}
 	}
 
 	/**

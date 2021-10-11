@@ -2,6 +2,10 @@ package fr.maxlego08.zsupport.lang;
 
 public enum Message {
 
+	TICKET_CREATE_WAIT,
+	TICKET_CREATE_SUCCESS,
+	TICKET_CREATE_ERROR,
+	
 	TICKET_ALREADY_CREATE,
 	TICKET_DESC,
 	TICKET_PLUGIN_CHOOSE,
