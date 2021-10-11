@@ -124,7 +124,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 					builder.setDescription(this.getMessage(type, Message.TICKET_CREATE_ERROR));
 					builder.setColor(Color.getHSBColor(250, 45, 45));
-					
+
 					message.editMessage(builder.build()).queue(messageEdit -> {
 						schedule(1000 * 10, () -> messageEdit.delete().queue());
 					});
@@ -143,21 +143,9 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 */
 	private String getTicketFormat() {
 		int ticket = Config.ticketNumber;
-		String tickets = "";
-		if (ticket < 10) {
-			tickets = "000" + ticket;
-		}
-		if (ticket < 100 && ticket >= 10) {
-			tickets = "00" + ticket;
-		}
-		if (ticket >= 100 && ticket < 1000) {
-			tickets = "0" + ticket;
-		}
-		if (ticket > 1000) {
-			tickets = "" + ticket;
-		}
+		String tickets = String.format("ticket-#%04d", ticket);
 		Config.ticketNumber++;
-		return "ticket-#" + tickets;
+		return tickets;
 	}
 
 	@Override

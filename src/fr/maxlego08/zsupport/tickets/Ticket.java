@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.managers.ChannelManager;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 public class Ticket extends ZUtils {
@@ -183,7 +184,7 @@ public class Ticket extends ZUtils {
 				for (Plugin plugin : Config.plugins)
 					message.addReaction(guild.getEmoteById(plugin.getEmoteId())).queue();
 			});
-			
+
 			consumer.accept(channel);
 		});
 
@@ -241,6 +242,9 @@ public class Ticket extends ZUtils {
 
 		builder.setDescription(stringBuilder.toString());
 		channel.sendMessage(builder.build()).queue();
+
+		ChannelManager channelManager = channel.getManager();
+		channelManager.setName(channel.getName() + "-" + plugin.getName()).queue();	
 
 		this.isWaiting = false;
 
