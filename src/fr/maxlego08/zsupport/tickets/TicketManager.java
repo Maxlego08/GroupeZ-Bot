@@ -22,6 +22,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.managers.ChannelManager;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 public class TicketManager extends ZUtils implements Constant, Saveable {
@@ -199,6 +200,23 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 		} else
 			player.sendMessage("You don't have permission");
+	}
+
+	/**
+	 * Call when user leave discord with a ticket
+	 * 
+	 * @param guild
+	 * @param user
+	 */
+	public void userLeave(Guild guild, User user) {
+		Ticket ticket = this.getByUser(user);
+		if (ticket != null) {
+
+			TextChannel channel = guild.getTextChannelById(ticket.getChannelId());
+			ChannelManager channelManager = channel.getManager();
+			channelManager.setName("user-leave").queue();
+
+		}
 	}
 
 }

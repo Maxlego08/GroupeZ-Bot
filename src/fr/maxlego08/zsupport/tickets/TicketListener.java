@@ -1,7 +1,10 @@
 package fr.maxlego08.zsupport.tickets;
 
 import fr.maxlego08.zsupport.Config;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.MessageReaction.ReactionEmote;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -42,6 +45,14 @@ public class TicketListener extends ListenerAdapter {
 
 			} 
 		}
+	}
+	
+	@Override
+	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
+
+		User user = event.getUser();
+		Guild guild = event.getGuild();
+		manager.userLeave(guild, user);
 	}
 	
 }
