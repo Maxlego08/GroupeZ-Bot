@@ -31,11 +31,16 @@ public class CommandTicketSet extends VCommand {
 		String desc = "";
 
 		desc += ":flag_fr: Clique pour créer un ticket";
+		desc += "\n:warning:Veuillez vérifier que votre compte discord est bien relié sur le site.";
+		desc += "\n";
 		desc += "\n";
 		desc += ":flag_us: Click for create a ticket";
+		desc += "\n:warning: Please check that your discord account is linked to the site.";
 
 		builder.setDescription(desc);
 
+		builder.setImage("https://img.groupez.dev/groupez/link-discord.gif");
+		
 		textChannel.sendTyping().queue();
 		Message message = textChannel.sendMessage(builder.build()).complete();
 		message.addReaction("🇺🇸").queue();

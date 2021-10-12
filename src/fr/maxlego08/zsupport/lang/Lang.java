@@ -41,6 +41,10 @@ public class Lang {
 				"Votre demande a bien été prise en compte, un administrateur va rapidement vérifier le paiement.");
 		frMessage.put(Message.TICKET_PLUGIN_ROLE_SUCCESS, "Vous venez de reçevoir le rôle pour le plugin %plugin%");
 		frMessage.put(Message.TICKET_PLUGIN_ROLE_ERROR_GIVE, "Impossible de prouver que vous avez acheter le plugin %plugin%.");
+		
+		frMessage.put(Message.TICKET_CREATE_ERROR, ":x: Impossible de créer votre ticket, veuillez vérifier que votre compte discord est correctement relié au site.");
+		frMessage.put(Message.TICKET_CREATE_SUCCESS, "Votre ticket est disponible ici : ");
+		frMessage.put(Message.TICKET_CREATE_WAIT, "Vérification de la liaison de votre compte discord en cours, veuillez patienter.");
 
 		// US
 		Map<Message, String> usMessage = new HashMap<>();
@@ -61,6 +65,10 @@ public class Lang {
 		usMessage.put(Message.TICKET_PLUGIN_ROLE_SUCCESS, "You have just received the role for the plugin %plugin%");
 		usMessage.put(Message.TICKET_PLUGIN_ROLE_ERROR_GIVE, "Unable to prove that you purchased the %plugin% plugin.");
 
+		usMessage.put(Message.TICKET_CREATE_ERROR, ":x: Unable to create your ticket, please check that your discord account is correctly linked to the site.");
+		usMessage.put(Message.TICKET_CREATE_SUCCESS, "Your ticket is available here: ");
+		usMessage.put(Message.TICKET_CREATE_WAIT, "Verification of the connection of your discord account in progress, please wait.");
+		
 		messages.put(LangType.FR, frMessage);
 		messages.put(LangType.US, usMessage);
 	}

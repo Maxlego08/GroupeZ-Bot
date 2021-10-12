@@ -1,22 +1,28 @@
 package fr.maxlego08.zsupport.tickets;
 
+import java.awt.Color;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
+import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import fr.maxlego08.zsupport.utils.storage.Persist;
 import fr.maxlego08.zsupport.utils.storage.Saveable;
+import fr.maxlego08.zsupport.verify.VerifyManager;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.managers.ChannelManager;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 public class TicketManager extends ZUtils implements Constant, Saveable {
@@ -67,20 +73,66 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 		return Config.plugins.stream().filter(l -> l.getEmoteId() == id).findAny().orElse(null);
 	}
 
-	public void createTicket(User user, Guild guild, LangType type) {
+	/**
+	 * Allows you to create a ticket When creating the ticket, the bot will
+	 * check if the user has linked his account on the site If yes, then the
+	 * user can create the ticket, if no, then he must link his discord account
+	 * on the site.
+	 * 
+	 * @param user
+	 * @param guild
+	 * @param type
+	 */
+	public void createTicket(User user, Guild guild, LangType type, TextChannel channel) {
 
 		Ticket ticket = getByUser(user);
-		// Le joueur a déjà un ticket
 		if (ticket != null) {
 
 			ticket.message(fr.maxlego08.zsupport.lang.Message.TICKET_ALREADY_CREATE);
 
 		} else {
 
-			ticket = new Ticket(type, guild.getIdLong(), user.getIdLong());
-			ticket.build(user, guild, getTicketFormat());
-			tickets.add(ticket);
-			ZSupport.instance.save();
+			VerifyManager manager = VerifyManager.getInstance();
+
+			EmbedBuilder builder = new EmbedBuilder();
+			builder.setTitle("GroupeZ - Support");
+			builder.setColor(Color.getHSBColor(45, 45, 45));
+			builder.setFooter("2021 - " + guild.getName(), guild.getIconUrl());
+			builder.setTimestamp(OffsetDateTime.now());
+
+			builder.setDescription(this.getMessage(type, Message.TICKET_CREATE_WAIT));
+
+			channel.sendMessage(builder.build()).queue(message -> {
+
+				manager.userIsLink(user, () -> {
+
+					Ticket createdTicket = new Ticket(type, guild.getIdLong(), user.getIdLong());
+					createdTicket.build(user, guild, getTicketFormat(), textChannel -> {
+
+						String stringMessage = this.getMessage(type, Message.TICKET_CREATE_SUCCESS)
+								+ textChannel.getAsMention();
+						builder.setDescription(stringMessage);
+						builder.setColor(Color.getHSBColor(45, 250, 45));
+
+						message.editMessage(builder.build()).queue(messageEdit -> {
+							schedule(1000 * 10, () -> messageEdit.delete().queue());
+						});
+					});
+					tickets.add(createdTicket);
+					ZSupport.instance.save();
+
+				}, () -> {
+
+					builder.setDescription(this.getMessage(type, Message.TICKET_CREATE_ERROR));
+					builder.setColor(Color.getHSBColor(250, 45, 45));
+
+					message.editMessage(builder.build()).queue(messageEdit -> {
+						schedule(1000 * 10, () -> messageEdit.delete().queue());
+					});
+
+				});
+
+			});
 
 		}
 
@@ -92,21 +144,9 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 */
 	private String getTicketFormat() {
 		int ticket = Config.ticketNumber;
-		String tickets = "";
-		if (ticket < 10) {
-			tickets = "000" + ticket;
-		}
-		if (ticket < 100 && ticket >= 10) {
-			tickets = "00" + ticket;
-		}
-		if (ticket >= 100 && ticket < 1000) {
-			tickets = "0" + ticket;
-		}
-		if (ticket > 1000) {
-			tickets = "" + ticket;
-		}
+		String tickets = String.format("ticket-#%04d", ticket);
 		Config.ticketNumber++;
-		return "ticket-#" + tickets;
+		return tickets;
 	}
 
 	@Override
@@ -160,6 +200,23 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 		} else
 			player.sendMessage("You don't have permission");
+	}
+
+	/**
+	 * Call when user leave discord with a ticket
+	 * 
+	 * @param guild
+	 * @param user
+	 */
+	public void userLeave(Guild guild, User user) {
+		Ticket ticket = this.getByUser(user);
+		if (ticket != null) {
+
+			TextChannel channel = guild.getTextChannelById(ticket.getChannelId());
+			ChannelManager channelManager = channel.getManager();
+			channelManager.setName("user-leave").queue();
+
+		}
 	}
 
 }
