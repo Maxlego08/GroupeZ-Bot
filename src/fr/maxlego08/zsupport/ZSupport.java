@@ -14,7 +14,8 @@ import com.google.gson.GsonBuilder;
 import fr.maxlego08.zsupport.command.CommandManager;
 import fr.maxlego08.zsupport.listener.CommandListener;
 import fr.maxlego08.zsupport.listener.MemberListener;
-import fr.maxlego08.zsupport.listener.SuggestListener;
+import fr.maxlego08.zsupport.suggestions.SuggestionManager;
+import fr.maxlego08.zsupport.suggestions.listeners.SuggestListener;
 import fr.maxlego08.zsupport.role.RoleManager;
 import fr.maxlego08.zsupport.tickets.TicketListener;
 import fr.maxlego08.zsupport.tickets.TicketManager;
@@ -67,6 +68,7 @@ public class ZSupport implements Constant {
 		this.saveables.add(Config.getInstance());
 		this.saveables.add(ticketManager);
 		this.saveables.add(RoleManager.getInstance());
+		this.saveables.add(new SuggestionManager());
 
 		Thread thread = new Thread(commandListener, "bot");
 		thread.start();
