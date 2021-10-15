@@ -180,7 +180,7 @@ public class Ticket extends ZUtils {
 
 			builder.setDescription(stringBuilder.toString());
 
-			channel.sendMessage(builder.build()).queue(message -> {
+			channel.sendMessageEmbeds(builder.build()).queue(message -> {
 				for (Plugin plugin : Config.plugins)
 					message.addReaction(guild.getEmoteById(plugin.getEmoteId())).queue();
 			});
@@ -241,7 +241,7 @@ public class Ticket extends ZUtils {
 		stringBuilder.append(message);
 
 		builder.setDescription(stringBuilder.toString());
-		channel.sendMessage(builder.build()).queue();
+		channel.sendMessageEmbeds(builder.build()).queue();
 
 		ChannelManager channelManager = channel.getManager();
 		channelManager.setName(channel.getName() + "-" + plugin.getName()).queue();	

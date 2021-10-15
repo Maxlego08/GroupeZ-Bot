@@ -37,7 +37,7 @@ public class CommandServer extends VCommand {
 		builder.addField("Phone", "+33 07.82.60.90.13", false);
 
 		textChannel.sendTyping().queue();
-		textChannel.sendMessage(builder.build()).complete();
+		textChannel.sendMessageEmbeds(builder.build()).complete();
 		builder.clear();
 
 		return CommandType.SUCCESS;

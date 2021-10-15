@@ -211,7 +211,7 @@ public class VerifyManager extends ZUtils {
 		}
 
 		textChannel.sendTyping().queue();
-		textChannel.sendMessage(builder.build()).complete();
+		textChannel.sendMessageEmbeds(builder.build()).complete();
 		builder.clear();
 
 	}

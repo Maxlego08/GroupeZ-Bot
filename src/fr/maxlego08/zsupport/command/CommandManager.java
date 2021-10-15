@@ -147,7 +147,7 @@ public class CommandManager extends ZUtils implements Constant {
 				EmbedBuilder builder = new EmbedBuilder();
 				builder.setColor(Color.RED);
 				builder.setDescription(":x: You can not execute a command here !");
-				net.dv8tion.jda.api.entities.Message message = channel.sendMessage(builder.build()).complete();
+				net.dv8tion.jda.api.entities.Message message = channel.sendMessageEmbeds(builder.build()).complete();
 				schedule(1000 * 10, () -> message.delete().complete());
 				return CommandType.DEFAULT;
 			}

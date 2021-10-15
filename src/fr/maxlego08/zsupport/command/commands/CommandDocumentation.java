@@ -31,7 +31,7 @@ public class CommandDocumentation extends VCommand {
 				);
 
 		textChannel.sendTyping().queue();
-		textChannel.sendMessage(builder.build()).complete();
+		textChannel.sendMessageEmbeds(builder.build()).complete();
 		builder.clear();
 		return CommandType.SUCCESS;
 	}

@@ -1,22 +1,22 @@
 package fr.maxlego08.zsupport.suggestions.listeners;
 
-import fr.maxlego08.zsupport.suggestions.entity.Suggestion;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.jetbrains.annotations.NotNull;
+
 import fr.maxlego08.zsupport.suggestions.SuggestionManager;
 import fr.maxlego08.zsupport.suggestions.entity.Choice;
+import fr.maxlego08.zsupport.suggestions.entity.Suggestion;
 import fr.maxlego08.zsupport.utils.Constant;
 import net.dv8tion.jda.api.entities.AbstractChannel;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.InteractionType;
 import net.dv8tion.jda.api.interactions.components.Component;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
-import java.util.Optional;
 
 public class SuggestInteraction extends ListenerAdapter implements Constant {
 
@@ -27,7 +27,6 @@ public class SuggestInteraction extends ListenerAdapter implements Constant {
         final InteractionType interactionType = event.getType();
         final Interaction interaction = event.getInteraction();
         final AbstractChannel channel = interaction.getChannel();
-        final User user = interaction.getUser();
 
         if (interactionType != InteractionType.COMPONENT) {
             return;

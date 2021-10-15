@@ -82,9 +82,10 @@ public class DiscordPlayer extends ZUtils implements PlayerSender {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setColor(Color.RED);
 		builder.setDescription(message.getMessage());
-		net.dv8tion.jda.api.entities.Message discordMessage = channel.sendMessage(builder.build()).complete();
-		if (delete)
-			schedule(1000 * 10, () -> discordMessage.delete().complete());
+		channel.sendMessageEmbeds(builder.build()).queue(discordMessege -> {		
+			if (delete)
+				schedule(1000 * 10, () -> discordMessege.delete().queue());
+		});
 	}
 
 }

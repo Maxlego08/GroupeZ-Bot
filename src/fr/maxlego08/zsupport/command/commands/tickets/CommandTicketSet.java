@@ -42,7 +42,7 @@ public class CommandTicketSet extends VCommand {
 		builder.setImage("https://img.groupez.dev/groupez/link-discord.gif");
 		
 		textChannel.sendTyping().queue();
-		Message message = textChannel.sendMessage(builder.build()).complete();
+		Message message = textChannel.sendMessageEmbeds(builder.build()).complete();
 		message.addReaction("🇺🇸").queue();
 		message.addReaction("🇫🇷").queue();
 		builder.clear();

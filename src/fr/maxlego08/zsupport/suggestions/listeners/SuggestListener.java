@@ -32,7 +32,7 @@ public class SuggestListener extends ListenerAdapter implements Constant {
             return;
         }
 
-        message.getChannel().sendMessage(new EmbedBuilder()
+        message.getChannel().sendMessageEmbeds(new EmbedBuilder()
                         .setAuthor(message.getAuthor().getAsTag() + " suggest's", message.getAuthor().getDefaultAvatarUrl())
                         .setColor(Color.getHSBColor(5, 255, 5))
                         .setDescription(message.getContentDisplay())

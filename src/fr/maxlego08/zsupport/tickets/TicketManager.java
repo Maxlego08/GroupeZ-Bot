@@ -102,7 +102,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 			builder.setDescription(this.getMessage(type, Message.TICKET_CREATE_WAIT));
 
-			channel.sendMessage(builder.build()).queue(message -> {
+			channel.sendMessageEmbeds(builder.build()).queue(message -> {
 
 				manager.userIsLink(user, () -> {
 
@@ -114,7 +114,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 						builder.setDescription(stringMessage);
 						builder.setColor(Color.getHSBColor(45, 250, 45));
 
-						message.editMessage(builder.build()).queue(messageEdit -> {
+						message.editMessageEmbeds(builder.build()).queue(messageEdit -> {
 							schedule(1000 * 10, () -> messageEdit.delete().queue());
 						});
 					});
@@ -126,7 +126,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 					builder.setDescription(this.getMessage(type, Message.TICKET_CREATE_ERROR));
 					builder.setColor(Color.getHSBColor(250, 45, 45));
 
-					message.editMessage(builder.build()).queue(messageEdit -> {
+					message.editMessageEmbeds(builder.build()).queue(messageEdit -> {
 						schedule(1000 * 10, () -> messageEdit.delete().queue());
 					});
 
