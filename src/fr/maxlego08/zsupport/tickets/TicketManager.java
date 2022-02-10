@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
@@ -21,9 +22,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.managers.ChannelManager;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
@@ -84,13 +87,16 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 * @param user
 	 * @param guild
 	 * @param type
+	 * @param message2
 	 */
-	public void createTicket(User user, Guild guild, LangType type, TextChannel channel) {
+	public void createTicket(User user, Guild guild, LangType type, MessageChannel messageChannel,
+			ButtonClickEvent event) {
 
 		Ticket ticket = getByUser(user);
 		if (ticket != null) {
 
 			ticket.message(fr.maxlego08.zsupport.lang.Message.TICKET_ALREADY_CREATE);
+			
 
 		} else {
 
@@ -104,8 +110,8 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 			builder.setDescription(this.getMessage(type, Message.TICKET_CREATE_WAIT));
 
-			channel.sendMessageEmbeds(builder.build()).queue(message -> {
-
+			event.replyEmbeds(builder.build()).queue(message -> {
+								
 				manager.userIsLink(user, () -> {
 
 					Ticket createdTicket = new Ticket(type, guild.getIdLong(), user.getIdLong());
@@ -114,10 +120,10 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 						String stringMessage = this.getMessage(type, Message.TICKET_CREATE_SUCCESS)
 								+ textChannel.getAsMention();
 						builder.setDescription(stringMessage);
-						builder.setColor(Color.getHSBColor(45, 250, 45));
+						builder.setColor(new Color(45, 250, 45));
 
-						message.editMessageEmbeds(builder.build()).queue(messageEdit -> {
-							schedule(1000 * 10, () -> messageEdit.delete().queue());
+						message.editOriginalEmbeds(builder.build()).queue(messageEdit -> {
+							messageEdit.delete().queueAfter(10, TimeUnit.SECONDS);
 						});
 					});
 					tickets.add(createdTicket);
@@ -126,10 +132,10 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 				}, () -> {
 
 					builder.setDescription(this.getMessage(type, Message.TICKET_CREATE_ERROR));
-					builder.setColor(Color.getHSBColor(250, 45, 45));
+					builder.setColor(Color.RED);
 
-					message.editMessageEmbeds(builder.build()).queue(messageEdit -> {
-						schedule(1000 * 10, () -> messageEdit.delete().queue());
+					message.editOriginalEmbeds(builder.build()).queue(messageEdit -> {
+						messageEdit.delete().queueAfter(10, TimeUnit.SECONDS);
 					});
 
 				});

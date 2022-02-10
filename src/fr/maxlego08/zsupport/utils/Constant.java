@@ -14,4 +14,7 @@ public interface Constant {
 	final long SUGGEST_TREATED_CHANNEL = 898655238565822524l;
 	
 	long ADMIN_ROLE = 720573324836470884l;
+	
+	String BUTTON_FR = "btn:FR";
+	String BUTTON_EN = "btn:EN";
 }
