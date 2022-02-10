@@ -19,8 +19,8 @@ import com.google.gson.reflect.TypeToken;
 
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
-import fr.maxlego08.zsupport.tickets.Plugin;
-import fr.maxlego08.zsupport.utils.Message;
+import fr.maxlego08.zsupport.lang.BasicMessage;
+import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -59,6 +59,14 @@ public class VerifyManager extends ZUtils {
 		return instance;
 	}
 
+	/**
+	 * Allows you to verify the user
+	 * 
+	 * @param user
+	 * @param textChannel
+	 * @param sender
+	 * @param delete
+	 */
 	public void submitData(User user, TextChannel textChannel, PlayerSender sender, boolean delete) {
 		new Thread(new Runnable() {
 			@Override
@@ -80,13 +88,13 @@ public class VerifyManager extends ZUtils {
 	 */
 	public void userIsLink(User user, Runnable runnableSuccess, Runnable runnableError) {
 		try {
-			String url = "https://groupez.dev/api/v1/discord/" + user.getIdLong();
+			String url = String.format(Config.API_URL, user.getIdLong());
 			URL obj = new URL(url);
 			HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 
 			// add reuqest header
 			con.setRequestMethod("POST");
-			con.setRequestProperty("User-Agent", USER__AGENT);
+			con.setRequestProperty("User-Agent", this.USER__AGENT);
 			con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
 			// Send post request
@@ -95,12 +103,7 @@ public class VerifyManager extends ZUtils {
 			wr.flush();
 			wr.close();
 
-			int responseCode;
-			responseCode = con.getResponseCode();
-
-			// System.out.println("\nSending 'POST' request to URL : " + url);
-			// System.out.println("Post parameters : " + urlParameters);
-			// System.out.println("Response Code : " + responseCode);
+			int responseCode = con.getResponseCode();
 
 			if (responseCode != 200) {
 				runnableError.run();
@@ -123,13 +126,15 @@ public class VerifyManager extends ZUtils {
 	 */
 	private void sendData(User user, TextChannel textChannel, PlayerSender sender, boolean delete) throws Exception {
 
-		String url = "https://groupez.dev/api/v1/discord/" + user.getIdLong();
-		URL obj = new URL(url);
-		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
+		Guild guild = textChannel.getGuild();
+
+		String urlAsString = String.format(Config.API_URL, user.getIdLong());
+		URL url = new URL(urlAsString);
+		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
 		// add reuqest header
 		con.setRequestMethod("POST");
-		con.setRequestProperty("User-Agent", USER__AGENT);
+		con.setRequestProperty("User-Agent", this.USER__AGENT);
 		con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
 		// Send post request
@@ -140,12 +145,9 @@ public class VerifyManager extends ZUtils {
 
 		int responseCode = con.getResponseCode();
 
-		// System.out.println("\nSending 'POST' request to URL : " + url);
-		// System.out.println("Post parameters : " + urlParameters);
-		// System.out.println("Response Code : " + responseCode);
-
+		// If the query returned an error
 		if (responseCode != 200) {
-			sender.sendEmbed(Message.VERIFY_ERROR, true);
+			this.sendErrorMessage(textChannel, user, guild, BasicMessage.VERIFY_ERROR);
 			return;
 		}
 
@@ -158,21 +160,18 @@ public class VerifyManager extends ZUtils {
 		}
 		in.close();
 
-		// print result
-		// System.out.println(response.toString());
-
 		Gson gson = ZSupport.instance.getGson();
 
 		Type listType = new TypeToken<List<GPlugin>>() {
 		}.getType();
 		List<GPlugin> list = gson.fromJson(response.toString(), listType);
 
+		// If the user has not purchased any plugin
 		if (list.size() == 0) {
-			sender.sendEmbed(Message.VERIFY_ERROR_EMPTY, delete);
+			this.sendErrorMessage(textChannel, user, guild, BasicMessage.VERIFY_ERROR_EMPTY);
 			return;
 		}
 
-		Guild guild = textChannel.getGuild();
 		Member member = sender.getMember();
 
 		List<Role> roles = list.stream().map(e -> {
@@ -180,40 +179,64 @@ public class VerifyManager extends ZUtils {
 			if (optional.isPresent()) {
 				Plugin plugin = optional.get();
 				Role role = guild.getRoleById(plugin.getRole());
-				if (hasRole(member, plugin.getRole()))
+				if (hasRole(member, plugin.getRole())) {
 					return null;
+				}
 				return role;
 			}
 			return null;
 		}).filter(e -> e != null).collect(Collectors.toList());
 
+		// If the user already has all the roles
 		if (roles.size() == 0) {
-			sender.sendEmbed(Message.VERIFY_ERROR_ALREADY, delete);
+			this.sendErrorMessage(textChannel, user, guild, BasicMessage.VERIFY_ERROR_ALREADY);
 			return;
 		}
 
-		roles.forEach(role -> guild.addRoleToMember(member, role).complete());
+		roles.forEach(role -> guild.addRoleToMember(member, role).queue());
 
 		Random random = new Random();
 		EmbedBuilder builder = new EmbedBuilder();
 
 		builder.setTitle("GroupeZ - " + user.getAsTag());
 		builder.setColor(Color.getHSBColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
-		builder.setFooter("2021 - " + guild.getName(), guild.getIconUrl());
+		builder.setFooter("2022 - " + guild.getName(), guild.getIconUrl());
+
+		String footer = "\n\n\nUse ``!verify`` to verify your account.";
 
 		if (roles.size() == 1) {
-			builder.setDescription("You just got the role: " + roles.get(0).getAsMention());
+			builder.setDescription("You just got the role: " + roles.get(0).getAsMention() + footer);
 			System.out.println("Ajout du rôle " + roles.get(0).getName() + " à l'utilisateur " + user.getAsTag());
 		} else {
 			String str = toList(roles.stream().map(e -> e.getAsMention()).collect(Collectors.toList()));
-			builder.setDescription("You just got the roles: " + str);
+			builder.setDescription("You just got the roles: " + str + footer);
 			System.out.println("Ajout des rôles " + str + " à l'utilisateur " + user.getAsTag());
 		}
 
 		textChannel.sendTyping().queue();
-		textChannel.sendMessageEmbeds(builder.build()).complete();
+		textChannel.sendMessageEmbeds(builder.build()).queue();
 		builder.clear();
 
+	}
+
+	/**
+	 * Send error message
+	 * 
+	 * @param textChannel
+	 * @param user
+	 * @param guild
+	 * @param basicMessage
+	 */
+	private void sendErrorMessage(TextChannel textChannel, User user, Guild guild, BasicMessage basicMessage) {
+		EmbedBuilder builder = new EmbedBuilder();
+
+		builder.setTitle("GroupeZ - " + user.getAsTag());
+		builder.setColor(new Color(240, 10, 10));
+		builder.setFooter("2022 - " + guild.getName(), guild.getIconUrl());
+
+		builder.setDescription(basicMessage.getMessage());
+
+		textChannel.sendMessageEmbeds(builder.build()).queue();
 	}
 
 }

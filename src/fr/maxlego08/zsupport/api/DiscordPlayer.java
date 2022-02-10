@@ -3,7 +3,7 @@ package fr.maxlego08.zsupport.api;
 import java.awt.Color;
 
 import fr.maxlego08.zsupport.exception.ChannelNullException;
-import fr.maxlego08.zsupport.utils.Message;
+import fr.maxlego08.zsupport.lang.BasicMessage;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -56,19 +56,19 @@ public class DiscordPlayer extends ZUtils implements PlayerSender {
 	}
 
 	@Override
-	public void sendMessage(Message message) {
+	public void sendMessage(BasicMessage message) {
 		user.openPrivateChannel().complete().sendMessage(message.getMessage()).complete();
 	}
 
 	@Override
-	public void sendMessage(Message message, boolean delete, Object... args) {
+	public void sendMessage(BasicMessage message, boolean delete, Object... args) {
 		if (channel == null)
 			throw new ChannelNullException("Le channel est null, impossible d'envoyer un message");
-		net.dv8tion.jda.api.entities.Message discordMessage = channel
-				.sendMessage(String.format(message.getMessage(), args)).complete();
-		schedule(1000 * 10, () -> {
-			if (discordMessage != null)
-				discordMessage.delete().complete();
+		channel.sendMessage(String.format(message.getMessage(), args)).queue(discordMessage -> {
+			schedule(1000 * 10, () -> {
+				if (discordMessage != null)
+					discordMessage.delete().complete();
+			});
 		});
 	}
 
@@ -78,11 +78,11 @@ public class DiscordPlayer extends ZUtils implements PlayerSender {
 	}
 
 	@Override
-	public void sendEmbed(Message message, boolean delete) {
+	public void sendEmbed(BasicMessage message, boolean delete) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setColor(Color.RED);
 		builder.setDescription(message.getMessage());
-		channel.sendMessageEmbeds(builder.build()).queue(discordMessege -> {		
+		channel.sendMessageEmbeds(builder.build()).queue(discordMessege -> {
 			if (delete)
 				schedule(1000 * 10, () -> discordMessege.delete().queue());
 		});

@@ -15,34 +15,42 @@ import java.awt.*;
 
 public class SuggestListener extends ListenerAdapter implements Constant {
 
-    @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
+	@Override
+	public void onMessageReceived(MessageReceivedEvent event) {
 
-        Message message = event.getMessage();
-        Member member = event.getMember();
-        Guild guild = event.getGuild();
+		Message message = event.getMessage();
+		Member member = event.getMember();
+		Guild guild = event.getGuild();
 
-        if (message.getChannel().getIdLong() != SUGGEST_CHANNEL) {
-            return;
-        }
+		if (message.getChannel().getIdLong() != SUGGEST_CHANNEL) {
+			return;
+		}
 
-        assert member != null;
+		assert member != null;
 
-        if (member.getUser().isBot()) {
-            return;
-        }
+		if (member.getUser().isBot()) {
+			return;
+		}
 
-        message.getChannel().sendMessageEmbeds(new EmbedBuilder()
-                        .setAuthor(message.getAuthor().getAsTag() + " suggest's", message.getAuthor().getDefaultAvatarUrl())
-                        .setColor(Color.getHSBColor(5, 255, 5))
-                        .setDescription(message.getContentDisplay())
-                        .setFooter("2021 - " + guild.getName(), guild.getIconUrl()).build())
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setColor(Color.getHSBColor(5, 255, 5)).setDescription(message.getContentDisplay());
+		builder.setFooter("2021 - " + guild.getName(), guild.getIconUrl());
+		builder.setAuthor(message.getAuthor().getAsTag() + " suggest's", message.getAuthor().getDefaultAvatarUrl());
+		builder.setDescription(message.getContentDisplay());
 
-                .queue(discordMessage -> discordMessage.addReaction("U+2705")
-                        .queue(e -> discordMessage.addReaction("U+274C")
-                                .queue(e2 -> message.delete().queue())));
+		message.getChannel().sendMessageEmbeds(builder.build()).queue(discordMessage -> {
 
-        SuggestionManager.getSuggestions().add(new Suggestion(member.getUser().getId(), message.getContentDisplay(), message.getId()));
-        ZSupport.instance.save();
-    }
+			Suggestion suggestion = new Suggestion(member.getUser().getId(), message.getContentDisplay(),
+					discordMessage.getId());
+			SuggestionManager.getSuggestions().add(suggestion);
+			ZSupport.instance.save();
+
+			discordMessage.addReaction("U+2705").queue(reaction1 -> {
+				discordMessage.addReaction("U+274C").queue(reaction2 -> {
+					message.delete().queue();
+				});
+			});
+		});
+
+	}
 }

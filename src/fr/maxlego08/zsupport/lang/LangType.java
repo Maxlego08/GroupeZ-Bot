@@ -1,4 +1,4 @@
-package fr.maxlego08.zsupport.tickets;
+package fr.maxlego08.zsupport.lang;
 
 public enum LangType {
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import fr.maxlego08.zsupport.tickets.Plugin;
+import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.storage.Persist;
 import fr.maxlego08.zsupport.utils.storage.Saveable;
 
@@ -14,7 +14,10 @@ public class Config implements Saveable {
 	public static int ticketNumber = 1;
 	public static Long ticketCategoryId = 511517312067829766l;
 	public static long ticketChannel = 712305238748692572l;
+	public static long commandChannel = 714518716943171605l;
 
+	public static String API_URL = "https://groupez.dev/api/v1/discord/%s";
+	
 	public static List<Plugin> plugins = new ArrayList<>();
 
 	static {

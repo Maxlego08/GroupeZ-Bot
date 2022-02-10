@@ -1,6 +1,7 @@
 package fr.maxlego08.zsupport.tickets;
 
 import fr.maxlego08.zsupport.Config;
+import fr.maxlego08.zsupport.lang.LangType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.MessageReaction.ReactionEmote;

@@ -1,7 +1,7 @@
 package fr.maxlego08.zsupport.utils.commands;
 
+import fr.maxlego08.zsupport.lang.BasicMessage;
 import fr.maxlego08.zsupport.utils.Constant;
-import fr.maxlego08.zsupport.utils.Message;
 import net.dv8tion.jda.api.Permission;
 
 public interface Sender extends Constant{
@@ -12,12 +12,12 @@ public interface Sender extends Constant{
 	
 	void sendMessage(String message);
 	
-	void sendMessage(Message message);
+	void sendMessage(BasicMessage message);
 	
-	void sendMessage(Message message, boolean delete, Object... args);
+	void sendMessage(BasicMessage message, boolean delete, Object... args);
 
 	boolean hasPermission(Permission permission);
 	
-	void sendEmbed(Message message, boolean delete);
+	void sendEmbed(BasicMessage message, boolean delete);
 	
 }

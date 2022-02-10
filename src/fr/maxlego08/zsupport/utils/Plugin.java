@@ -1,4 +1,4 @@
-package fr.maxlego08.zsupport.tickets;
+package fr.maxlego08.zsupport.utils;
 
 public class Plugin {
 

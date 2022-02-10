@@ -14,9 +14,10 @@ import com.google.gson.GsonBuilder;
 import fr.maxlego08.zsupport.command.CommandManager;
 import fr.maxlego08.zsupport.listener.CommandListener;
 import fr.maxlego08.zsupport.listener.MemberListener;
-import fr.maxlego08.zsupport.suggestions.SuggestionManager;
-import fr.maxlego08.zsupport.suggestions.listeners.SuggestListener;
 import fr.maxlego08.zsupport.role.RoleManager;
+import fr.maxlego08.zsupport.suggestions.SuggestionManager;
+import fr.maxlego08.zsupport.suggestions.listeners.SuggestInteraction;
+import fr.maxlego08.zsupport.suggestions.listeners.SuggestListener;
 import fr.maxlego08.zsupport.tickets.TicketListener;
 import fr.maxlego08.zsupport.tickets.TicketManager;
 import fr.maxlego08.zsupport.utils.Constant;
@@ -55,22 +56,22 @@ public class ZSupport implements Constant {
 
 		instance = this;
 
-		gson = getGsonBuilder().create();
-		persist = new Persist(this);
-		commandManager = new CommandManager(this);
-		commandListener = new CommandListener(this);
-		memberListener = new MemberListener();
-		ticketManager = new TicketManager(this);
-		ticketListener = new TicketListener(ticketManager);
+		this.gson = getGsonBuilder().create();
+		this.persist = new Persist(this);
+		this.commandManager = new CommandManager(this);
+		this.commandListener = new CommandListener(this);
+		this.memberListener = new MemberListener();
+		this.ticketManager = new TicketManager(this);
+		this.ticketListener = new TicketListener(ticketManager);
 		this.suggestListener = new SuggestListener();
 		// xpListener = new XpListener(this);
 
 		this.saveables.add(Config.getInstance());
-		this.saveables.add(ticketManager);
+		this.saveables.add(this.ticketManager);
 		this.saveables.add(RoleManager.getInstance());
 		this.saveables.add(new SuggestionManager());
 
-		Thread thread = new Thread(commandListener, "bot");
+		Thread thread = new Thread(this.commandListener, "bot");
 		thread.start();
 
 		this.saveables.forEach(save -> save.load(persist));
@@ -94,9 +95,27 @@ public class ZSupport implements Constant {
 		jda.addEventListener(ticketListener);
 		jda.addEventListener(memberListener);
 		jda.addEventListener(suggestListener);
-		// jda.addEventListener(xpListener);
+		jda.addEventListener(new SuggestInteraction());
 
-		System.out.println(PREFIX_CONSOLE + "Bot lancé avec succès !");
+		/**
+		 * 
+		 * JDA jda= this.textChannel.getJDA(); Emoji emoji =
+		 * Emoji.fromEmote(jda.getEmoteById(941374457312850011l));
+		 * .setActionRow(new ButtonImpl("test", "test", ButtonStyle.SECONDARY,
+		 * false, emoji))
+		 * 
+		 */
+
+		/*
+		 * CommandListUpdateAction action = jda.updateCommands();
+		 * 
+		 * action.addCommands(new CommandData("hello", "test"));
+		 * action.addCommands(new CommandData("info", "test"));
+		 * 
+		 * action.queue();
+		 */
+
+		System.out.println(PREFIX_CONSOLE + "Bot lancé avec succés !");
 
 		Timer timer = new Timer();
 		long period = 1000 * 60 * 30;

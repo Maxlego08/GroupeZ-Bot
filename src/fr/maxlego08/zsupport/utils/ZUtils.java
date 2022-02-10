@@ -6,8 +6,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.maxlego08.zsupport.lang.Lang;
+import fr.maxlego08.zsupport.lang.LangType;
 import fr.maxlego08.zsupport.lang.Message;
-import fr.maxlego08.zsupport.tickets.LangType;
 import net.dv8tion.jda.api.entities.Member;
 
 public class ZUtils {

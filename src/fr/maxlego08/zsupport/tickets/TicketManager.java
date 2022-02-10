@@ -8,8 +8,10 @@ import java.util.List;
 
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
+import fr.maxlego08.zsupport.lang.LangType;
 import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.utils.Constant;
+import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import fr.maxlego08.zsupport.utils.storage.Persist;

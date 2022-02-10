@@ -1,6 +1,6 @@
 package fr.maxlego08.zsupport.api;
 
-import fr.maxlego08.zsupport.utils.Message;
+import fr.maxlego08.zsupport.lang.BasicMessage;
 import fr.maxlego08.zsupport.utils.commands.ConsoleSender;
 import net.dv8tion.jda.api.Permission;
 
@@ -22,12 +22,12 @@ public class DiscordConsoleSender implements ConsoleSender {
 	}
 
 	@Override
-	public void sendMessage(Message message) {
+	public void sendMessage(BasicMessage message) {
 		this.sendMessage(message.getMessage());
 	}
 
 	@Override
-	public void sendMessage(Message message, boolean delete, Object... args) {
+	public void sendMessage(BasicMessage message, boolean delete, Object... args) {
 		this.sendMessage(String.format(message.getMessage(), args));
 	}
 
@@ -37,7 +37,7 @@ public class DiscordConsoleSender implements ConsoleSender {
 	}
 
 	@Override
-	public void sendEmbed(Message message, boolean delete) {
+	public void sendEmbed(BasicMessage message, boolean delete) {
 		this.sendMessage(message, delete);
 	}
 
