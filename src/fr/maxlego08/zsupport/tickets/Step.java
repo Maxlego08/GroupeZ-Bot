@@ -128,6 +128,8 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 	protected void closeTicket(Ticket ticket, ButtonClickEvent event) {
 		EmbedBuilder builder = this.createEmbed();
 		builder.setDescription(ticket.getMessage(Message.TICKET_CLOSE, 10, "s"));
+		
+		ticket.setClose(true);
 
 		event.replyEmbeds(builder.build()).queue(e -> {
 
@@ -148,6 +150,7 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 						channelManager.setName(ticket.getName() + "-close").queue();
 
 						e4.delete().queue();
+						
 
 					});
 				});

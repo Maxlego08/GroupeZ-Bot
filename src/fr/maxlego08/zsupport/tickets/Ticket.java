@@ -17,6 +17,7 @@ public class Ticket extends ZUtils {
 	private final long guildId;
 	private final long userId;
 	private boolean isWaiting = true;
+	private boolean isClose = false;
 	private String name;
 	private TicketStep ticketStep;
 	private String pluginName;
@@ -36,6 +37,21 @@ public class Ticket extends ZUtils {
 		this.guildId = guildId;
 		this.userId = userId;
 		this.name = name;
+	}
+
+	/**
+	 * @return the isClose
+	 */
+	public boolean isClose() {
+		return isClose;
+	}
+
+	/**
+	 * @param isClose
+	 *            the isClose to set
+	 */
+	public void setClose(boolean isClose) {
+		this.isClose = isClose;
 	}
 
 	/**
@@ -203,6 +219,9 @@ public class Ticket extends ZUtils {
 	}
 
 	public boolean isValid() {
+		if (this.isClose){
+			return false;
+		}
 		ZSupport instance = ZSupport.instance;
 		JDA jda = instance.getJda();
 		Guild guild = jda.getGuildById(this.guildId);
@@ -217,7 +236,7 @@ public class Ticket extends ZUtils {
 		this.step = this.ticketStep.getStep();
 		this.step.manager = manager;
 		this.step.ticket = this;
-		
+
 		System.out.println(this.step);
 	}
 

@@ -1,5 +1,8 @@
 package fr.maxlego08.zsupport.tickets.steps;
 
+import java.awt.Color;
+import java.io.IOException;
+
 import fr.maxlego08.zsupport.api.DiscordPlayer;
 import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.tickets.Step;
@@ -7,6 +10,7 @@ import fr.maxlego08.zsupport.tickets.Ticket;
 import fr.maxlego08.zsupport.tickets.TicketStep;
 import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.commands.PlayerSender;
+import fr.maxlego08.zsupport.utils.image.ImageHelper;
 import fr.maxlego08.zsupport.verify.VerifyManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -72,10 +76,20 @@ public class TicketPlugin extends Step {
 				manager.getGUser(user.getIdLong(), gUser -> {
 
 					EmbedBuilder embedBuilder = this.createEmbed();
-					embedBuilder.setThumbnail(gUser.getAvatar());
-					embedBuilder.setTitle(gUser.getName(), gUser.getDashboardURL());
 
-					messageChannel.sendMessageEmbeds(embedBuilder.build()).queue();
+					try {
+						int rgb[] = ImageHelper.getHexColor(gUser.getAvatar());
+
+						if (rgb.length == 3) {
+							embedBuilder.setColor(new Color(rgb[0], rgb[1], rgb[2]));
+						}
+						embedBuilder.setThumbnail(gUser.getAvatar());
+						embedBuilder.setTitle(gUser.getName(), gUser.getDashboardURL());
+						messageChannel.sendMessageEmbeds(embedBuilder.build()).queue();
+
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 
 				});
 			});

@@ -71,9 +71,13 @@ public class ImageDominantColor {
 		Collections.sort(list, (Map.Entry<Integer, Integer> obj1,
 				Map.Entry<Integer, Integer> obj2) -> ((Comparable) obj1.getValue()).compareTo(obj2.getValue()));
 
-		Map.Entry<Integer, Integer> entry = list.get(list.size() - 1);
-		int[] rgb = getRGBArr(entry.getKey());
-		return rgb;
+		if (list.size() > 0) {
+			Map.Entry<Integer, Integer> entry = list.get(list.size() - 1);
+			int[] rgb = getRGBArr(entry.getKey());
+			return rgb;
+		} else {
+			return new int[0];
+		}
 		// return "#" + Integer.toHexString(rgb[0]) +
 		// Integer.toHexString(rgb[1]) + Integer.toHexString(rgb[2]);
 	}
