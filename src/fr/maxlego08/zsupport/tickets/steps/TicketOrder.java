@@ -1,6 +1,7 @@
 package fr.maxlego08.zsupport.tickets.steps;
 
 import fr.maxlego08.zsupport.Config;
+import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.tickets.Step;
 import fr.maxlego08.zsupport.tickets.Ticket;
 import fr.maxlego08.zsupport.tickets.TicketStep;
@@ -23,35 +24,9 @@ public class TicketOrder extends Step {
 
 		EmbedBuilder builder = this.createEmbed();
 
-		StringBuilder stringBuilder = new StringBuilder();
+		builder.setDescription(this.ticket.getMessage(Message.TICKET_ORDER));
 
-		stringBuilder
-				.append("Pour pouvoir passer une commande vous devez donner toutes les informations sur le projet.");
-
-		stringBuilder.append("\n");
-		stringBuilder.append("Comme par exemple:");
-		stringBuilder.append("\n");
-		stringBuilder.append("- Le nom de votre serveur");
-		stringBuilder.append("\n");
-		stringBuilder.append("- La version de votre serveur");
-		stringBuilder.append("\n");
-		stringBuilder.append("- Le délais de livraison");
-		stringBuilder.append("\n");
-		stringBuilder.append("- La description complète de votre plugin");
-		stringBuilder.append("\n");
-		stringBuilder.append("\n");
-		stringBuilder.append("Informations:");
-		stringBuilder.append("\n");
-		stringBuilder.append("Tarif: **20€/h**");
-		stringBuilder.append("\n");
-		stringBuilder.append(
-				"Achat du code source: **50%** du prix (par exemple, pour un plugin à 100€ les sources seront vendu à 50€)");
-		stringBuilder.append("\n");
-		stringBuilder.append("Siret: 88761749600013");
-
-		builder.setDescription(stringBuilder);
-
-		this.event.editMessageEmbeds(builder.build()).setActionRows().queue();
+		this.event.editMessageEmbeds(builder.build()).setActionRow(this.createCloseButton()).queue();
 
 		this.ticket.setWaiting(false);
 
@@ -69,7 +44,10 @@ public class TicketOrder extends Step {
 	@Override
 	public void buttonClick(Ticket ticket, MessageChannel messageChannel, Guild guild, User user, Button button,
 			ButtonClickEvent event) {
-		// TODO Auto-generated method stub
+
+		if (button.getId().equals(BUTTON_CLOSE)) {
+			this.closeTicket(ticket, event);
+		}
 
 	}
 

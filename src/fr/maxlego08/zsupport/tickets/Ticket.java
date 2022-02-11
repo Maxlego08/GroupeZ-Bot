@@ -145,6 +145,13 @@ public class Ticket extends ZUtils {
 		return this.textChannel;
 	}
 
+	public TextChannel getTextChannel(Guild guild) {
+		if (this.textChannel == null) {
+			this.textChannel = guild.getTextChannelById(this.channelId);
+		}
+		return this.textChannel;
+	}
+
 	/**
 	 * @return the userId
 	 */
@@ -162,7 +169,7 @@ public class Ticket extends ZUtils {
 
 	public Plugin getPlugin() {
 		return Config.plugins.stream().filter(e -> e.getName().equals(this.pluginName)).findFirst()
-				.orElse(new Plugin(this.pluginName, 0, 0, 0));
+				.orElse(new Plugin(this.pluginName, 0, 0, 0, 0));
 	}
 
 	/**
@@ -210,6 +217,8 @@ public class Ticket extends ZUtils {
 		this.step = this.ticketStep.getStep();
 		this.step.manager = manager;
 		this.step.ticket = this;
+		
+		System.out.println(this.step);
 	}
 
 }

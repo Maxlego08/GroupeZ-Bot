@@ -41,24 +41,16 @@ public class TicketTypeStep extends Step {
 
 				EmbedBuilder builder = this.createEmbed();
 
-				StringBuilder stringBuilder = this.createDescription();
-				stringBuilder.append("Veuillez choisir le type de votre ticket:");
-				stringBuilder.append("\n");
-				stringBuilder.append("\n");
-				stringBuilder.append(":dollar: Pour passer une commande");
-				stringBuilder.append("\n");
-				stringBuilder.append(":question: Pour demander de l'aide sur un plugin");
-				stringBuilder.append("\n");
-				stringBuilder.append("\n");
-
-				builder.setDescription(stringBuilder.toString());
+				builder.setDescription(this.ticket.getMessage(Message.TICKET_CHOOSE));
 
 				MessageAction action = channel.sendMessageEmbeds(builder.build());
 
-				Button buttonOrder = new ButtonImpl(BUTTON_CHOOSE_ORDER, "Passer une commande", ButtonStyle.SECONDARY,
-						false, Emoji.fromUnicode("U+1F4B5"));
-				Button buttonHelp = new ButtonImpl(BUTTON_CHOOSE_SUPPORT, "Support plugins", ButtonStyle.SECONDARY,
-						false, Emoji.fromUnicode("U+2753"));
+				Button buttonOrder = new ButtonImpl(BUTTON_CHOOSE_ORDER,
+						this.ticket.getMessage(Message.TICKET_CHOOSE_ORDER), ButtonStyle.SECONDARY, false,
+						Emoji.fromUnicode("U+1F4B5"));
+				Button buttonHelp = new ButtonImpl(BUTTON_CHOOSE_SUPPORT,
+						this.ticket.getMessage(Message.TICKET_CHOOSE_PLUGIN), ButtonStyle.SECONDARY, false,
+						Emoji.fromUnicode("U+2753"));
 
 				action.setActionRow(buttonHelp, buttonOrder);
 				action.queue();
@@ -81,7 +73,7 @@ public class TicketTypeStep extends Step {
 		String buttonId = button.getId();
 		Step step = (buttonId.equals(BUTTON_CHOOSE_ORDER) ? TicketStep.ORDER : TicketStep.CHOOSE_PLUGIN).getStep();
 		ticket.setStep(step);
-		
+
 		step.preProcess(this.manager, ticket, messageChannel, guild, user, event, null);
 
 	}

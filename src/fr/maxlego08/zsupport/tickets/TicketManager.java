@@ -100,6 +100,10 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 			Ticket ticket = optional.get();
 			ticket.message(fr.maxlego08.zsupport.lang.Message.TICKET_ALREADY_CREATE);
+			
+			event.reply(this.getMessage(type, Message.TICKET_ALREADY_CREATE_REPLY, ticket.getTextChannel(guild).getAsMention())).queue(m -> {
+				m.deleteOriginal().queueAfter(10, TimeUnit.SECONDS);
+			});
 
 		} else {
 

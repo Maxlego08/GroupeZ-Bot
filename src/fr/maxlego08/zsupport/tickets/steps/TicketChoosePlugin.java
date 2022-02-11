@@ -34,12 +34,12 @@ public class TicketChoosePlugin extends Step {
 
 		});
 
-		selectionMenu.addOption("Autre", "other", Emoji.fromMarkdown("U+1F6AB"));
+		selectionMenu.addOption(this.ticket.getMessage(Message.OTHER), "other", Emoji.fromMarkdown("U+1F6AB"));
 
 		EmbedBuilder builder = this.createEmbed();
 
 		StringBuilder stringBuilder = this.createDescription();
-		stringBuilder.append("Veuillez choisir le plugin pour lequelle vous avez besoin d'aide.");
+		stringBuilder.append(this.ticket.getMessage(Message.TICKET_OTHER_INFO));
 
 		builder.setDescription(stringBuilder.toString());
 
@@ -63,7 +63,7 @@ public class TicketChoosePlugin extends Step {
 			Step step = TicketStep.PLUGIN.getStep();
 			this.ticket.setStep(step);
 			Plugin plugin = Config.plugins.stream().filter(l -> l.getName().equals(pluginName)).findAny()
-					.orElse(new Plugin("Other", 0, 0, 0));
+					.orElse(new Plugin("Other", 0, 0, 0, 0));
 			this.ticket.setPlugin(plugin);
 
 			step.preProcess(this.manager, this.ticket, messageChannel, guild, user, event, null);

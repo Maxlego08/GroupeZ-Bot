@@ -45,7 +45,8 @@ public class Lang {
 	 * @return
 	 */
 	public String getMessage(LangType type, Message message, Object... objects) {
-		return String.format(messages.get(type).getOrDefault(message, "Message not found"), objects);
+		String finalMessage = this.messages.get(type).getOrDefault(message, "Message not found");
+		return objects.length == 0 ? finalMessage : String.format(finalMessage, objects);
 	}
 
 }

@@ -2,26 +2,31 @@ package fr.maxlego08.zsupport.tickets;
 
 import java.awt.Color;
 import java.time.OffsetDateTime;
+import java.util.concurrent.TimeUnit;
 
 import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.Component;
+import net.dv8tion.jda.api.managers.ChannelManager;
+import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 public abstract class Step extends ZUtils implements Constant, Cloneable {
 
 	protected TicketManager manager;
 	protected Ticket ticket;
-	protected GenericComponentInteractionCreateEvent event;	
+	protected GenericComponentInteractionCreateEvent event;
 	protected Member member;
 	protected Guild guild;
 	protected Runnable runnable;
@@ -110,9 +115,44 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 
 		this.process(ticket, messageChannel, guild, user);
 	}
-	
-	public Component createCloseButton(){
+
+	public Component createCloseButton() {
 		return Button.danger(BUTTON_CLOSE, this.ticket.getMessage(Message.TICKET_CLOSE_BUTTON));
+	}
+
+	/**
+	 * Allows you to close a ticket with a timer.
+	 * @param ticket
+	 * @param event
+	 */
+	protected void closeTicket(Ticket ticket, ButtonClickEvent event) {
+		EmbedBuilder builder = this.createEmbed();
+		builder.setDescription(ticket.getMessage(Message.TICKET_CLOSE, 10, "s"));
+
+		event.replyEmbeds(builder.build()).queue(e -> {
+
+			builder.setDescription(ticket.getMessage(Message.TICKET_CLOSE, 5, "s"));
+			e.editOriginalEmbeds(builder.build()).queueAfter(5, TimeUnit.SECONDS, e2 -> {
+
+				builder.setDescription(ticket.getMessage(Message.TICKET_CLOSE, 2, "s"));
+				e.editOriginalEmbeds(builder.build()).queueAfter(3, TimeUnit.SECONDS, e3 -> {
+
+					builder.setDescription(ticket.getMessage(Message.TICKET_CLOSE, 1, ""));
+					e.editOriginalEmbeds(builder.build()).queueAfter(1, TimeUnit.SECONDS, e4 -> {
+
+						TextChannel channel = event.getTextChannel();
+						PermissionOverrideAction permissionOverrideAction = channel.putPermissionOverride(this.member);
+						permissionOverrideAction.clear(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue();
+
+						ChannelManager channelManager = channel.getManager();
+						channelManager.setName(ticket.getName() + "-close").queue();
+
+						e4.delete().queue();
+
+					});
+				});
+			});
+		});
 	}
 
 }

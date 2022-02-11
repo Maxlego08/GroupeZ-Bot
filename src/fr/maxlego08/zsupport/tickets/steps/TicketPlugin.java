@@ -1,7 +1,5 @@
 package fr.maxlego08.zsupport.tickets.steps;
 
-import java.util.concurrent.TimeUnit;
-
 import fr.maxlego08.zsupport.api.DiscordPlayer;
 import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.tickets.Step;
@@ -46,7 +44,7 @@ public class TicketPlugin extends Step {
 					message += "\n";
 					message += "\n";
 
-					if (!hasRole(this.member, plugin.getRole())) {
+					if (!hasRole(this.member, plugin.getRole()) && plugin.isPremium()) {
 						message += this.ticket.getMessage(Message.TICKET_PLUGIN_ROLE_ERROR);
 					}
 
@@ -66,7 +64,7 @@ public class TicketPlugin extends Step {
 				this.event.editMessageEmbeds(builder.build()).setActionRow(this.createCloseButton()).queue();
 				this.ticket.setWaiting(true);
 
-				if (!hasRole(this.member, plugin.getRole())) {
+				if (!hasRole(this.member, plugin.getRole()) && plugin.isPremium()) {
 					PlayerSender sender = new DiscordPlayer(user, this.member, channel);
 					manager.submitData(user, channel, sender, false);
 				}
@@ -91,39 +89,7 @@ public class TicketPlugin extends Step {
 			ButtonClickEvent event) {
 
 		if (button.getId().equals(BUTTON_CLOSE)) {
-
-			EmbedBuilder builder = this.createEmbed();
-			builder.setDescription(ticket.getMessage(Message.TICKET_CLOSE, 10, "s"));
-
-			event.replyEmbeds(builder.build()).queue(e -> {
-
-				builder.setDescription(ticket.getMessage(Message.TICKET_CLOSE, 5, "s"));
-				e.editOriginalEmbeds(builder.build()).queueAfter(5, TimeUnit.SECONDS, e2 -> {
-
-					builder.setDescription(ticket.getMessage(Message.TICKET_CLOSE, 2, "s"));
-					e.editOriginalEmbeds(builder.build()).queueAfter(3, TimeUnit.SECONDS, e3 -> {
-
-						builder.setDescription(ticket.getMessage(Message.TICKET_CLOSE, 1, ""));
-						e.editOriginalEmbeds(builder.build()).queueAfter(1, TimeUnit.SECONDS, e4 -> {
-
-							TextChannel channel = (TextChannel) messageChannel;
-							PermissionOverrideAction permissionOverrideAction = channel
-									.putPermissionOverride(this.member);
-							permissionOverrideAction.clear(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue();
-
-							ChannelManager channelManager = channel.getManager();
-							channelManager.setName(ticket.getName() + "-close").queue();
-							
-							e4.delete().queue();
-
-						});
-
-					});
-
-				});
-
-			});
-
+			this.closeTicket(ticket, event);
 		}
 
 	}

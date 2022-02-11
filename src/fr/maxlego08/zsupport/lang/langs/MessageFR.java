@@ -12,6 +12,9 @@ public class MessageFR {
 		Map<Message, String> frMessage = new HashMap<>();
 		frMessage.put(Message.TICKET_ALREADY_CREATE,
 				"**Attention!** %user% tu as déjà créé un ticket ici, inutile d'enfaire un autre.");
+
+		frMessage.put(Message.TICKET_ALREADY_CREATE_REPLY, "Vous avez déjà un ticket ouvert: %s");
+
 		frMessage.put(Message.TICKET_DESC,
 				"Bienvenue dans votre ticket, un membre de l'équipe  viendra répondre à vos besoins sous peu.");
 		frMessage.put(Message.TICKET_PLUGIN_CHOOSE, "Clique sur le plugin pour lequel tu souhaites obtenir de l'aide:");
@@ -38,10 +41,29 @@ public class MessageFR {
 		frMessage.put(Message.TICKET_PLUGIN_ERROR, "Une erreur est survenue, merci de contacter l'équipe.");
 
 		frMessage.put(Message.TICKET_CLOSE_BUTTON, "Fermer le ticket");
-		
+
 		frMessage.put(Message.TICKET_OTHER, "Veuillez détailler la demande de votre ticket.");
 		frMessage.put(Message.TICKET_CLOSE, "Fermure du ticket dans %s seconde%s");
-		
+
+		frMessage.put(Message.OTHER, "Autre");
+		frMessage.put(Message.TICKET_OTHER_INFO, "Veuillez choisir le plugin pour lequelle vous avez besoin d'aide.");
+
+		frMessage.put(Message.TICKET_ORDER,
+				"Pour pouvoir passer une commande vous devez donner toutes les informations sur le projet." + "\n"
+						+ "Comme par exemple:" + "\n" + "- Le nom de votre serveur" + "\n"
+						+ "- La version de votre serveur" + "\n" + "- Le délais de livraison" + "\n"
+						+ "- La description complète de votre plugin" + "\n" + "\n" + "Informations:" + "\n"
+						+ "Tarif: **20€/h**" + "\n"
+						+ "Achat du code source: **50%** du prix (par exemple, pour un plugin à 100€ les sources seront vendu à 50€)"
+						+ "\n" + "Siret: 88761749600013");
+
+		frMessage.put(Message.TICKET_CHOOSE,
+				"Veuillez choisir le type de votre ticket:" + "\n" + "\n" + ":dollar: Pour passer une commande" + "\n"
+						+ ":question: Pour demander de l'aide sur un plugin" + "\n" + "\n");
+
+		frMessage.put(Message.TICKET_CHOOSE_ORDER, "Passer une commande");
+		frMessage.put(Message.TICKET_CHOOSE_PLUGIN, "Support plugins");
+
 		return frMessage;
 	}
 

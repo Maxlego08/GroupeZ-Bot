@@ -62,7 +62,7 @@ public class ZSupport implements Constant {
 		this.commandListener = new CommandListener(this);
 		this.memberListener = new MemberListener();
 		this.ticketManager = new TicketManager(this);
-		this.ticketListener = new TicketListener(ticketManager);
+		this.ticketListener = new TicketListener(this.ticketManager);
 		this.suggestListener = new SuggestListener();
 		// xpListener = new XpListener(this);
 
@@ -74,7 +74,7 @@ public class ZSupport implements Constant {
 		Thread thread = new Thread(this.commandListener, "bot");
 		thread.start();
 
-		this.saveables.forEach(save -> save.load(persist));
+		this.saveables.forEach(save -> save.load(this.persist));
 
 		System.out.println(PREFIX_CONSOLE + "Chargement du bot");
 
@@ -89,13 +89,13 @@ public class ZSupport implements Constant {
 
 		JDABuilder builder = JDABuilder.create(Config.botToken, list);
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
-		jda = builder.build();
-		jda.getPresence().setActivity(Activity.playing("!help V" + VERSION));
-		jda.addEventListener(commandListener);
-		jda.addEventListener(ticketListener);
-		jda.addEventListener(memberListener);
-		jda.addEventListener(suggestListener);
-		jda.addEventListener(new SuggestInteraction());
+		this.jda = builder.build();
+		this.jda.getPresence().setActivity(Activity.playing("!help V" + VERSION));
+		this.jda.addEventListener(this.commandListener);
+		this.jda.addEventListener(this.ticketListener);
+		this.jda.addEventListener(this.memberListener);
+		this.jda.addEventListener(this.suggestListener);
+		this.jda.addEventListener(new SuggestInteraction());
 
 		/**
 		 * 
