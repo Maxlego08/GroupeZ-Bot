@@ -4,8 +4,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import fr.maxlego08.zsupport.role.RoleManager;
 import fr.maxlego08.zsupport.utils.Constant;
@@ -34,15 +32,7 @@ public class MemberListener extends ListenerAdapter implements Constant {
 
 		if (channel.getIdLong() == CHANNEL_ROBOT) {
 
-			guild.addRoleToMember(member, role).complete();
-			// event.getUser().openPrivateChannel().complete().sendMessage("**You
-			// are not a robot !**").complete();
-			// event.getUser().openPrivateChannel().complete().sendMessage("https://youtu.be/fsF7enQY8uI").complete();
-
-			/*
-			 * Envoyer un message à l'utilisateur avec toutes les informations
-			 * sur le GroupeZ
-			 */
+			guild.addRoleToMember(member, role).queue();
 
 		}
 
@@ -68,9 +58,10 @@ public class MemberListener extends ListenerAdapter implements Constant {
 		if ((roleMentionned >= 5 || memberMentionned >= 10) && !member.hasPermission(Permission.MESSAGE_MANAGE)) {
 
 			guild.kick(member, "Le message contient trop de mention: (" + roleMentionned + " roles mentionné, "
-					+ memberMentionned + " membres mentionné)").complete();
-			member.getUser().openPrivateChannel().complete().sendMessage("You do not have permission to do this.")
-					.complete();
+					+ memberMentionned + " membres mentionné)").queue();
+			member.getUser().openPrivateChannel().queue(e -> {
+				e.sendMessage("You do not have permission to do this.").queue();
+			});
 
 		}
 
@@ -94,40 +85,21 @@ public class MemberListener extends ListenerAdapter implements Constant {
 
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+
 		Guild guild = event.getGuild();
 		Role role = guild.getRoleById(ROLE_DEFAULT);
 		Member member = event.getMember();
-		guild.addRoleToMember(member, role).complete();
+		guild.addRoleToMember(member, role).queue();
 
 		OffsetDateTime dateTime = member.getUser().getTimeCreated();
 		Date date = new Date();
 		OffsetDateTime offsetDateTime = date.toInstant().atOffset(ZoneOffset.UTC);
 
-//		PrivateChannel channel = member.getUser().openPrivateChannel().complete();
-
-		// https://youtu.be/UDd8h5yX4BM
-
-		/*String buy = ":flag_fr: Comment acheter ?\n"
-				+ "Pour acheter les plugins vous devez vous rendre sur https://groupez.xyz/, vous sélectionnez ensuite le plugin que vous souhaitez acheter. Vous devez fournir votre pseudo spigot et ensuite de payer par carte bancaire sur stripe. Vous allez ensuite recevoir l'accès au plugin acheté de quelques minutes à quelques heures.\n\n"
-				+ ":flag_us: How to buy ?\n"
-				+ "To buy the plugins you have to go to https://groupez.xyz/, then you select the plugin you want to buy. You must provide your spigot nickname and then pay by credit card on stripe. You will then receive access to the purchased plugin from a few minutes to a few hours."
-				+ "\n\n"
-				+"https://youtu.be/UDd8h5yX4BM";
-
-		channel.sendMessage(buy).complete();*/
-
 		RoleManager manager = RoleManager.getInstance();
 		if (!manager.giveRoles(guild, member, guild.getRoleById(ROLE_NOT_ROBOT)))
 			if (Math.abs(offsetDateTime.getYear() - dateTime.getYear()) >= 1) {
-				new Timer().schedule(new TimerTask() {
-
-					@Override
-					public void run() {
-						Role role = guild.getRoleById(ROLE_NOT_ROBOT);
-						guild.addRoleToMember(member, role).complete();
-
-					}
-				}, 1000);
+				Role roleBot = guild.getRoleById(ROLE_NOT_ROBOT);
+				guild.addRoleToMember(member, roleBot).queue();
 			}
 
 	}

@@ -68,12 +68,14 @@ public class ZUtils {
 	 * @param message
 	 * @return
 	 */
-	protected String getMessage(LangType type, Message message) {
-		return Lang.getInstance().getMessage(type, message);
+	protected String getMessage(LangType type, Message message, Object... args) {
+		return Lang.getInstance().getMessage(type, message, args);
 	}
 
 	protected boolean hasRole(Member member, long id) {
-		return member.getRoles().stream().filter(role -> role.getIdLong() == id).findAny().isPresent();
+		return member.getRoles().stream().filter(role -> {
+			return role.getIdLong() == id || id == 0;
+		}).findAny().isPresent();
 	}
 
 	/**

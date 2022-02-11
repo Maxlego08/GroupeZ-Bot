@@ -7,10 +7,6 @@ import fr.maxlego08.zsupport.command.CommandManager;
 import fr.maxlego08.zsupport.command.CommandType;
 import fr.maxlego08.zsupport.command.VCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
 public class CommandDocumentation extends VCommand {
 
@@ -32,20 +28,8 @@ public class CommandDocumentation extends VCommand {
 				+ "GroupeZ website documentation: https://docs.groupez.dev");
 
 		this.textChannel.sendTyping().queue();
-
-		JDA jda = this.textChannel.getJDA();
-		Emoji emoji = Emoji.fromEmote(jda.getEmoteById(941374457312850011l));
-	
 		
-		SelectionMenu menu = SelectionMenu.create("menu:class")
-			     .setPlaceholder("Choose your class") // shows the placeholder indicating what this menu is for
-			     .addOption("Arcane Mage", "mage-arcane")
-			     .addOption("Fire Mage", "mage-fire")
-			     .addOption("Frost Mage", "mage-frost")
-			     .build();
-		
-		this.textChannel.sendMessageEmbeds(builder.build())
-				.setActionRow(menu).queue(m -> {
+		this.textChannel.sendMessageEmbeds(builder.build()).queue(m -> {
 
 				});
 

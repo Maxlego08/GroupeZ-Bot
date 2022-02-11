@@ -49,10 +49,12 @@ public abstract class VCommand extends Arguments implements Constant {
 	protected TextChannel textChannel;
 	protected Guild guild;
 
+	protected boolean deleteMessage = true;
+
 	public boolean isOnlyInCommandChannel() {
 		return onlyInCommandChannel;
 	}
-	
+
 	/**
 	 * Permet de savoir le nombre de parent de façon récursive
 	 * 
@@ -72,15 +74,16 @@ public abstract class VCommand extends Arguments implements Constant {
 	 */
 	public CommandType prePerform(ZSupport main, Sender commandSender, String[] args, MessageReceivedEvent event) {
 
-		// On met à jour le nombre d'argument en fonction du nombre de parent
+		// We update the number of arguments according to the number of parents
 
-		parentCount = parentCount(0);
-		argsMaxLength = requireArgs.size() + optionalArgs.size() + parentCount;
-		argsMinLength = requireArgs.size() + parentCount;
+		this.parentCount = parentCount(0);
+		this.argsMaxLength = this.requireArgs.size() + this.optionalArgs.size() + this.parentCount;
+		this.argsMinLength = this.requireArgs.size() + this.parentCount;
 
-		// On génère le syntaxe de base s'il y est impossible de la trouver
-		if (syntaxe == null)
-			syntaxe = generateDefaultSyntaxe("");
+		// We generate the basic syntax if it is impossible to find it
+		if (this.syntaxe == null) {
+			this.syntaxe = generateDefaultSyntaxe("");
+		}
 
 		this.args = args;
 
@@ -93,25 +96,30 @@ public abstract class VCommand extends Arguments implements Constant {
 			}
 		}
 
-		if (argsMinLength != 0 && argsMaxLength != 0
-				&& !(args.length >= argsMinLength && args.length <= argsMaxLength)) {
+		if (this.argsMinLength != 0 && this.argsMaxLength != 0
+				&& !(args.length >= this.argsMinLength && args.length <= this.argsMaxLength)) {
 			return CommandType.SYNTAX_ERROR;
 		}
 
 		this.sender = commandSender;
-		if (sender instanceof PlayerSender)
-			player = (PlayerSender) commandSender;
+		if (this.sender instanceof PlayerSender) {
+			this.player = (PlayerSender) commandSender;
+		}
 
 		this.event = event;
 		if (event != null) {
 			this.textChannel = event.getTextChannel();
 			this.guild = event.getGuild();
+
+			if (this.deleteMessage) {
+				event.getMessage().delete().queue();
+			}
 		}
 
 		try {
 			return perform(main);
 		} catch (Exception e) {
-			if (DEBUG) {
+			if (this.DEBUG) {
 				System.out.println(PREFIX_CONSOLE + "Commands: " + toString());
 				System.out.println(PREFIX_CONSOLE + "Error:");
 				e.printStackTrace();
@@ -121,7 +129,7 @@ public abstract class VCommand extends Arguments implements Constant {
 	}
 
 	protected TextChannel getChannel(long id) {
-		return guild.getTextChannelById(id);
+		return this.guild.getTextChannelById(id);
 	}
 
 	/**
@@ -130,7 +138,7 @@ public abstract class VCommand extends Arguments implements Constant {
 	protected abstract CommandType perform(ZSupport main);
 
 	public boolean isPlayerCanUse() {
-		return playerCanUse;
+		return this.playerCanUse;
 	}
 
 	/**
