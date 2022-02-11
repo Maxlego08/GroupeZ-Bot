@@ -16,8 +16,13 @@ public class Config implements Saveable {
 	public static long ticketChannel = 712305238748692572l;
 	public static long ticketOrderChannel = 937373283911872542l;
 	public static long commandChannel = 714518716943171605l;
+	public static long pluginsChannel = 941739992139579523l;
+	public static long groupezEmote = 710806746779615233l;
+	
 
 	public static String API_URL = "https://groupez.dev/api/v1/discord/%s";
+	public static String API_RESOURCE_URL = "https://groupez.dev/api/v1/resource/%s";
+	public static String RESOURCE_URL = "https://groupez.dev/resources/%s";
 	public static String DASHBOARD_URL = "https://groupez.dev/dashboard/users/%s";
 	
 	public static List<Plugin> plugins = new ArrayList<>();

@@ -30,7 +30,7 @@ public class TicketOrder extends Step {
 
 		this.ticket.setWaiting(false);
 
-		TextChannel channel = ticket.getTextChannel();
+		TextChannel channel = ticket.getTextChannel(guild);
 		PermissionOverrideAction permissionOverrideAction = channel.putPermissionOverride(member);
 		permissionOverrideAction.setAllow(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue();
 
