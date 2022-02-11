@@ -82,11 +82,13 @@ public class PluginManager extends ZUtils implements Constant {
 			}.getType();
 
 			Resource resource = gson.fromJson(response.toString(), resourceType);
-			
+
 			int[] colorRGB = ImageHelper.getHexColor(resource.getLogo());
 
 			EmbedBuilder builder = new EmbedBuilder();
-			builder.setColor(new Color(colorRGB[0], colorRGB[1], colorRGB[2]));
+			if (colorRGB.length == 3) {
+				builder.setColor(new Color(colorRGB[0], colorRGB[1], colorRGB[2]));
+			}
 			builder.setTimestamp(OffsetDateTime.now());
 			builder.setFooter("2022 - " + guild.getName(), guild.getIconUrl());
 
