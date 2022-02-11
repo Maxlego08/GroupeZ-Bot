@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -18,8 +19,17 @@ public class TicketListener extends ListenerAdapter implements Constant {
 	public TicketListener(TicketManager manager) {
 		super();
 		this.manager = manager;
-	}	
+	}
 
+	@Override
+	public void onSelectionMenu(SelectionMenuEvent event) {
+		if (event.getChannel().getName().contains("ticket-") && !event.getUser().isBot()) {
+
+			this.manager.stepSelectionMenu(event, event.getUser(), event.getGuild(), event.getChannel());
+
+		}
+	}
+	
 	@Override
 	public void onButtonClick(ButtonClickEvent event) {
 
@@ -28,8 +38,11 @@ public class TicketListener extends ListenerAdapter implements Constant {
 		if (event.getChannel().getIdLong() == Config.ticketChannel && !event.getUser().isBot()) {
 
 			LangType langType = button.getId().equals(BUTTON_FR) ? LangType.FR : LangType.US;
-			this.manager.createTicket(event.getUser(), event.getGuild(), langType, event.getChannel(),
-					event);
+			this.manager.createTicket(event.getUser(), event.getGuild(), langType, event.getChannel(), event);
+
+		} else if (event.getChannel().getName().contains("ticket-") && !event.getUser().isBot()) {
+
+			this.manager.stepButton(event, event.getUser(), event.getGuild(), event.getChannel());
 
 		}
 

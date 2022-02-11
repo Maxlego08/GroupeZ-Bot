@@ -49,4 +49,8 @@ public class Plugin {
 		return role;
 	}
 
+	public boolean isReal() {
+		return this.emoteId != 0 && this.role != 0 && this.plugin_id != 0;
+	}
+
 }

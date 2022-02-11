@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import fr.maxlego08.zsupport.Config;
@@ -27,6 +28,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.managers.ChannelManager;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
@@ -54,9 +56,9 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 * @param user
 	 * @return
 	 */
-	public Ticket getByUser(User user) {
+	public Optional<Ticket> getByUser(User user) {
 		ticketIsValid();
-		return tickets.stream().filter(ticket -> ticket.getUserId() == user.getIdLong()).findAny().orElse(null);
+		return tickets.stream().filter(ticket -> ticket.getUserId() == user.getIdLong()).findAny();
 	}
 
 	/**
@@ -64,9 +66,9 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 * @param user
 	 * @return
 	 */
-	public Ticket getByChannel(TextChannel channel) {
+	public Optional<Ticket> getByChannel(TextChannel channel) {
 		ticketIsValid();
-		return tickets.stream().filter(ticket -> ticket.getChannelId() == channel.getIdLong()).findAny().orElse(null);
+		return tickets.stream().filter(ticket -> ticket.getChannelId() == channel.getIdLong()).findAny();
 	}
 
 	/**
@@ -74,8 +76,8 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 * @param id
 	 * @return
 	 */
-	public Plugin getById(long id) {
-		return Config.plugins.stream().filter(l -> l.getEmoteId() == id).findAny().orElse(null);
+	public Optional<Plugin> getById(long id) {
+		return Config.plugins.stream().filter(l -> l.getEmoteId() == id).findAny();
 	}
 
 	/**
@@ -87,16 +89,17 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 * @param user
 	 * @param guild
 	 * @param type
-	 * @param message2
+	 * @param messageChannel
+	 * @param event
 	 */
 	public void createTicket(User user, Guild guild, LangType type, MessageChannel messageChannel,
 			ButtonClickEvent event) {
 
-		Ticket ticket = getByUser(user);
-		if (ticket != null) {
+		Optional<Ticket> optional = getByUser(user);
+		if (optional.isPresent()) {
 
+			Ticket ticket = optional.get();
 			ticket.message(fr.maxlego08.zsupport.lang.Message.TICKET_ALREADY_CREATE);
-			
 
 		} else {
 
@@ -111,21 +114,29 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 			builder.setDescription(this.getMessage(type, Message.TICKET_CREATE_WAIT));
 
 			event.replyEmbeds(builder.build()).queue(message -> {
-								
+
 				manager.userIsLink(user, () -> {
 
-					Ticket createdTicket = new Ticket(type, guild.getIdLong(), user.getIdLong());
-					createdTicket.build(user, guild, getTicketFormat(), textChannel -> {
+					Ticket createdTicket = new Ticket(type, guild.getIdLong(), user.getIdLong(), this.getTicketName());
 
+					Step step = TicketStep.CHOOSE_TICKET_TYPE.getStep();
+					createdTicket.setStep(step);
+
+					step.preProcess(this, createdTicket, messageChannel, guild, user, event, () -> {
+
+						TextChannel textChannel = createdTicket.getTextChannel();
 						String stringMessage = this.getMessage(type, Message.TICKET_CREATE_SUCCESS)
 								+ textChannel.getAsMention();
-						builder.setDescription(stringMessage);
-						builder.setColor(new Color(45, 250, 45));
 
+						builder.setDescription(stringMessage);
+
+						builder.setColor(new Color(45, 250, 45));
 						message.editOriginalEmbeds(builder.build()).queue(messageEdit -> {
 							messageEdit.delete().queueAfter(10, TimeUnit.SECONDS);
 						});
+
 					});
+
 					tickets.add(createdTicket);
 					ZSupport.instance.save();
 
@@ -147,10 +158,11 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	}
 
 	/**
+	 * Return ticket name
 	 * 
-	 * @return
+	 * @return ticket name
 	 */
-	private String getTicketFormat() {
+	public String getTicketName() {
 		int ticket = Config.ticketNumber;
 		String tickets = String.format("ticket-#%04d", ticket);
 		Config.ticketNumber++;
@@ -165,6 +177,9 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	@Override
 	public void load(Persist persist) {
 		persist.loadOrSaveDefault(this, TicketManager.class);
+		tickets.forEach(ticket -> {
+			ticket.step(this);
+		});
 	}
 
 	/**
@@ -175,7 +190,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 */
 	public void choosePlugin(Guild guild, User user, long id) {
 
-		Ticket ticket = getByUser(user);
+		/*Ticket ticket = getByUser(user);
 		// Le joueur a déjà un ticket
 		if (ticket != null && ticket.isWaiting()) {
 
@@ -186,18 +201,19 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 			}
 
-		}
+		}*/
 	}
 
 	public void createVocal(PlayerSender player, TextChannel textChannel, Guild guild) {
 		if (player.hasPermission(Permission.MANAGE_CHANNEL)) {
 
-			Ticket ticket = getByChannel(textChannel);
-			if (ticket == null) {
+			Optional<Ticket> optional = getByChannel(textChannel);
+			if (!optional.isPresent()) {
 				System.out.println("Impossible de trouver le ticket.");
 				return;
 			}
 
+			Ticket ticket = optional.get();
 			Member member = guild.getMemberById(ticket.getUserId());
 
 			VoiceChannel channel = guild.getCategoryById(Config.ticketCategoryId)
@@ -217,13 +233,57 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 * @param user
 	 */
 	public void userLeave(Guild guild, User user) {
-		Ticket ticket = this.getByUser(user);
-		if (ticket != null) {
+		Optional<Ticket> optional = this.getByUser(user);
+		if (optional.isPresent()) {
 
+			Ticket ticket = optional.get();
+			
 			TextChannel channel = guild.getTextChannelById(ticket.getChannelId());
 			ChannelManager channelManager = channel.getManager();
 			channelManager.setName("user-leave").queue();
 
+		}
+	}
+
+	/**
+	 * 
+	 * @param event
+	 * @param user
+	 * @param guild
+	 * @param channel
+	 */
+	public void stepButton(ButtonClickEvent event, User user, Guild guild, MessageChannel channel) {
+
+		Optional<Ticket> optional = this.getByUser(user);
+		if (optional.isPresent()) {
+			
+			Ticket ticket = optional.get();
+			Step step = ticket.getStep();
+			
+			step.preButtonClick(this, event, user, guild, channel);
+			
+		}
+		
+	}
+
+	/**
+	 * Allows you to manage the Selection Menu
+	 * 
+	 * @param event
+	 * @param user
+	 * @param guild
+	 * @param channel
+	 */
+	public void stepSelectionMenu(SelectionMenuEvent event, User user, Guild guild, MessageChannel channel) {
+		
+		Optional<Ticket> optional = this.getByUser(user);
+		if (optional.isPresent()) {
+			
+			Ticket ticket = optional.get();
+			Step step = ticket.getStep();
+			
+			step.selectionClick(this, event, user, guild, channel);
+			
 		}
 	}
 

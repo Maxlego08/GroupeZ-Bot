@@ -15,7 +15,7 @@ public class MessageFR {
 		frMessage.put(Message.TICKET_DESC,
 				"Bienvenue dans votre ticket, un membre de l'équipe  viendra répondre à vos besoins sous peu.");
 		frMessage.put(Message.TICKET_PLUGIN_CHOOSE, "Clique sur le plugin pour lequel tu souhaites obtenir de l'aide:");
-		frMessage.put(Message.TICKET_PLUGIN, "Vous venez de choisir le plugin **%plugin%** %pluginEmote%.");
+		frMessage.put(Message.TICKET_PLUGIN, "Vous venez de choisir le plugin **%s** %s.");
 		frMessage.put(Message.TICKET_PLUGIN_ROLE,
 				"Vous avez déjà confirmé l'achat du plugin, vous pouvez directement poser votre question.");
 		frMessage.put(Message.TICKET_PLUGIN_ROLE_ERROR,
@@ -29,10 +29,16 @@ public class MessageFR {
 				"Impossible de prouver que vous avez acheter le plugin %plugin%.");
 
 		frMessage.put(Message.TICKET_CREATE_ERROR,
-				":x: Impossible de créer votre ticket, veuillez vérifier que votre compte discord est correctement relié au site.");
+				":x: Impossible de créer votre ticket, veuillez vérifier que votre compte discord est correctement relié au site.\nhttps://groupez.dev/dashboard/account");
 		frMessage.put(Message.TICKET_CREATE_SUCCESS, "Votre ticket est disponible ici : ");
 		frMessage.put(Message.TICKET_CREATE_WAIT,
 				"Vérification de la liaison de votre compte discord en cours, veuillez patienter.");
+
+		frMessage.put(Message.TICKET_WELCOME, "Bienvenue %s");
+		frMessage.put(Message.TICKET_PLUGIN_ERROR, "Une erreur est survenue, merci de contacter l'équipe.");
+
+		frMessage.put(Message.TICKET_CLOSE_BUTTON, "Fermer le ticket");
+		
 		return frMessage;
 	}
 

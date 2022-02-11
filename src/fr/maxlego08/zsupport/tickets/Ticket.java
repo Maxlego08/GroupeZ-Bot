@@ -31,6 +31,11 @@ public class Ticket extends ZUtils {
 	private final long userId;
 	private boolean isWaiting = true;
 	private String name;
+	private TicketStep ticketStep;
+	private String pluginName;
+
+	private transient TextChannel textChannel;
+	private transient Step step;
 
 	/**
 	 * @param lang
@@ -38,11 +43,12 @@ public class Ticket extends ZUtils {
 	 * @param guildId
 	 * @param userId
 	 */
-	public Ticket(LangType lang, long guildId, long userId) {
+	public Ticket(LangType lang, long guildId, long userId, String name) {
 		super();
 		this.type = lang;
 		this.guildId = guildId;
 		this.userId = userId;
+		this.name = name;
 	}
 
 	/**
@@ -83,6 +89,53 @@ public class Ticket extends ZUtils {
 	}
 
 	/**
+	 * @return the ticketStep
+	 */
+	public TicketStep getTicketStep() {
+		return ticketStep;
+	}
+
+	/**
+	 * @return the step
+	 */
+	public Step getStep() {
+		return step;
+	}
+
+	/**
+	 * @param channelId
+	 *            the channelId to set
+	 */
+	public void setChannelId(long channelId) {
+		this.channelId = channelId;
+	}
+
+	/**
+	 * @param isWaiting
+	 *            the isWaiting to set
+	 */
+	public void setWaiting(boolean isWaiting) {
+		this.isWaiting = isWaiting;
+	}
+
+	/**
+	 * @param ticketStep
+	 *            the ticketStep to set
+	 */
+	public void setTicketStep(TicketStep ticketStep) {
+		this.ticketStep = ticketStep;
+	}
+
+	/**
+	 * @param step
+	 *            the step to set
+	 */
+	public void setStep(Step step) {
+		this.step = step;
+		this.ticketStep = step.getStep();
+	}
+
+	/**
 	 * @return the channelId
 	 */
 	public long getChannelId() {
@@ -96,6 +149,15 @@ public class Ticket extends ZUtils {
 		return guildId;
 	}
 
+	public void setTextChannel(TextChannel textChannel) {
+		this.textChannel = textChannel;
+		this.channelId = textChannel.getIdLong();
+	}
+
+	public TextChannel getTextChannel() {
+		return textChannel;
+	}
+
 	/**
 	 * @return the userId
 	 */
@@ -107,13 +169,21 @@ public class Ticket extends ZUtils {
 		return name;
 	}
 
+	public void setPlugin(Plugin plugin) {
+		this.pluginName = plugin.getName();
+	}
+
+	public Plugin getPlugin() {
+		return Config.plugins.stream().filter(e -> e.getName().equals(this.pluginName)).findFirst().orElse(new Plugin(this.pluginName, 0, 0, 0));
+	}
+
 	/**
 	 * 
 	 * @param message
 	 * @return
 	 */
-	protected String getMessage(Message message) {
-		return super.getMessage(this.type, message);
+	public String getMessage(Message message, Object... args) {
+		return super.getMessage(this.type, message, args);
 	}
 
 	/**
@@ -246,10 +316,20 @@ public class Ticket extends ZUtils {
 		channel.sendMessageEmbeds(builder.build()).queue();
 
 		ChannelManager channelManager = channel.getManager();
-		channelManager.setName(channel.getName() + "-" + plugin.getName()).queue();	
+		channelManager.setName(channel.getName() + "-" + plugin.getName()).queue();
 
 		this.isWaiting = false;
 
+	}
+
+	public void step(TicketManager manager) {
+		if (this.ticketStep == null) {
+			System.out.println("Le step est null!");
+			return;
+		}
+		this.step = this.ticketStep.getStep();
+		this.step.manager = manager;
+		this.step.ticket = this;
 	}
 
 }

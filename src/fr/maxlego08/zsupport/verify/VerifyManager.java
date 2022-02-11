@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -124,12 +125,14 @@ public class VerifyManager extends ZUtils {
 	 * @param delete
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	private void sendData(User user, TextChannel textChannel, PlayerSender sender, boolean delete) throws Exception {
 
 		Guild guild = textChannel.getGuild();
 
 		String urlAsString = String.format(Config.API_URL, user.getIdLong());
 		URL url = new URL(urlAsString);
+
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
 		// add reuqest header
@@ -147,7 +150,7 @@ public class VerifyManager extends ZUtils {
 
 		// If the query returned an error
 		if (responseCode != 200) {
-			this.sendErrorMessage(textChannel, user, guild, BasicMessage.VERIFY_ERROR);
+			this.sendErrorMessage(textChannel, user, guild, BasicMessage.VERIFY_ERROR, null);
 			return;
 		}
 
@@ -162,20 +165,28 @@ public class VerifyManager extends ZUtils {
 
 		Gson gson = ZSupport.instance.getGson();
 
-		Type listType = new TypeToken<List<GPlugin>>() {
+		Type listType = new TypeToken<Map<String, Object>>() {
 		}.getType();
-		List<GPlugin> list = gson.fromJson(response.toString(), listType);
+
+		Map<String, Object> values = gson.fromJson(response.toString(), listType);
+
+		Map<String, Object> userAsMap = (Map<String, Object>) values.get("user");
+		GUser gUser = new GUser((String) userAsMap.get("name"), ((Number) userAsMap.get("id")).intValue(),
+				(String) userAsMap.get("avatar"));
+
+		List<GPlugin> list = GPlugin.toList((List<Object>) values.get("plugins"));
 
 		// If the user has not purchased any plugin
+
 		if (list.size() == 0) {
-			this.sendErrorMessage(textChannel, user, guild, BasicMessage.VERIFY_ERROR_EMPTY);
+			this.sendErrorMessage(textChannel, user, guild, BasicMessage.VERIFY_ERROR_EMPTY, gUser);
 			return;
 		}
 
 		Member member = sender.getMember();
 
 		List<Role> roles = list.stream().map(e -> {
-			Optional<Plugin> optional = Config.getPlugin(e.getPlugin_id());
+			Optional<Plugin> optional = Config.getPlugin(e.getPluginId());
 			if (optional.isPresent()) {
 				Plugin plugin = optional.get();
 				Role role = guild.getRoleById(plugin.getRole());
@@ -189,7 +200,7 @@ public class VerifyManager extends ZUtils {
 
 		// If the user already has all the roles
 		if (roles.size() == 0) {
-			this.sendErrorMessage(textChannel, user, guild, BasicMessage.VERIFY_ERROR_ALREADY);
+			this.sendErrorMessage(textChannel, user, guild, BasicMessage.VERIFY_ERROR_ALREADY, gUser);
 			return;
 		}
 
@@ -198,9 +209,10 @@ public class VerifyManager extends ZUtils {
 		Random random = new Random();
 		EmbedBuilder builder = new EmbedBuilder();
 
-		builder.setTitle("GroupeZ - " + user.getAsTag());
+		builder.setTitle("GroupeZ - " + user.getAsTag(), gUser.getDashboardURL());
 		builder.setColor(Color.getHSBColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
 		builder.setFooter("2022 - " + guild.getName(), guild.getIconUrl());
+		builder.setThumbnail(gUser.getAvatar());
 
 		String footer = "\n\n\nUse ``!verify`` to verify your account.";
 
@@ -227,14 +239,21 @@ public class VerifyManager extends ZUtils {
 	 * @param guild
 	 * @param basicMessage
 	 */
-	private void sendErrorMessage(TextChannel textChannel, User user, Guild guild, BasicMessage basicMessage) {
+	private void sendErrorMessage(TextChannel textChannel, User user, Guild guild, BasicMessage basicMessage,
+			GUser gUser) {
 		EmbedBuilder builder = new EmbedBuilder();
 
-		builder.setTitle("GroupeZ - " + user.getAsTag());
 		builder.setColor(new Color(240, 10, 10));
 		builder.setFooter("2022 - " + guild.getName(), guild.getIconUrl());
 
 		builder.setDescription(basicMessage.getMessage());
+
+		if (gUser != null) {
+			builder.setTitle("GroupeZ - " + user.getAsTag(), gUser.getDashboardURL());
+			builder.setThumbnail(gUser.getAvatar());
+		} else {
+			builder.setTitle("GroupeZ - " + user.getAsTag());
+		}
 
 		textChannel.sendMessageEmbeds(builder.build()).queue();
 	}
