@@ -1,4 +1,4 @@
-package fr.maxlego08.zsupport.utils;
+package fr.maxlego08.zsupport.utils.image;
 
 import java.awt.Graphics2D;
 import java.awt.Image;

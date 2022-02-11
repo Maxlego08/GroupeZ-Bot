@@ -1,14 +1,12 @@
 package fr.maxlego08.zsupport.plugins;
 
 import java.awt.Color;
-import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.time.OffsetDateTime;
 
-import javax.imageio.ImageIO;
 import javax.net.ssl.HttpsURLConnection;
 
 import com.google.gson.Gson;
@@ -17,9 +15,9 @@ import com.google.gson.reflect.TypeToken;
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.utils.Constant;
-import fr.maxlego08.zsupport.utils.ImageDominantColor;
 import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.ZUtils;
+import fr.maxlego08.zsupport.utils.image.ImageHelper;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
@@ -84,17 +82,8 @@ public class PluginManager extends ZUtils implements Constant {
 			}.getType();
 
 			Resource resource = gson.fromJson(response.toString(), resourceType);
-
-			URL urlImage = new URL(resource.getLogo());
-			HttpsURLConnection conImage = (HttpsURLConnection) urlImage.openConnection();
-
-			// add reuqest header
-			conImage.setRequestMethod("GET");
-			conImage.setRequestProperty("User-Agent", "Mozilla/5.0");
-			conImage.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-
-			Image image = ImageIO.read(conImage.getInputStream());
-			int[] colorRGB = ImageDominantColor.getHexColor(ImageDominantColor.toBufferedImage(image));
+			
+			int[] colorRGB = ImageHelper.getHexColor(resource.getLogo());
 
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.setColor(new Color(colorRGB[0], colorRGB[1], colorRGB[2]));

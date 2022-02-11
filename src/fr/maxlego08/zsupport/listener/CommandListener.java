@@ -45,12 +45,7 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 			command = command.replaceFirst(commands, "");
 			String[] args = command.length() != 0 ? get(command.split(" ")) : new String[0];
 			PlayerSender sender = new DiscordPlayer(user, member, event.getTextChannel());
-			instance.getCommandManager().onCommand(sender, commands, args, event);
-			try {
-				event.getMessage().delete().queue();
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
+			this.instance.getCommandManager().onCommand(sender, commands, args, event);
 		}
 
 	}
@@ -63,7 +58,7 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 	}
 
 	public void onDisable() {
-		instance.onDisable();
+		this.instance.onDisable();
 		this.isRunning = false;
 	}
 
