@@ -39,6 +39,9 @@ public class MessageFR {
 
 		frMessage.put(Message.TICKET_CLOSE_BUTTON, "Fermer le ticket");
 		
+		frMessage.put(Message.TICKET_OTHER, "Veuillez détailler la demande de votre ticket.");
+		frMessage.put(Message.TICKET_CLOSE, "Fermure du ticket dans %s seconde%s");
+		
 		return frMessage;
 	}
 

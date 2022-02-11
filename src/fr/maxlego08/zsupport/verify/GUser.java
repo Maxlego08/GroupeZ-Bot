@@ -7,7 +7,7 @@ public class GUser {
 	private final String name;
 	private final int id;
 	private final String avatar;
-	private final long updatedAt;
+	private final long expiredAt;
 
 	/**
 	 * @param name
@@ -19,7 +19,7 @@ public class GUser {
 		this.name = name;
 		this.id = id;
 		this.avatar = avatar;
-		this.updatedAt = System.currentTimeMillis();
+		this.expiredAt = System.currentTimeMillis() + (1000 * 60 * 5);
 	}
 
 	/**
@@ -43,12 +43,16 @@ public class GUser {
 		return avatar;
 	}
 
-	public long getUpdatedAt() {
-		return updatedAt;
+	public long getExpiredAt() {
+		return expiredAt;
 	}
 
 	public String getDashboardURL() {
 		return String.format(Config.DASHBOARD_URL, this.id);
+	}
+
+	public boolean isExpired() {
+		return System.currentTimeMillis() > this.expiredAt;
 	}
 
 }

@@ -73,7 +73,9 @@ public class ZUtils {
 	}
 
 	protected boolean hasRole(Member member, long id) {
-		return member.getRoles().stream().filter(role -> role.getIdLong() == id).findAny().isPresent();
+		return member.getRoles().stream().filter(role -> {
+			return role.getIdLong() == id || id == 0;
+		}).findAny().isPresent();
 	}
 
 	/**

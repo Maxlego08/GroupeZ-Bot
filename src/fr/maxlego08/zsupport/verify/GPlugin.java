@@ -51,8 +51,6 @@ public class GPlugin {
 
 			Map<String, Object> map = (Map<String, Object>) e;
 
-			System.out.println(map);
-
 			int id = ((Number) map.get("id")).intValue();
 			int pluginId = ((Number) map.get("plugin_id")).intValue();
 			int userId = ((Number) map.get("user_id")).intValue();

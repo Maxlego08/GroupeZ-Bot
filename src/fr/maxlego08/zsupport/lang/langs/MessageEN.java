@@ -38,6 +38,9 @@ public class MessageEN {
 		
 		usMessage.put(Message.TICKET_CLOSE_BUTTON, "Close ticket");
 		
+		usMessage.put(Message.TICKET_OTHER, "Please detail your ticket request.");
+		usMessage.put(Message.TICKET_CLOSE, "Ticket closes in %s seconds%s");
+		
 		return usMessage;
 
 	}
