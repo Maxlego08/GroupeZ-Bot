@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 
@@ -26,7 +25,7 @@ public class TicketListener extends ListenerAdapter implements Constant {
 		if (event.getChannel().getName().contains("ticket-") && !event.getUser().isBot()) {
 
 			this.manager.stepSelectionMenu(event, event.getUser(), event.getGuild(), event.getChannel());
-
+			
 		}
 	}
 	
@@ -49,26 +48,12 @@ public class TicketListener extends ListenerAdapter implements Constant {
 	}
 
 	@Override
-	public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-
-		if (event.getChannel().getName().contains("ticket-") && event.getReactionEmote().isEmote()
-				&& !event.getUser().isBot()) {
-
-			long id = event.getReactionEmote().getIdLong();
-			event.getReaction().removeReaction(event.getUser()).queue();
-
-			// Permet de choisir le plugin
-			manager.choosePlugin(event.getGuild(), event.getUser(), id);
-
-		}
-	}
-
-	@Override
 	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
 
 		User user = event.getUser();
 		Guild guild = event.getGuild();
-		manager.userLeave(guild, user);
+		this.manager.userLeave(guild, user);
+		
 	}
 
 }
