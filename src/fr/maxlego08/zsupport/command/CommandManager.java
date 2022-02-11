@@ -9,6 +9,7 @@ import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.command.commands.CommandClear;
 import fr.maxlego08.zsupport.command.commands.CommandDocumentation;
+import fr.maxlego08.zsupport.command.commands.CommandPurchase;
 import fr.maxlego08.zsupport.command.commands.CommandRoles;
 import fr.maxlego08.zsupport.command.commands.CommandServer;
 import fr.maxlego08.zsupport.command.commands.CommandStop;
@@ -43,6 +44,7 @@ public class CommandManager extends ZUtils implements Constant {
 		registetCommand("documentation", new CommandDocumentation(this), "d", "doc", "docs");
 		registetCommand("clear", new CommandClear(this));
 		registetCommand("verify", new CommandVerify(this));
+		registetCommand("howtopurchase", new CommandPurchase(this));
 		registetCommand("suggestion-traitment", new SuggestionTraitmentCommand(this), "st");
 	}
 

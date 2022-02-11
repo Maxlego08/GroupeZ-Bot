@@ -29,7 +29,7 @@ public class CommandTicketSet extends VCommand {
 		builder.setTitle("Create a ticket");
 		builder.setColor(new Color(45, 45, 45));
 		builder.setTimestamp(OffsetDateTime.now());
-		builder.setFooter("2020 - " + this.guild.getName(), this.guild.getIconUrl());
+		builder.setFooter("2022 - " + this.guild.getName(), this.guild.getIconUrl());
 
 		String desc = "";
 
