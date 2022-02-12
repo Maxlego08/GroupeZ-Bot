@@ -11,18 +11,18 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 
-public class TicketOrder extends Step {
+public class TicketSpigot extends Step {
 
 	@Override
 	public void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user) {
 
 		EmbedBuilder builder = this.createEmbed();
 
-		builder.setDescription(this.ticket.getMessage(Message.TICKET_ORDER));
+		builder.setDescription(this.ticket.getMessage(Message.TICKET_SPIGOT));
 
 		this.event.editMessageEmbeds(builder.build()).setActionRow(this.createCloseButton()).queue();
-
-		this.endQuestions(guild, ticket.getName() + "-custom", true);
+		
+		this.endQuestions(guild, ticket.getName() + "-spigot");
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class TicketOrder extends Step {
 
 	@Override
 	public TicketStep getStep() {
-		return TicketStep.ORDER;
+		return TicketStep.CHOOSE_SPIGOT;
 	}
 
 }

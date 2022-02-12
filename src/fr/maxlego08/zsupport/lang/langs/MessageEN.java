@@ -13,7 +13,7 @@ public class MessageEN {
 		usMessage.put(Message.TICKET_ALREADY_CREATE,
 				"**Warning!** %user% you've already opened a ticket here! No need to try to create another one.");
 		usMessage.put(Message.TICKET_ALREADY_CREATE_REPLY, "You already have an open ticket: %s.");
-		
+
 		usMessage.put(Message.TICKET_DESC,
 				"Welcome to your ticket, a member of the team will come to meet your needs shortly.");
 		usMessage.put(Message.TICKET_PLUGIN_CHOOSE, "Click on the plugin for which you want help:");
@@ -56,11 +56,15 @@ public class MessageEN {
 
 		usMessage.put(Message.TICKET_CHOOSE,
 				"Please choose the type of your ticket:" + "\n" + "\n" + ":dollar: To take an order" + "\n"
-						+ ":question: To request help on a plugin" + "\n" + "\n");
+						+ ":question: To request help on a plugin" + "\n" + "%s To request access on spigot" + "\n");
 
-		usMessage.put(Message.TICKET_CHOOSE_ORDER, "Place an order");
+		usMessage.put(Message.TICKET_CHOOSE_ORDER, "Take an order");
 		usMessage.put(Message.TICKET_CHOOSE_PLUGIN, "Plugin support");
-		
+		usMessage.put(Message.TICKET_CHOOSE_SPIGOT, "Request access on spigot");
+
+		usMessage.put(Message.TICKET_SPIGOT,
+				"To request access you need to provide the name of your spigot account as well as the list of plugins where you want access.");
+
 		return usMessage;
 
 	}

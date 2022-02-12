@@ -2,7 +2,7 @@ package fr.maxlego08.zsupport.utils;
 
 public interface Constant {
 
-	final String VERSION = "3.0.0";
+	final String VERSION = "3.0.1";
 	final String PREFIX_CONSOLE = "[zSupport V" + VERSION + "] ";
 	final String COMMAND_PREFIX = "!";
 	final long CHANNEL_ROBOT = 527778577245011988l;
@@ -18,6 +18,7 @@ public interface Constant {
 	final String BUTTON_FR = "btn:FR";
 	final String BUTTON_EN = "btn:EN";
 
+	final String BUTTON_CHOOSE_SPIGOT = "btn:spigot";
 	final String BUTTON_CHOOSE_ORDER = "btn:order";
 	final String BUTTON_CHOOSE_SUPPORT = "btn:help";
 	
