@@ -4,11 +4,13 @@ import java.awt.Color;
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
 
+import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -76,6 +78,10 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 		this.member = guild.getMember(user);
 		Button button = event.getButton();
 
+		if (button.getId().equals(BUTTON_CLOSE)) {
+			this.closeTicket(ticket, event);
+		}
+
 		this.buttonClick(ticket, channel, guild, user, button, event);
 	}
 
@@ -122,13 +128,14 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 
 	/**
 	 * Allows you to close a ticket with a timer.
+	 * 
 	 * @param ticket
 	 * @param event
 	 */
 	protected void closeTicket(Ticket ticket, ButtonClickEvent event) {
 		EmbedBuilder builder = this.createEmbed();
 		builder.setDescription(ticket.getMessage(Message.TICKET_CLOSE, 10, "s"));
-		
+
 		ticket.setClose(true);
 
 		event.replyEmbeds(builder.build()).queue(e -> {
@@ -150,12 +157,46 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 						channelManager.setName(ticket.getName() + "-close").queue();
 
 						e4.delete().queue();
-						
 
 					});
 				});
 			});
 		});
+	}
+
+	/**
+	 * Allows to finish the questions and to give access to the user to write
+	 * 
+	 * @param guild
+	 * @param ticketName
+	 */
+	protected void endQuestions(Guild guild, String ticketName) {
+		this.endQuestions(guild, ticketName, false);
+	}
+
+	/**
+	 * Allows to finish the questions and to give access to the user to write
+	 * 
+	 * @param guild
+	 * @param ticketName
+	 * @param move
+	 */
+	protected void endQuestions(Guild guild, String ticketName, boolean move) {
+
+		this.ticket.setWaiting(false);
+
+		TextChannel channel = this.ticket.getTextChannel(guild);
+		PermissionOverrideAction permissionOverrideAction = channel.putPermissionOverride(member);
+		permissionOverrideAction.setAllow(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue();
+
+		ChannelManager channelManager = channel.getManager();
+		channelManager.setName(ticketName).queue(e -> {
+			if (move) {
+				Category category = guild.getCategoryById(Config.ticketOrderChannel);
+				channelManager.setParent(category).queue();
+			}
+		});
+
 	}
 
 }

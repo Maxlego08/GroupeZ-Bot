@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -39,20 +40,26 @@ public class TicketTypeStep extends Step {
 				String welcomeMessage = ticket.getMessage(Message.TICKET_WELCOME, user.getAsMention());
 				channel.sendMessage(welcomeMessage).queue();
 
+				Emote emote = guild.getEmoteById(Config.spigotEmote);
 				EmbedBuilder builder = this.createEmbed();
 
-				builder.setDescription(this.ticket.getMessage(Message.TICKET_CHOOSE));
+				builder.setDescription(this.ticket.getMessage(Message.TICKET_CHOOSE, emote.getAsMention()));
 
 				MessageAction action = channel.sendMessageEmbeds(builder.build());
 
 				Button buttonOrder = new ButtonImpl(BUTTON_CHOOSE_ORDER,
 						this.ticket.getMessage(Message.TICKET_CHOOSE_ORDER), ButtonStyle.SECONDARY, false,
 						Emoji.fromUnicode("U+1F4B5"));
+
 				Button buttonHelp = new ButtonImpl(BUTTON_CHOOSE_SUPPORT,
 						this.ticket.getMessage(Message.TICKET_CHOOSE_PLUGIN), ButtonStyle.SECONDARY, false,
 						Emoji.fromUnicode("U+2753"));
 
-				action.setActionRow(buttonHelp, buttonOrder);
+				Button buttonSpigot = new ButtonImpl(BUTTON_CHOOSE_SPIGOT,
+						this.ticket.getMessage(Message.TICKET_CHOOSE_SPIGOT), ButtonStyle.SECONDARY, false,
+						Emoji.fromEmote(emote));
+
+				action.setActionRow(buttonHelp, buttonOrder, buttonSpigot);
 				action.queue();
 
 			});
@@ -71,7 +78,9 @@ public class TicketTypeStep extends Step {
 			ButtonClickEvent event) {
 
 		String buttonId = button.getId();
-		Step step = (buttonId.equals(BUTTON_CHOOSE_ORDER) ? TicketStep.ORDER : TicketStep.CHOOSE_PLUGIN).getStep();
+		Step step = (buttonId.equals(BUTTON_CHOOSE_ORDER) ? TicketStep.ORDER
+				: buttonId.equals(BUTTON_CHOOSE_SPIGOT) ? TicketStep.CHOOSE_SPIGOT : TicketStep.CHOOSE_PLUGIN)
+						.getStep();
 		ticket.setStep(step);
 
 		step.preProcess(this.manager, ticket, messageChannel, guild, user, event, null);

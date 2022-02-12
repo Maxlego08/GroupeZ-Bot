@@ -59,10 +59,14 @@ public class MessageFR {
 
 		frMessage.put(Message.TICKET_CHOOSE,
 				"Veuillez choisir le type de votre ticket:" + "\n" + "\n" + ":dollar: Pour passer une commande" + "\n"
-						+ ":question: Pour demander de l'aide sur un plugin" + "\n" + "\n");
+						+ ":question: Pour demander de l'aide sur un plugin" + "\n" + "%s Pour demander l'accès sur spigot" + "\n");
 
 		frMessage.put(Message.TICKET_CHOOSE_ORDER, "Passer une commande");
 		frMessage.put(Message.TICKET_CHOOSE_PLUGIN, "Support plugins");
+		frMessage.put(Message.TICKET_CHOOSE_SPIGOT, "Demander l'accès sur spigot");
+
+		frMessage.put(Message.TICKET_SPIGOT,
+				"Pour demander l'accès vous devez fournir le nom de votre compte spigot ainsi que la liste des plugins où vous voulez l'accès.");
 
 		return frMessage;
 	}
