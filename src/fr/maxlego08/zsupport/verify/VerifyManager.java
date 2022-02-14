@@ -321,7 +321,9 @@ public class VerifyManager extends ZUtils {
 			textChannel.sendTyping().queue();
 			textChannel.sendMessageEmbeds(builder.build()).queue();
 
-			consumer.accept(gUser);
+			if (consumer != null) {
+				consumer.accept(gUser);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
