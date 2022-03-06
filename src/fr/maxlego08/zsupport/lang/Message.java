@@ -32,4 +32,6 @@ public enum Message {
 	TICKET_CHOOSE_PLUGIN, 
 	TICKET_CHOOSE_SPIGOT,
 	
+	TICKET_HOUR,
+	
 }
