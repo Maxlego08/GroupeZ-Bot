@@ -3,8 +3,11 @@ package fr.maxlego08.zsupport.tickets;
 import java.awt.Color;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -29,12 +32,14 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.managers.ChannelManager;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 public class TicketManager extends ZUtils implements Constant, Saveable {
 
 	private static List<Ticket> tickets = new ArrayList<Ticket>();
+	private transient Map<Long, Long> cooldownMessages = new HashMap<Long, Long>();
 
 	public TicketManager(ZSupport support) {
 		super();
@@ -100,10 +105,11 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 			Ticket ticket = optional.get();
 			ticket.message(fr.maxlego08.zsupport.lang.Message.TICKET_ALREADY_CREATE);
-			
-			event.reply(this.getMessage(type, Message.TICKET_ALREADY_CREATE_REPLY, ticket.getTextChannel(guild).getAsMention())).queue(m -> {
-				m.deleteOriginal().queueAfter(10, TimeUnit.SECONDS);
-			});
+
+			event.reply(this.getMessage(type, Message.TICKET_ALREADY_CREATE_REPLY,
+					ticket.getTextChannel(guild).getAsMention())).queue(m -> {
+						m.deleteOriginal().queueAfter(10, TimeUnit.SECONDS);
+					});
 
 		} else {
 
@@ -194,18 +200,18 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 */
 	public void choosePlugin(Guild guild, User user, long id) {
 
-		/*Ticket ticket = getByUser(user);
-		// Le joueur a déjà un ticket
-		if (ticket != null && ticket.isWaiting()) {
-
-			Plugin plugin = getById(id);
-			if (plugin != null) {
-
-				ticket.choose(plugin, guild, user);
-
-			}
-
-		}*/
+		/*
+		 * Ticket ticket = getByUser(user); // Le joueur a déjà un ticket if
+		 * (ticket != null && ticket.isWaiting()) {
+		 * 
+		 * Plugin plugin = getById(id); if (plugin != null) {
+		 * 
+		 * ticket.choose(plugin, guild, user);
+		 * 
+		 * }
+		 * 
+		 * }
+		 */
 	}
 
 	public void createVocal(PlayerSender player, TextChannel textChannel, Guild guild) {
@@ -241,7 +247,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 		if (optional.isPresent()) {
 
 			Ticket ticket = optional.get();
-			
+
 			TextChannel channel = guild.getTextChannelById(ticket.getChannelId());
 			ChannelManager channelManager = channel.getManager();
 			channelManager.setName("user-leave").queue();
@@ -260,14 +266,14 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 		Optional<Ticket> optional = this.getByUser(user);
 		if (optional.isPresent()) {
-			
+
 			Ticket ticket = optional.get();
 			Step step = ticket.getStep();
-			
+
 			step.preButtonClick(this, event, user, guild, channel);
-			
+
 		}
-		
+
 	}
 
 	/**
@@ -279,16 +285,50 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 * @param channel
 	 */
 	public void stepSelectionMenu(SelectionMenuEvent event, User user, Guild guild, MessageChannel channel) {
-		
+
 		Optional<Ticket> optional = this.getByUser(user);
 		if (optional.isPresent()) {
-			
+
 			Ticket ticket = optional.get();
 			Step step = ticket.getStep();
-			
+
 			step.selectionClick(this, event, user, guild, channel);
-			
+
 		}
+	}
+
+	/**
+	 * Allows to send information to say that there is no support at night
+	 * 
+	 * @param event
+	 * @param textChannel
+	 * @param author
+	 */
+	public void sendInformations(MessageReceivedEvent event, TextChannel textChannel, User user) {
+
+		Optional<Ticket> optional = this.getByUser(user);
+		if (optional.isPresent() && !event.getMember().hasPermission(Permission.MANAGE_CHANNEL)) {
+
+			Ticket ticket = optional.get();
+
+			Calendar calendar = Calendar.getInstance();
+			int hour = calendar.get(Calendar.HOUR_OF_DAY);
+
+			if (hour <= 9 || hour >= 20) {
+
+				if (this.cooldownMessages.getOrDefault(user.getIdLong(), 0l) > System.currentTimeMillis()) {
+					return;
+				}
+
+				this.cooldownMessages.put(user.getIdLong(), System.currentTimeMillis() + (1000 * 60 * 10));
+
+				String response = ticket.getMessage(Message.TICKET_HOUR, hour, calendar.get(Calendar.MINUTE));
+				net.dv8tion.jda.api.entities.Message message = event.getMessage();
+				message.reply(response).queue();
+
+			}
+		}
+
 	}
 
 }

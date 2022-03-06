@@ -65,6 +65,9 @@ public class MessageEN {
 		usMessage.put(Message.TICKET_SPIGOT,
 				"To request access you need to provide the name of your spigot account as well as the list of plugins where you want access.");
 
+		usMessage.put(Message.TICKET_HOUR,
+				":exclamation: Attention, it is currently **%s:%s** in France. The support is available only between **9 hours** and **20 hours** every day. However the support reserves the right to be less active during the weekends.");
+
 		return usMessage;
 
 	}

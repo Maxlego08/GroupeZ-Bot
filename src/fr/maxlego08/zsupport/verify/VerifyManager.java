@@ -308,6 +308,10 @@ public class VerifyManager extends ZUtils {
 			builder.setThumbnail(gUser.getAvatar());
 
 			String footer = "\n\n\nUse ``!verify`` to verify your account.";
+			if (textChannel.getIdLong() != Config.commandChannel) {
+				TextChannel commandChannel = guild.getTextChannelById(Config.commandChannel);
+				footer += "\nOn " + commandChannel.getAsMention();
+			}
 
 			if (roles.size() == 1) {
 				builder.setDescription("You just got the role: " + roles.get(0).getAsMention() + footer);
@@ -321,7 +325,9 @@ public class VerifyManager extends ZUtils {
 			textChannel.sendTyping().queue();
 			textChannel.sendMessageEmbeds(builder.build()).queue();
 
-			consumer.accept(gUser);
+			if (consumer != null) {
+				consumer.accept(gUser);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -342,7 +348,15 @@ public class VerifyManager extends ZUtils {
 		builder.setColor(new Color(240, 10, 10));
 		builder.setFooter("2022 - " + guild.getName(), guild.getIconUrl());
 
-		builder.setDescription(basicMessage.getMessage());
+		String desc = basicMessage.getMessage();
+
+		if (textChannel.getIdLong() != Config.commandChannel) {
+			TextChannel commandChannel = guild.getTextChannelById(Config.commandChannel);
+			desc = desc.replace("%channel%", "on " + commandChannel.getAsMention());
+		}
+		desc = desc.replace(" %channel%", "");
+
+		builder.setDescription(desc);
 
 		if (gUser != null) {
 			builder.setTitle("GroupeZ - " + user.getAsTag(), gUser.getDashboardURL());

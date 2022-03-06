@@ -59,7 +59,8 @@ public class MessageFR {
 
 		frMessage.put(Message.TICKET_CHOOSE,
 				"Veuillez choisir le type de votre ticket:" + "\n" + "\n" + ":dollar: Pour passer une commande" + "\n"
-						+ ":question: Pour demander de l'aide sur un plugin" + "\n" + "%s Pour demander l'accès sur spigot" + "\n");
+						+ ":question: Pour demander de l'aide sur un plugin" + "\n"
+						+ "%s Pour demander l'accès sur spigot" + "\n");
 
 		frMessage.put(Message.TICKET_CHOOSE_ORDER, "Passer une commande");
 		frMessage.put(Message.TICKET_CHOOSE_PLUGIN, "Support plugins");
@@ -67,6 +68,11 @@ public class MessageFR {
 
 		frMessage.put(Message.TICKET_SPIGOT,
 				"Pour demander l'accès vous devez fournir le nom de votre compte spigot ainsi que la liste des plugins où vous voulez l'accès.");
+
+		frMessage.put(Message.TICKET_HOUR,
+				":exclamation: Attention, il est actuellement **%s:%s** en france."
+						+ " Le support est disponible uniquement entre **9 heures** et **20 heures** tout les jours."
+						+ " Cependant le support se livre le droit d'être moins actif durant les weekends.");
 
 		return frMessage;
 	}

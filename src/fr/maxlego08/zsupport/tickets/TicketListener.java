@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 
@@ -25,6 +26,16 @@ public class TicketListener extends ListenerAdapter implements Constant {
 		if (event.getChannel().getName().contains("ticket-") && !event.getUser().isBot()) {
 
 			this.manager.stepSelectionMenu(event, event.getUser(), event.getGuild(), event.getChannel());
+			
+		}
+	}
+
+	@Override
+	public void onMessageReceived(MessageReceivedEvent event) {
+		// 	
+		if (event.getChannel().getName().contains("ticket-") && !event.getAuthor().isBot()) {
+
+			this.manager.sendInformations(event, event.getTextChannel(), event.getAuthor());
 			
 		}
 	}
