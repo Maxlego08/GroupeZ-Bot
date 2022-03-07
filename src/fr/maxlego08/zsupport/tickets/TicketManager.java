@@ -314,7 +314,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 			Calendar calendar = Calendar.getInstance();
 			int hour = calendar.get(Calendar.HOUR_OF_DAY);
 
-			if (hour <= 9 || hour >= 20) {
+			if (hour < 9 || hour >= 20) {
 
 				if (this.cooldownMessages.getOrDefault(user.getIdLong(), 0l) > System.currentTimeMillis()) {
 					return;
