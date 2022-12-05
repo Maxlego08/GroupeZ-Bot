@@ -17,7 +17,6 @@ import fr.maxlego08.zsupport.command.commands.CommandVerify;
 import fr.maxlego08.zsupport.command.commands.tickets.CommandTicketSet;
 import fr.maxlego08.zsupport.command.commands.tickets.CommandTicketVocal;
 import fr.maxlego08.zsupport.lang.BasicMessage;
-import fr.maxlego08.zsupport.suggestions.commands.SuggestionTraitmentCommand;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.utils.commands.ConsoleSender;
@@ -46,7 +45,7 @@ public class CommandManager extends ZUtils implements Constant {
 		registetCommand("verify", new CommandVerify(this));
 		registetCommand("howtopurchase", new CommandPurchase(this));
 		registetCommand("plugins", new CommandPlugins(this));
-		registetCommand("suggestion-traitment", new SuggestionTraitmentCommand(this), "st");
+		// registetCommand("suggestion-traitment", new SuggestionTraitmentCommand(this), "st");
 	}
 
 	public VCommand addCommand(VCommand command) {
