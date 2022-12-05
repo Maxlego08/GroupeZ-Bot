@@ -19,6 +19,7 @@ public class Config implements Saveable {
 	public static long pluginsChannel = 941739992139579523l;
 	public static long groupezEmote = 710806746779615233l;
 	public static long spigotEmote = 942107776883257364l;
+	public static long generalChannel = 511516467615760407l;
 	
 	public static String API_URL = "https://groupez.dev/api/v1/discord/%s";
 	public static String API_RESOURCE_URL = "https://groupez.dev/api/v1/resource/%s";

@@ -14,8 +14,9 @@ public class CommandRoles extends VCommand {
 
 	public CommandRoles(CommandManager commandManager) {
 		super(commandManager);
-		consoleCanUse = false;
-		onlyInCommandChannel = true;
+		this.consoleCanUse = false;
+		this.onlyInCommandChannel = true;
+		this.description = "Display the number of users by roles";
 	}
 
 	@Override
@@ -24,15 +25,15 @@ public class CommandRoles extends VCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Roles");
 		builder.setColor(Color.getHSBColor(5, 255, 5));
-		builder.setFooter("2020 - " + guild.getName(), guild.getIconUrl());
+		builder.setFooter("2022 - " + this.guild.getName(), this.guild.getIconUrl());
 		Config.plugins.forEach(plugin -> {
-			Role role = guild.getRoleById(plugin.getRole());
-			builder.addField(plugin.getName(), String.valueOf(getMember(role)), true);
+			Role role = this.guild.getRoleById(plugin.getRole());
+			if (role != null) {
+				builder.addField(plugin.getName(), String.valueOf(getMember(role)), true);
+			}
 		});
 
-		textChannel.sendTyping().queue();
-		textChannel.sendMessageEmbeds(builder.build()).complete();
-		builder.clear();
+		this.event.deferReply(true).addEmbeds(builder.build()).queue();
 
 		return CommandType.SUCCESS;
 	}

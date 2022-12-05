@@ -3,7 +3,6 @@ package fr.maxlego08.zsupport.command;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
@@ -26,7 +25,7 @@ import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import fr.maxlego08.zsupport.utils.commands.Sender;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 public class CommandManager extends ZUtils implements Constant {
 
@@ -72,7 +71,7 @@ public class CommandManager extends ZUtils implements Constant {
 	 * @param event
 	 * @return
 	 */
-	public boolean onCommand(Sender sender, String cmd, String[] args, MessageReceivedEvent event) {
+	public boolean onCommand(Sender sender, String cmd, String[] args, SlashCommandEvent event) {
 		for (VCommand command : this.commands) {
 			if (command.getSubCommands().contains(cmd.toLowerCase())) {
 				if ((args.length == 0 || command.isIgnoreParent()) && command.getParent() == null) {
@@ -140,14 +139,14 @@ public class CommandManager extends ZUtils implements Constant {
 	 * @return
 	 */
 	private CommandType processRequirements(VCommand command, Sender sender, String[] strings,
-			MessageReceivedEvent event) {
+			SlashCommandEvent event) {
 
 		if (!(sender instanceof PlayerSender) && !command.isConsoleCanUse()) {
-			sender.sendMessage(BasicMessage.COMMAND_NO_CONSOLE);
+			sender.sendMessage(event, BasicMessage.COMMAND_NO_CONSOLE);
 			return CommandType.DEFAULT;
 		}
 		if (!(sender instanceof ConsoleSender) && !command.isPlayerCanUse()) {
-			sender.sendEmbed(BasicMessage.COMMAND_NO_PLAYER, true);
+			sender.sendEmbed(event, BasicMessage.COMMAND_NO_PLAYER);
 			return CommandType.DEFAULT;
 		}
 		if (sender instanceof PlayerSender && command.isOnlyInCommandChannel()) {
@@ -162,9 +161,7 @@ public class CommandManager extends ZUtils implements Constant {
 				String message = ":x: You must use the " + commandChannel.getAsMention() + " to send a command.";
 				builder.setDescription(message);
 
-				event.getMessage().replyEmbeds(builder.build()).queue(msg -> {
-					msg.delete().queueAfter(10, TimeUnit.SECONDS);
-				});
+				event.deferReply(true).addEmbeds(builder.build()).queue();
 				return CommandType.DEFAULT;
 			}
 
@@ -174,13 +171,17 @@ public class CommandManager extends ZUtils implements Constant {
 			CommandType returnType = command.prePerform(support, sender, strings, event);
 
 			if (returnType == CommandType.SYNTAX_ERROR) {
-				sender.sendMessage(BasicMessage.COMMAND_SYNTAXE_ERROR, true, command.getSyntaxe());
+				sender.sendMessage(event, BasicMessage.COMMAND_SYNTAXE_ERROR, true, command.getSyntaxe());
 			}
 
 			return returnType;
 		}
-		sender.sendEmbed(BasicMessage.COMMAND_NO_PERMISSION, true);
+		sender.sendEmbed(event, BasicMessage.COMMAND_NO_PERMISSION);
 		return CommandType.DEFAULT;
+	}
+	
+	public List<VCommand> getCommands() {
+		return commands;
 	}
 
 }

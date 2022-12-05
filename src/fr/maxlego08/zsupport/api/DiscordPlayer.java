@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.Interaction;
 
 public class DiscordPlayer extends ZUtils implements PlayerSender {
 
@@ -86,6 +87,24 @@ public class DiscordPlayer extends ZUtils implements PlayerSender {
 			if (delete)
 				schedule(1000 * 10, () -> discordMessege.delete().queue());
 		});
+	}
+
+	@Override
+	public void sendMessage(Interaction interaction, BasicMessage message) {
+		interaction.reply(message.getMessage()).setEphemeral(true).queue();
+	}
+
+	@Override
+	public void sendMessage(Interaction interaction, BasicMessage message, boolean delete, Object... args) {
+		interaction.reply(String.format(message.getMessage(), args)).setEphemeral(true).queue();		
+	}
+
+	@Override
+	public void sendEmbed(Interaction interaction, BasicMessage message) {
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setColor(Color.RED);
+		builder.setDescription(message.getMessage());
+		interaction.replyEmbeds(builder.build()).setEphemeral(true).queue();
 	}
 
 }

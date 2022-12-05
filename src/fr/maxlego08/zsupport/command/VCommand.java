@@ -11,7 +11,7 @@ import fr.maxlego08.zsupport.utils.commands.Sender;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 public abstract class VCommand extends Arguments implements Constant {
 
@@ -45,11 +45,9 @@ public abstract class VCommand extends Arguments implements Constant {
 	private CommandManager commandManager;
 	protected ZSupport instance;
 
-	protected MessageReceivedEvent event;
+	protected SlashCommandEvent event;
 	protected TextChannel textChannel;
 	protected Guild guild;
-
-	protected boolean deleteMessage = true;
 
 	public boolean isOnlyInCommandChannel() {
 		return onlyInCommandChannel;
@@ -72,7 +70,7 @@ public abstract class VCommand extends Arguments implements Constant {
 	 * @param args
 	 * @return {@link CommandType}
 	 */
-	public CommandType prePerform(ZSupport main, Sender commandSender, String[] args, MessageReceivedEvent event) {
+	public CommandType prePerform(ZSupport main, Sender commandSender, String[] args, SlashCommandEvent event) {
 
 		// We update the number of arguments according to the number of parents
 
@@ -110,10 +108,6 @@ public abstract class VCommand extends Arguments implements Constant {
 		if (event != null) {
 			this.textChannel = event.getTextChannel();
 			this.guild = event.getGuild();
-
-			if (this.deleteMessage) {
-				event.getMessage().delete().queue();
-			}
 		}
 
 		try {
@@ -239,7 +233,7 @@ public abstract class VCommand extends Arguments implements Constant {
 	 * @return the description
 	 */
 	public String getDescription() {
-		return description;
+		return description == null ? "No description" : description;
 	}
 
 	/**

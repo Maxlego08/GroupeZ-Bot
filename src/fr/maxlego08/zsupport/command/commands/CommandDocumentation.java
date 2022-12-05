@@ -12,8 +12,9 @@ public class CommandDocumentation extends VCommand {
 
 	public CommandDocumentation(CommandManager commandManager) {
 		super(commandManager);
-		consoleCanUse = false;
-		onlyInCommandChannel = false;
+		this.consoleCanUse = false;
+		this.onlyInCommandChannel = false;
+		this.description = "Display plugin documentation";
 	}
 
 	@Override
@@ -22,18 +23,13 @@ public class CommandDocumentation extends VCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Server Info");
 		builder.setColor(Color.getHSBColor(45, 45, 45));
-		builder.setFooter("2021 - " + guild.getName(), guild.getIconUrl());
+		builder.setFooter("2022 - " + this.guild.getName(), this.guild.getIconUrl());
 		builder.setDescription("zAuctionHouse documentation: https://zauctionhouse.groupez.dev" + "\n"
 				+ "zShop documentation: https://github.com/Maxlego08/zShop-API/wiki" + "\n"
+				+ "zMenu documentation: https://zmenu.groupez.dev/" + "\n"
 				+ "GroupeZ website documentation: https://docs.groupez.dev");
-
-		this.textChannel.sendTyping().queue();
+		event.replyEmbeds(builder.build()).queue();
 		
-		this.textChannel.sendMessageEmbeds(builder.build()).queue(m -> {
-
-				});
-
-		builder.clear();
 		return CommandType.SUCCESS;
 	}
 

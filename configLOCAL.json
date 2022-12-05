@@ -1,0 +1,39 @@
+{
+  "botToken": "OTQxMzc0MDY2NDEyMDkzNDgw.YgVA6w.PH6aQk_dSi-p5KrY3ORmlZjK7Uc",
+  "ticketNumber": 57,
+  "ticketCategoryId": 941374018743853118,
+  "ticketChannel": 941374301473501245,
+  "ticketOrderChannel": 941634904301649930,
+  "commandChannel": 941407139816177714,
+  "pluginsChannel": 941740105817796628,
+  "groupezEmote": 941736786114281522,
+  "spigotEmote": 942108372818346015,
+  "generalChannel": 831874518455812149,
+  "API_URL": "https://groupez.dev/api/v1/discord/%s",
+  "API_RESOURCE_URL": "https://groupez.dev/api/v1/resource/%s",
+  "RESOURCE_URL": "https://groupez.dev/resources/%s",
+  "DASHBOARD_URL": "https://groupez.dev/dashboard/users/%s",
+  "plugins": [
+    {
+      "name": "zAuctionHouse",
+      "emoteId": 941374457312850011,
+      "role": 941375275332153354,
+      "plugin_id": 1,
+      "price": 0.0
+    },
+    {
+      "name": "zShop",
+      "emoteId": 941374696908259328,
+      "role": 941631906800341042,
+      "plugin_id": 2,
+      "price": 0.0
+    },
+    {
+      "name": "zTournament",
+      "emoteId": 941374802202079262,
+      "role": 941631938412838962,
+      "plugin_id": 3,
+      "price": 0.0
+    }
+  ]
+}

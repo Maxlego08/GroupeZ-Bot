@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.Component;
 import net.dv8tion.jda.api.managers.ChannelManager;
@@ -33,7 +34,7 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 	protected Guild guild;
 	protected Runnable runnable;
 
-	public abstract void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user);
+	public abstract void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user, Interaction interaction);
 
 	public abstract void buttonClick(Ticket ticket, MessageChannel messageChannel, Guild guild, User user,
 			Button button, ButtonClickEvent event);
@@ -119,7 +120,7 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 		this.runnable = runnable;
 		this.guild = guild;
 
-		this.process(ticket, messageChannel, guild, user);
+		this.process(ticket, messageChannel, guild, user, event);
 	}
 
 	public Component createCloseButton() {

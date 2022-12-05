@@ -13,7 +13,8 @@ public class CommandVerify extends VCommand {
 	public CommandVerify(CommandManager commandManager) {
 		super(commandManager);
 		this.consoleCanUse = false;
-		onlyInCommandChannel = true;
+		this.onlyInCommandChannel = true;
+		this.description = "Allows you to check your purchases on groupez.dev";
 	}
 
 	@Override
@@ -24,7 +25,7 @@ public class CommandVerify extends VCommand {
 		User user = playerSender.getUser();
 
 		VerifyManager manager = VerifyManager.getInstance();
-		manager.submitData(user, this.textChannel, this.player, true);
+		manager.submitData(user, this.textChannel, this.player, true, this.event);
 
 		return CommandType.SUCCESS;
 	}

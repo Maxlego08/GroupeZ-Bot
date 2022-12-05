@@ -10,11 +10,13 @@ import fr.maxlego08.zsupport.api.DiscordPlayer;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.commands.ConsoleSender;
 import fr.maxlego08.zsupport.utils.commands.PlayerSender;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class CommandListener extends ListenerAdapter implements Constant, Runnable {
 
@@ -28,6 +30,32 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 	}
 
 	@Override
+	public void onGuildReady(GuildReadyEvent event) {
+		Guild guild = event.getGuild();
+		List<CommandData> commands = new ArrayList<>();
+		this.instance.getCommandManager().getCommands().forEach(command -> {
+			if (!command.isPlayerCanUse()) return;
+			String cmd = command.getSubCommands().get(0);
+			System.out.println("Enregistrement de la commande " + cmd + " (" + command.getDescription() + ")");
+			// guild.upsertCommand(cmd, command.getDescription()).queue();
+			commands.add(new CommandData(cmd, command.getDescription()));
+		});
+		
+		guild.updateCommands().addCommands(commands).queue();
+	}
+	
+	@Override
+	public void onSlashCommand(SlashCommandEvent event) {
+		String commandString = event.getCommandPath();
+		
+		User user = event.getUser();
+		Member member = event.getMember();
+		
+		PlayerSender sender = new DiscordPlayer(user, member, event.getTextChannel());
+		this.instance.getCommandManager().onCommand(sender, commandString, new String[0], event);
+	}
+
+	/*@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
 
 		User user = event.getAuthor();
@@ -35,8 +63,6 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 		Message message = event.getMessage();
 		String command = message.getContentDisplay();
 
-		
-		
 		if (command.startsWith(COMMAND_PREFIX)) {
 
 			command = command.replaceFirst(COMMAND_PREFIX, "");
@@ -48,8 +74,9 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 			this.instance.getCommandManager().onCommand(sender, commands, args, event);
 		}
 
-	}
+	}*/
 
+	@SuppressWarnings("unused")
 	private String[] get(String[] tableau) {
 		List<String> test = new ArrayList<>();
 		for (int a = 1; a != tableau.length; a++)
@@ -65,7 +92,7 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 	@Override
 	public void run() {
 		isRunning = true;
-		
+
 		while (isRunning) {
 			if (scanner.hasNextLine()) {
 
@@ -78,7 +105,7 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 				instance.getCommandManager().onCommand(sender, commande, args, null);
 			}
 		}
-		
+
 		scanner.close();
 
 		System.out.println(PREFIX_CONSOLE + "Disconnect !");
