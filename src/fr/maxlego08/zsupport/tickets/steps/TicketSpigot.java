@@ -17,12 +17,13 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.components.Button;
 
 public class TicketSpigot extends Step {
 
 	@Override
-	public void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user) {
+	public void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user, Interaction interaction) {
 
 		EmbedBuilder builder = this.createEmbed();
 
@@ -33,7 +34,7 @@ public class TicketSpigot extends Step {
 		VerifyManager manager = VerifyManager.getInstance();
 		TextChannel channel = ticket.getTextChannel(guild);
 		PlayerSender sender = new DiscordPlayer(user, this.member, channel);
-		manager.submitData(user, channel, sender, false);
+		manager.submitData(user, channel, sender, false, interaction);
 		manager.getGUser(user.getIdLong(), gUser -> {
 
 			EmbedBuilder embedBuilder = this.createEmbed();

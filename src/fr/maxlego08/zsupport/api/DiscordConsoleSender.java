@@ -3,6 +3,7 @@ package fr.maxlego08.zsupport.api;
 import fr.maxlego08.zsupport.lang.BasicMessage;
 import fr.maxlego08.zsupport.utils.commands.ConsoleSender;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.interactions.Interaction;
 
 public class DiscordConsoleSender implements ConsoleSender {
 
@@ -39,6 +40,24 @@ public class DiscordConsoleSender implements ConsoleSender {
 	@Override
 	public void sendEmbed(BasicMessage message, boolean delete) {
 		this.sendMessage(message, delete);
+	}
+
+	@Override
+	public void sendMessage(Interaction interaction, BasicMessage message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendMessage(Interaction interaction, BasicMessage message, boolean delete, Object... args) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendEmbed(Interaction interaction, BasicMessage message) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

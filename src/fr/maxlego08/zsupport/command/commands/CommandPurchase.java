@@ -22,6 +22,7 @@ public class CommandPurchase extends VCommand {
 	public CommandPurchase(CommandManager commandManager) {
 		super(commandManager);
 		this.permission = Permission.ADMINISTRATOR;
+		this.description = "Display message on how to buy";
 	}
 
 	@Override
@@ -39,7 +40,7 @@ public class CommandPurchase extends VCommand {
 
 		desc += ":flag_fr: Pour acheter un plugin vous devez vous rendre sur https://groupez.dev/resources";
 		desc += "\n";
-		desc += "Vous ne pouvez pas payer par **Paypal** les plugins de GroupeZ, pour plus d'informations vous pouvez créer un ticket.";
+		desc += "Vous pouvez payer par **Paypal** les plugins de GroupeZ en utilisant Spigot, mais vous aurez une différence de prix.";
 		desc += "\n";
 		desc += "Après l'achat vous pouvez créer un ticket dans " + channel.getAsMention()
 				+ " pour demander l'accès sur spigot.";
@@ -47,7 +48,7 @@ public class CommandPurchase extends VCommand {
 		desc += "\n";
 		desc += ":flag_us: To purchase a plugin you must go to https://groupez.dev/resources";
 		desc += "\n";
-		desc += "You cannot pay by **Paypal** for GroupeZ plugins, for more information you can create a ticket.";
+		desc += "You can pay by **Paypal** for GroupeZ plugins using Spigot, but you will have a price difference.";
 		desc += "\n";
 		desc += "After purchase you can create a ticket in " + channel.getAsMention() + " to request access on spigot.";
 
@@ -58,6 +59,7 @@ public class CommandPurchase extends VCommand {
 				"https://groupez.dev/resources", false, Emoji.fromEmote(emote));
 
 		this.textChannel.sendMessageEmbeds(builder.build()).setActionRow(buttonUrl).queue(message -> {
+			this.event.deferReply(true).setContent("Envoie de la commande effectué avec succès.").queue();
 		});
 
 		return CommandType.SUCCESS;

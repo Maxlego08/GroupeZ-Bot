@@ -2,7 +2,7 @@ package fr.maxlego08.zsupport.utils;
 
 public interface Constant {
 
-	final String VERSION = "3.0.2";
+	final String VERSION = "3.0.3";
 	final String PREFIX_CONSOLE = "[zSupport V" + VERSION + "] ";
 	final String COMMAND_PREFIX = "!";
 	final long CHANNEL_ROBOT = 527778577245011988l;

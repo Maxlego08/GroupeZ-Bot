@@ -18,12 +18,13 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.components.Button;
 
 public class TicketPlugin extends Step {
 
 	@Override
-	public void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user) {
+	public void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user, Interaction interaction) {
 
 		Plugin plugin = ticket.getPlugin();
 		String name = ticket.getName() + "-" + plugin.getName();
@@ -65,7 +66,7 @@ public class TicketPlugin extends Step {
 
 		if (!hasRole(this.member, plugin.getRole()) && plugin.isPremium()) {
 			PlayerSender sender = new DiscordPlayer(user, this.member, channel);
-			manager.submitData(user, channel, sender, false);
+			manager.submitData(user, channel, sender, false, interaction);
 		}
 
 		manager.getGUser(user.getIdLong(), gUser -> {

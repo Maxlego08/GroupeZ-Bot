@@ -20,6 +20,7 @@ public class CommandTicketSet extends VCommand {
 		super(commandManager);
 		this.consoleCanUse = false;
 		this.permission = Permission.ADMINISTRATOR;
+		this.description = "Afficher le message des tickets";
 	}
 
 	@Override
@@ -52,6 +53,7 @@ public class CommandTicketSet extends VCommand {
 		Button buttonEn = new ButtonImpl(BUTTON_EN, "English", ButtonStyle.SECONDARY, false, Emoji.fromUnicode("U+1F1FA U+1F1F8"));
 		
 		this.textChannel.sendMessageEmbeds(builder.build()).setActionRow(buttonFr, buttonEn).queue(message -> {
+			this.event.deferReply(true).setContent("Envoie de la commande effectué avec succès.").queue();
 		});
 
 		return CommandType.SUCCESS;

@@ -37,6 +37,10 @@ public class TicketListener extends ListenerAdapter implements Constant {
 
 			this.manager.sendInformations(event, event.getTextChannel(), event.getAuthor());
 			
+		} else if (event.getChannel().getIdLong() == Config.generalChannel && !event.getAuthor().isBot()) {
+			
+			this.manager.sendTicketUse(event, event.getTextChannel());
+			
 		}
 	}
 	

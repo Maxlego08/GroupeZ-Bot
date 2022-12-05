@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu.Builder;
@@ -24,7 +25,7 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu.Buil
 public class TicketChoosePlugin extends Step {
 
 	@Override
-	public void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user) {
+	public void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user, Interaction interaction) {
 
 		Builder selectionMenu = SelectionMenu.create(BUTTON_SELECT_PLUGIN);
 		Config.plugins.forEach(plugin -> {

@@ -90,7 +90,7 @@ public class ZSupport implements Constant {
 		JDABuilder builder = JDABuilder.create(Config.botToken, list);
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
 		this.jda = builder.build();
-		this.jda.getPresence().setActivity(Activity.playing("!help V" + VERSION));
+		this.jda.getPresence().setActivity(Activity.playing("/help V" + VERSION));
 		this.jda.addEventListener(this.commandListener);
 		this.jda.addEventListener(this.ticketListener);
 		this.jda.addEventListener(this.memberListener);

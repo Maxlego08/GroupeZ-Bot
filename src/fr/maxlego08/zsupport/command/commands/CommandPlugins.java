@@ -12,6 +12,7 @@ public class CommandPlugins extends VCommand {
 	public CommandPlugins(CommandManager commandManager) {
 		super(commandManager);
 		this.permission = Permission.ADMINISTRATOR;
+		this.description = "Display the list of plugins";
 	}
 
 	@Override
@@ -19,6 +20,7 @@ public class CommandPlugins extends VCommand {
 
 		PluginManager manager = new PluginManager();
 		manager.displayPlugins(this.guild);
+		this.event.deferReply(true).setContent("Envoie de la commande effectué avec succès.").queue();
 
 		return CommandType.SUCCESS;
 	}

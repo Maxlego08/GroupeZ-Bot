@@ -9,12 +9,12 @@ public class CommandStop extends VCommand {
 
 	public CommandStop(CommandManager commandManager) {
 		super(commandManager);
-		playerCanUse = false;
+		this.playerCanUse = false;
 	}
 
 	@Override
 	protected CommandType perform(ZSupport main) {
-		sender.sendMessage("Désactivation du bot.");
+		this.sender.sendMessage("Désactivation du bot.");
 		main.getCommandListener().onDisable();
 		return CommandType.SUCCESS;
 	}

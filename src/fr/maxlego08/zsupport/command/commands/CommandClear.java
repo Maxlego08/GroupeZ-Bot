@@ -13,7 +13,7 @@ public class CommandClear extends VCommand {
 		super(commandManager);
 		this.addRequireArg("nombre/all");
 		this.permission = Permission.MESSAGE_MANAGE;
-		this.deleteMessage = false;
+		this.description = "Delete messages";
 	}
 
 	@Override

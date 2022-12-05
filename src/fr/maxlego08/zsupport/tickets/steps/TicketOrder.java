@@ -9,12 +9,13 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.components.Button;
 
 public class TicketOrder extends Step {
 
 	@Override
-	public void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user) {
+	public void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user, Interaction interaction) {
 
 		EmbedBuilder builder = this.createEmbed();
 

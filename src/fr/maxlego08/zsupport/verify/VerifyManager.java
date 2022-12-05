@@ -32,6 +32,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.Interaction;
 
 /**
  * Class to optimize to avoid making the same request several times
@@ -69,8 +70,8 @@ public class VerifyManager extends ZUtils {
 		return instance;
 	}
 
-	public void submitData(User user, TextChannel textChannel, PlayerSender sender, boolean delete) {
-		this.submitData(user, textChannel, sender, delete, null);
+	public void submitData(User user, TextChannel textChannel, PlayerSender sender, boolean delete, Interaction event) {
+		this.submitData(user, textChannel, sender, delete, null, event);
 	}
 
 	/**
@@ -82,8 +83,8 @@ public class VerifyManager extends ZUtils {
 	 * @param delete
 	 */
 	public void submitData(User user, TextChannel textChannel, PlayerSender sender, boolean delete,
-			Consumer<GUser> consumer) {
-		new Thread(() -> this.sendData(user, textChannel, sender, delete, consumer)).start();
+			Consumer<GUser> consumer, Interaction event) {
+		new Thread(() -> this.sendData(user, textChannel, sender, delete, consumer, event)).start();
 	}
 
 	/**
@@ -211,11 +212,12 @@ public class VerifyManager extends ZUtils {
 	 * @param textChannel
 	 * @param sender
 	 * @param delete
+	 * @param event
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
 	private void sendData(User user, TextChannel textChannel, PlayerSender sender, boolean delete,
-			Consumer<GUser> consumer) {
+			Consumer<GUser> consumer, Interaction event) {
 
 		try {
 
@@ -241,7 +243,7 @@ public class VerifyManager extends ZUtils {
 
 			// If the query returned an error
 			if (responseCode != 200) {
-				this.sendErrorMessage(textChannel, user, guild, BasicMessage.VERIFY_ERROR, null);
+				this.sendErrorMessage(event, textChannel, user, guild, BasicMessage.VERIFY_ERROR, null);
 				return;
 			}
 
@@ -272,7 +274,7 @@ public class VerifyManager extends ZUtils {
 			// If the user has not purchased any plugin
 
 			if (list.size() == 0) {
-				this.sendErrorMessage(textChannel, user, guild, BasicMessage.VERIFY_ERROR_EMPTY, gUser);
+				this.sendErrorMessage(event, textChannel, user, guild, BasicMessage.VERIFY_ERROR_EMPTY, gUser);
 				return;
 			}
 
@@ -293,7 +295,7 @@ public class VerifyManager extends ZUtils {
 
 			// If the user already has all the roles
 			if (roles.size() == 0) {
-				this.sendErrorMessage(textChannel, user, guild, BasicMessage.VERIFY_ERROR_ALREADY, gUser);
+				this.sendErrorMessage(event, textChannel, user, guild, BasicMessage.VERIFY_ERROR_ALREADY, gUser);
 				return;
 			}
 
@@ -307,7 +309,7 @@ public class VerifyManager extends ZUtils {
 			builder.setFooter("2022 - " + guild.getName(), guild.getIconUrl());
 			builder.setThumbnail(gUser.getAvatar());
 
-			String footer = "\n\n\nUse ``!verify`` to verify your account.";
+			String footer = "\n\n\nUse ``/verify`` to verify your account.";
 			if (textChannel.getIdLong() != Config.commandChannel) {
 				TextChannel commandChannel = guild.getTextChannelById(Config.commandChannel);
 				footer += "\nOn " + commandChannel.getAsMention();
@@ -322,8 +324,7 @@ public class VerifyManager extends ZUtils {
 				System.out.println("Ajout des rôles " + str + " à l'utilisateur " + user.getAsTag());
 			}
 
-			textChannel.sendTyping().queue();
-			textChannel.sendMessageEmbeds(builder.build()).queue();
+			event.replyEmbeds(builder.build()).queue();
 
 			if (consumer != null) {
 				consumer.accept(gUser);
@@ -341,8 +342,8 @@ public class VerifyManager extends ZUtils {
 	 * @param guild
 	 * @param basicMessage
 	 */
-	private void sendErrorMessage(TextChannel textChannel, User user, Guild guild, BasicMessage basicMessage,
-			GUser gUser) {
+	private void sendErrorMessage(Interaction event, TextChannel textChannel, User user, Guild guild,
+			BasicMessage basicMessage, GUser gUser) {
 		EmbedBuilder builder = new EmbedBuilder();
 
 		builder.setColor(new Color(240, 10, 10));
@@ -365,7 +366,7 @@ public class VerifyManager extends ZUtils {
 			builder.setTitle("GroupeZ - " + user.getAsTag());
 		}
 
-		textChannel.sendMessageEmbeds(builder.build()).queue();
+		event.replyEmbeds(builder.build()).setEphemeral(true).queue();
 	}
 
 }

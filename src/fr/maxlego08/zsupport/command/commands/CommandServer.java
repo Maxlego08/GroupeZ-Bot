@@ -12,8 +12,9 @@ public class CommandServer extends VCommand {
 
 	public CommandServer(CommandManager commandManager) {
 		super(commandManager);
-		consoleCanUse = false;
-		onlyInCommandChannel = true;
+		this.consoleCanUse = false;
+		this.onlyInCommandChannel = true;
+		this.description = "Display server information";
 	}
 
 	@Override
@@ -22,7 +23,7 @@ public class CommandServer extends VCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Server Info");
 		builder.setColor(Color.getHSBColor(45, 45, 45));
-		builder.setFooter("2021 - " + guild.getName(), guild.getIconUrl());
+		builder.setFooter("2022 - " + guild.getName(), guild.getIconUrl());
 
 		builder.addField("Name of discord", guild.getName(), true);
 		builder.addField("Founder of discord", guild.getMemberById(522359210844094479l).getAsMention(), true);
@@ -36,9 +37,8 @@ public class CommandServer extends VCommand {
 		builder.addField("E-mail", "contact@groupez.dev", true);
 		builder.addField("Phone", "+33 07.82.60.90.13", false);
 
-		textChannel.sendTyping().queue();
-		textChannel.sendMessageEmbeds(builder.build()).complete();
-		builder.clear();
+		this.event.replyEmbeds(builder.build()).setEphemeral(true).queue();
+		
 
 		return CommandType.SUCCESS;
 	}

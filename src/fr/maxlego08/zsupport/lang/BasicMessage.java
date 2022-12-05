@@ -8,9 +8,9 @@ public enum BasicMessage {
 	COMMAND_NO_PERMISSION(":x: You do not have permission to execute this command.."),
 	COMMAND_SYNTAXE_ERROR(":x: You have to execute the command like this: %s"),
 	
-	VERIFY_ERROR(":x: Unable to add you find your account on https://groupez.dev/ please link your discord account to be able to make this command.\n\n\nUse ``!verify`` to verify your account."),
-	VERIFY_ERROR_EMPTY(":x: You have not purchased any plugin.\n\n\nUse ``!verify`` to verify your account %channel%."),
-	VERIFY_ERROR_ALREADY(":warning: You already have roles from your purchased plugins.\n\n\nUse ``!verify`` to verify your account."),
+	VERIFY_ERROR(":x: Unable to add you find your account on https://groupez.dev/ please link your discord account to be able to make this command.\n\n\nUse ``/verify`` to verify your account."),
+	VERIFY_ERROR_EMPTY(":x: You have not purchased any plugin.\n\n\nUse ``/verify`` to verify your account %channel%."),
+	VERIFY_ERROR_ALREADY(":warning: You already have roles from your purchased plugins.\n\n\nUse ``/verify`` to verify your account."),
 	
 	SUGGESTION_NOT_FOUND("Aucune suggestion avec cet id n'a été trouvé."),
 	SUGGESTION_NOT_FOUND2("Aucun message n'a été trouvé avec cet id !"),

@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
@@ -40,6 +39,9 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 	private static List<Ticket> tickets = new ArrayList<Ticket>();
 	private transient Map<Long, Long> cooldownMessages = new HashMap<Long, Long>();
+
+	private static long messageTicketId;
+	private static long lastSendTicketMessage;
 
 	public TicketManager(ZSupport support) {
 		super();
@@ -105,11 +107,10 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 			Ticket ticket = optional.get();
 			ticket.message(fr.maxlego08.zsupport.lang.Message.TICKET_ALREADY_CREATE);
-
-			event.reply(this.getMessage(type, Message.TICKET_ALREADY_CREATE_REPLY,
-					ticket.getTextChannel(guild).getAsMention())).queue(m -> {
-						m.deleteOriginal().queueAfter(10, TimeUnit.SECONDS);
-					});
+						
+			String content = this.getMessage(type, Message.TICKET_ALREADY_CREATE_REPLY,
+					ticket.getTextChannel(guild).getAsMention());
+			event.deferReply(true).setContent(content).queue();
 
 		} else {
 
@@ -118,12 +119,12 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.setTitle("GroupeZ - Support");
 			builder.setColor(Color.getHSBColor(45, 45, 45));
-			builder.setFooter("2021 - " + guild.getName(), guild.getIconUrl());
+			builder.setFooter("2022 - " + guild.getName(), guild.getIconUrl());
 			builder.setTimestamp(OffsetDateTime.now());
 
 			builder.setDescription(this.getMessage(type, Message.TICKET_CREATE_WAIT));
 
-			event.replyEmbeds(builder.build()).queue(message -> {
+			event.deferReply(true).addEmbeds(builder.build()).queue(message -> {			
 
 				manager.userIsLink(user, () -> {
 
@@ -141,9 +142,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 						builder.setDescription(stringMessage);
 
 						builder.setColor(new Color(45, 250, 45));
-						message.editOriginalEmbeds(builder.build()).queue(messageEdit -> {
-							messageEdit.delete().queueAfter(10, TimeUnit.SECONDS);
-						});
+						message.editOriginalEmbeds(builder.build()).queue();
 
 					});
 
@@ -155,9 +154,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 					builder.setDescription(this.getMessage(type, Message.TICKET_CREATE_ERROR));
 					builder.setColor(Color.RED);
 
-					message.editOriginalEmbeds(builder.build()).queue(messageEdit -> {
-						messageEdit.delete().queueAfter(10, TimeUnit.SECONDS);
-					});
+					message.editOriginalEmbeds(builder.build()).queue();
 
 				});
 
@@ -314,7 +311,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 			Calendar calendar = Calendar.getInstance();
 			int hour = calendar.get(Calendar.HOUR_OF_DAY);
 
-			if (hour <= 9 || hour >= 20) {
+			if (hour < 9 || hour >= 20) {
 
 				if (this.cooldownMessages.getOrDefault(user.getIdLong(), 0l) > System.currentTimeMillis()) {
 					return;
@@ -328,6 +325,59 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 			}
 		}
+
+	}
+
+	public void sendTicketUse(MessageReceivedEvent event, TextChannel textChannel) {
+
+		if (messageTicketId == 0) {
+
+			sendTicketInformations(textChannel);
+
+		} else {
+
+			textChannel.getHistoryAround(messageTicketId, 3).queue(history -> {
+				net.dv8tion.jda.api.entities.Message message = history.getMessageById(messageTicketId);
+
+				if (message != null) {
+
+					if (System.currentTimeMillis() - lastSendTicketMessage > (1000 * (60 * 10))) {
+
+						message.delete().queue(s -> {
+							sendTicketInformations(textChannel);
+						});
+
+					}
+
+				} else {
+					sendTicketInformations(textChannel);
+				}
+
+			});
+
+		}
+
+	}
+
+	public void sendTicketInformations(TextChannel channel) {
+
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setTitle("How to get help ?");
+		builder.setColor(new Color(45, 200, 45));
+		builder.setTimestamp(OffsetDateTime.now());
+		builder.setFooter("2022 - " + channel.getGuild().getName(), channel.getGuild().getIconUrl());
+
+		TextChannel ticketChannel = channel.getGuild().getTextChannelById(Config.ticketChannel);
+
+		String desc = "Do you need help? Please create a " + ticketChannel.getAsMention()
+				+ " and do not request help here.";
+
+		builder.setDescription(desc);
+
+		channel.sendMessageEmbeds(builder.build()).queue(message -> {
+			messageTicketId = message.getIdLong();
+			lastSendTicketMessage = System.currentTimeMillis();
+		});
 
 	}
 
