@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.Component;
@@ -30,11 +31,13 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 	protected TicketManager manager;
 	protected Ticket ticket;
 	protected GenericComponentInteractionCreateEvent event;
+	protected MessageReceivedEvent eventMessage;
 	protected Member member;
 	protected Guild guild;
 	protected Runnable runnable;
 
-	public abstract void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user, Interaction interaction);
+	public abstract void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user,
+			Interaction interaction);
 
 	public abstract void buttonClick(Ticket ticket, MessageChannel messageChannel, Guild guild, User user,
 			Button button, ButtonClickEvent event);
@@ -198,6 +201,22 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 			}
 		});
 
+	}
+
+	public void preMessage(TicketManager ticketManager, MessageReceivedEvent event, User user, Guild guild,
+			MessageChannel channel) {
+
+		this.guild = guild;
+		this.manager = ticketManager;
+		this.eventMessage = event;
+		this.member = guild.getMember(user);
+
+		this.onMessage(ticket, channel, guild, user, event);
+
+	}
+
+	protected void onMessage(Ticket ticket, MessageChannel channel, Guild guild, User user,
+			MessageReceivedEvent event) {
 	}
 
 }

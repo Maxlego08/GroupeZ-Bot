@@ -44,8 +44,8 @@ public class TicketChoosePlugin extends Step {
 
 		builder.setDescription(stringBuilder.toString());
 
-		this.event.editMessageEmbeds(builder.build()).setActionRow(selectionMenu.build()).queue();
-
+		ticket.setFirstMessage(this.event.getMessage());
+		this.event.editMessageEmbeds(builder.build()).setActionRow(selectionMenu.build()).queue();		
 	}
 
 	@Override
@@ -61,13 +61,23 @@ public class TicketChoosePlugin extends Step {
 		if (strings.size() == 1) {
 
 			String pluginName = strings.get(0);
-			Step step = TicketStep.PLUGIN.getStep();
-			this.ticket.setStep(step);
 			Plugin plugin = Config.plugins.stream().filter(l -> l.getName().equals(pluginName)).findAny()
-					.orElse(new Plugin("Other", 0, 0, 0, 0));
+					.orElse(new Plugin("Other", 0, 0, 0, 0, ""));
 			this.ticket.setPlugin(plugin);
 
-			step.preProcess(this.manager, this.ticket, messageChannel, guild, user, event, null);
+			if (plugin.isReal()) {
+
+				Step step = TicketStep.PLUGIN_VERSION.getStep();
+				this.ticket.setStep(step);
+				step.preProcess(this.manager, this.ticket, messageChannel, guild, user, event, null);
+
+			} else {
+
+				Step step = TicketStep.PLUGIN.getStep();
+				this.ticket.setStep(step);
+				step.preProcess(this.manager, this.ticket, messageChannel, guild, user, event, null);
+
+			}
 
 		} else {
 

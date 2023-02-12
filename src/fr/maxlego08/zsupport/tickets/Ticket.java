@@ -21,6 +21,9 @@ public class Ticket extends ZUtils {
 	private String name;
 	private TicketStep ticketStep;
 	private String pluginName;
+	private long lastMessageAt;
+
+	private transient net.dv8tion.jda.api.entities.Message firstMessage;
 
 	private transient TextChannel textChannel;
 	private transient Step step;
@@ -185,7 +188,7 @@ public class Ticket extends ZUtils {
 
 	public Plugin getPlugin() {
 		return Config.plugins.stream().filter(e -> e.getName().equals(this.pluginName)).findFirst()
-				.orElse(new Plugin(this.pluginName, 0, 0, 0, 0));
+				.orElse(new Plugin(this.pluginName, 0, 0, 0, 0, this.pluginName.toLowerCase()));
 	}
 
 	/**
@@ -219,7 +222,7 @@ public class Ticket extends ZUtils {
 	}
 
 	public boolean isValid() {
-		if (this.isClose){
+		if (this.isClose) {
 			return false;
 		}
 		ZSupport instance = ZSupport.instance;
@@ -238,6 +241,29 @@ public class Ticket extends ZUtils {
 		this.step.ticket = this;
 
 		System.out.println(this.step);
+	}
+
+	public void setFirstMessage(net.dv8tion.jda.api.entities.Message firstMessage) {
+		this.firstMessage = firstMessage;
+	}
+
+	public net.dv8tion.jda.api.entities.Message getFirstMessage() {
+		return firstMessage;
+	}
+
+	/**
+	 * @return the lastMessageAt
+	 */
+	public long getLastMessageAt() {
+		return lastMessageAt;
+	}
+
+	/**
+	 * @param lastMessageAt
+	 *            the lastMessageAt to set
+	 */
+	public void setLastMessageAt(long lastMessageAt) {
+		this.lastMessageAt = lastMessageAt;
 	}
 
 }

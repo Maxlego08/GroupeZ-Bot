@@ -3,6 +3,7 @@ package fr.maxlego08.zsupport.tickets;
 import fr.maxlego08.zsupport.tickets.steps.TicketChoosePlugin;
 import fr.maxlego08.zsupport.tickets.steps.TicketOrder;
 import fr.maxlego08.zsupport.tickets.steps.TicketPlugin;
+import fr.maxlego08.zsupport.tickets.steps.TicketPluginVersion;
 import fr.maxlego08.zsupport.tickets.steps.TicketSpigot;
 import fr.maxlego08.zsupport.tickets.steps.TicketTypeStep;
 
@@ -17,6 +18,8 @@ public enum TicketStep {
 	ORDER(new TicketOrder()),
 	
 	PLUGIN(new TicketPlugin()),
+	
+	PLUGIN_VERSION(new TicketPluginVersion()),
 	
 	;
 	

@@ -74,6 +74,26 @@ public class MessageFR {
 						+ " Le support est disponible uniquement entre **9 heures** et **20 heures** tout les jours."
 						+ " Cependant le support se livre le droit d'être moins actif durant les weekends.");
 
+		frMessage.put(Message.TICKET_PLUGIN_VERSION_COMMAND,
+				"Pour accélérer le support, veuillez écrire la version du plugin." + "\n"
+						+ "Pour obtenir la version du plugin faite la commande suivante: **/%s version**" + "\n"
+						+ "Example:");
+
+		frMessage.put(Message.TICKET_PLUGIN_VERSION_CONSOLE,
+				"Pour accélérer le support, veuillez écrire la version du plugin." + "\n"
+						+ "Pour obtenir la version du plugin regardez dans la console." + "\n" + "Example:");
+
+		frMessage.put(Message.TICKET_PLUGIN_VERSION_ERROR,
+				"Vous n'utilisez pas la dernière version du plugin." + "\n"
+						+ "Mettez à jour le plugin, vérifier si votre problème est toujours présent." + "\n"
+						+ "Si oui, vous pourrez alors créer un nouveau ticket." + "\n\n"
+						+ "Fermeture de votre ticket dans **30** secondes.");
+
+		frMessage.put(Message.TICKET_PLUGIN_RULES,
+				"\n" + "Merci de ne pas **mentionner** l'équipe de GroupeZ sous peine de sanction." + "\n"
+						+ "N'oubliez pas de désactiver les mentions lorsque vous faites une réponse !" + "\n" + "\n"
+						+ "Si votre ticket ne reçoit aucun message au bout de **48 heures**, il sera automatiquement fermé !");
+
 		return frMessage;
 	}
 

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,7 +157,7 @@ public class VerifyManager extends ZUtils {
 
 				Map<String, Object> userAsMap = (Map<String, Object>) values.get("user");
 				GUser gUser = new GUser((String) userAsMap.get("name"), ((Number) userAsMap.get("id")).intValue(),
-						(String) userAsMap.get("avatar"));
+						(String) userAsMap.get("avatar"), new ArrayList<>());
 
 				this.users.put(userId, gUser);
 				consumer.accept(gUser);
@@ -264,17 +265,21 @@ public class VerifyManager extends ZUtils {
 			Map<String, Object> values = gson.fromJson(response.toString(), listType);
 
 			Map<String, Object> userAsMap = (Map<String, Object>) values.get("user");
+			List<GPlugin> list = GPlugin.toList((List<Object>) values.get("plugins"));
+
 			GUser gUser = new GUser((String) userAsMap.get("name"), ((Number) userAsMap.get("id")).intValue(),
-					(String) userAsMap.get("avatar"));
+					(String) userAsMap.get("avatar"), list);
 
 			this.users.put(user.getIdLong(), gUser);
-
-			List<GPlugin> list = GPlugin.toList((List<Object>) values.get("plugins"));
 
 			// If the user has not purchased any plugin
 
 			if (list.size() == 0) {
-				this.sendErrorMessage(event, textChannel, user, guild, BasicMessage.VERIFY_ERROR_EMPTY, gUser);
+				if (consumer != null) {
+					consumer.accept(gUser);
+				} else {
+					this.sendErrorMessage(event, textChannel, user, guild, BasicMessage.VERIFY_ERROR_EMPTY, gUser);
+				}
 				return;
 			}
 
@@ -295,40 +300,49 @@ public class VerifyManager extends ZUtils {
 
 			// If the user already has all the roles
 			if (roles.size() == 0) {
-				this.sendErrorMessage(event, textChannel, user, guild, BasicMessage.VERIFY_ERROR_ALREADY, gUser);
+				if (consumer != null) {
+					consumer.accept(gUser);
+				} else {
+					this.sendErrorMessage(event, textChannel, user, guild, BasicMessage.VERIFY_ERROR_ALREADY, gUser);
+				}
 				return;
 			}
 
-			roles.forEach(role -> guild.addRoleToMember(member, role).queue());
-
-			Random random = new Random();
-			EmbedBuilder builder = new EmbedBuilder();
-
-			builder.setTitle("GroupeZ - " + user.getAsTag(), gUser.getDashboardURL());
-			builder.setColor(Color.getHSBColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
-			builder.setFooter("2022 - " + guild.getName(), guild.getIconUrl());
-			builder.setThumbnail(gUser.getAvatar());
-
-			String footer = "\n\n\nUse ``/verify`` to verify your account.";
-			if (textChannel.getIdLong() != Config.commandChannel) {
-				TextChannel commandChannel = guild.getTextChannelById(Config.commandChannel);
-				footer += "\nOn " + commandChannel.getAsMention();
-			}
-
-			if (roles.size() == 1) {
-				builder.setDescription("You just got the role: " + roles.get(0).getAsMention() + footer);
+			roles.forEach(role -> {
+				guild.addRoleToMember(member, role).queue();
 				System.out.println("Ajout du rôle " + roles.get(0).getName() + " à l'utilisateur " + user.getAsTag());
-			} else {
-				String str = toList(roles.stream().map(e -> e.getAsMention()).collect(Collectors.toList()));
-				builder.setDescription("You just got the roles: " + str + footer);
-				System.out.println("Ajout des rôles " + str + " à l'utilisateur " + user.getAsTag());
-			}
-
-			event.replyEmbeds(builder.build()).queue();
+			});
 
 			if (consumer != null) {
+
 				consumer.accept(gUser);
+
+			} else {
+
+				Random random = new Random();
+				EmbedBuilder builder = new EmbedBuilder();
+
+				builder.setTitle("GroupeZ - " + user.getAsTag(), gUser.getDashboardURL());
+				builder.setColor(Color.getHSBColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
+				builder.setFooter("2023 - " + guild.getName(), guild.getIconUrl());
+				builder.setThumbnail(gUser.getAvatar());
+
+				String footer = "\n\n\nUse ``/verify`` to verify your account.";
+				if (textChannel.getIdLong() != Config.commandChannel) {
+					TextChannel commandChannel = guild.getTextChannelById(Config.commandChannel);
+					footer += "\nOn " + commandChannel.getAsMention();
+				}
+
+				if (roles.size() == 1) {
+					builder.setDescription("You just got the role: " + roles.get(0).getAsMention() + footer);
+				} else {
+					String str = toList(roles.stream().map(e -> e.getAsMention()).collect(Collectors.toList()));
+					builder.setDescription("You just got the roles: " + str + footer);
+				}
+
+				textChannel.sendMessageEmbeds(builder.build()).queue();
 			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -347,7 +361,7 @@ public class VerifyManager extends ZUtils {
 		EmbedBuilder builder = new EmbedBuilder();
 
 		builder.setColor(new Color(240, 10, 10));
-		builder.setFooter("2022 - " + guild.getName(), guild.getIconUrl());
+		builder.setFooter("2023 - " + guild.getName(), guild.getIconUrl());
 
 		String desc = basicMessage.getMessage();
 
@@ -366,7 +380,7 @@ public class VerifyManager extends ZUtils {
 			builder.setTitle("GroupeZ - " + user.getAsTag());
 		}
 
-		event.replyEmbeds(builder.build()).setEphemeral(true).queue();
+		textChannel.sendMessageEmbeds(builder.build()).queue();
 	}
 
 }

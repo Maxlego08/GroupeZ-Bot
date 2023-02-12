@@ -68,6 +68,22 @@ public class MessageEN {
 		usMessage.put(Message.TICKET_HOUR,
 				":exclamation: Attention, it is currently **%s:%s** in France. The support is available only between **9 hours** and **20 hours** every day. However the support reserves the right to be less active during the weekends.");
 
+		usMessage.put(Message.TICKET_PLUGIN_VERSION_COMMAND,
+				"To speed up support, please write the version of the plugin. To get the version of the plugin do the following command: /%s version");
+
+		usMessage.put(Message.TICKET_PLUGIN_VERSION_CONSOLE,
+				"To speed up support, please write the plugin version. To get the plugin version look in the console.");
+
+		usMessage.put(Message.TICKET_PLUGIN_VERSION_ERROR,
+				"You are not using the latest version of the plugin." + "\n"
+						+ "Update the plugin, check if your problem is still present." + "\n"
+						+ "If so, you can create a new ticket." + "\n\n" + "Closing of your ticket in **30** seconds.");
+
+		usMessage.put(Message.TICKET_PLUGIN_RULES, "\n"
+				+ "Please do not **mention** the GroupeZ team under penalty of punishment." + "\n"
+				+ "Don't forget to disable mentions when you make a reply!" + "\n" + "\n"
+				+ "If your ticket does not receive any messages after **48 hours**, it will be automatically closed !");
+
 		return usMessage;
 
 	}

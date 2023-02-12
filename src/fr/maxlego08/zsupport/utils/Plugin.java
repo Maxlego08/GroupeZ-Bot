@@ -10,6 +10,7 @@ public class Plugin {
 	private final long role;
 	private final int plugin_id;
 	private final double price;
+	private final String command;
 
 	/**
 	 * @param name
@@ -18,13 +19,18 @@ public class Plugin {
 	 * @param plugin_id
 	 * @param price
 	 */
-	public Plugin(String name, long emoteId, long role, int plugin_id, double price) {
+	public Plugin(String name, long emoteId, long role, int plugin_id, double price, String command) {
 		super();
 		this.name = name;
 		this.emoteId = emoteId;
 		this.role = role;
 		this.plugin_id = plugin_id;
 		this.price = price;
+		this.command = command;
+	}
+	
+	public String getCommand() {
+		return command;
 	}
 
 	/**
@@ -65,6 +71,10 @@ public class Plugin {
 
 	public boolean isPremium(){
 		return this.price > 0;
+	}
+	
+	public boolean hasCommand(){
+		return this.command != null;
 	}
 
 }

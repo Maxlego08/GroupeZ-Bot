@@ -111,5 +111,9 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 		System.out.println(PREFIX_CONSOLE + "Disconnect !");
 		System.exit(0);
 	}
+	
+	public boolean isRunning() {
+		return isRunning;
+	}
 
 }

@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.time.OffsetDateTime;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -27,6 +30,8 @@ import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.internal.interactions.ButtonImpl;
 
 public class PluginManager extends ZUtils implements Constant {
+
+	private static ExecutorService executor = Executors.newFixedThreadPool(2);
 
 	/**
 	 * Display plugins informations
@@ -103,6 +108,54 @@ public class PluginManager extends ZUtils implements Constant {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	public static void fetchResource(Plugin plugin, Consumer<Resource> consumer) {
+
+		executor.execute(() -> {
+
+			try {
+
+				String urlAsString = String.format(Config.API_RESOURCE_URL, plugin.getPlugin_id());
+				URL url = new URL(urlAsString);
+
+				HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+
+				// add reuqest header
+				con.setRequestMethod("GET");
+				con.setRequestProperty("User-Agent", "Mozilla/5.0");
+				con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+				int responseCode = con.getResponseCode();
+
+				if (responseCode != 200) {
+					System.out.println("Erreur : " + responseCode);
+					return;
+				}
+
+				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+				String inputLine;
+				StringBuffer response = new StringBuffer();
+
+				while ((inputLine = in.readLine()) != null) {
+					response.append(inputLine);
+				}
+				in.close();
+
+				Gson gson = ZSupport.instance.getGson();
+
+				Type resourceType = new TypeToken<Resource>() {
+				}.getType();
+
+				Resource resource = gson.fromJson(response.toString(), resourceType);
+				consumer.accept(resource);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		});
 
 	}
 
