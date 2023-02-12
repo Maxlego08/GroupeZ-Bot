@@ -239,8 +239,6 @@ public class Ticket extends ZUtils {
 		this.step = this.ticketStep.getStep();
 		this.step.manager = manager;
 		this.step.ticket = this;
-
-		System.out.println(this.step);
 	}
 
 	public void setFirstMessage(net.dv8tion.jda.api.entities.Message firstMessage) {
