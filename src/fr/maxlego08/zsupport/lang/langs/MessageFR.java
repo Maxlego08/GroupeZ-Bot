@@ -98,6 +98,13 @@ public class MessageFR {
 		frMessage.put(Message.TICKET_QUESTION,
 				"Vous pouvez poser des questions avant l'achat d'un plugin. Vous ne pouvez pas demander du support dans ce ticket.");
 
+		frMessage.put(Message.TICKET_PLUGIN_INFO,
+				"Pour aider la prise en charge du support, veuillez donner un maximum d'informations:" + "\n"
+						+ "- La version du plugin" + "\n" + "- La version de votre serveur" + "\n"
+						+ "- La liste de vos plugins" + "\n" + "- Les logs, si vous avez des erreurs" + "\n"
+						+ "- Vos fichiers de configuration, si vous avez un problème de configuration" + "\n\n"
+						+ "Pour partager vos fichiers où vos logs vous pouvez utiliser https://pastebin.com/");
+
 		return frMessage;
 	}
 

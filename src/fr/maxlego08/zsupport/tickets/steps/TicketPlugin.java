@@ -139,6 +139,11 @@ public class TicketPlugin extends Step {
 			}
 
 		});
+		
+		EmbedBuilder builderInfo = this.createEmbed();
+		builderInfo.setDescription(this.getMessage(ticket.getLang(), Message.TICKET_PLUGIN_INFO));
+		
+		channel.sendMessageEmbeds(builderInfo.build()).queue();
 
 	}
 

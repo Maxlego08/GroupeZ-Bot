@@ -88,6 +88,14 @@ public class MessageEN {
 
 		usMessage.put(Message.TICKET_QUESTION, "You can ask questions before purchasing a plugin. You cannot request support in this ticket.");
 		
+
+		usMessage.put(Message.TICKET_PLUGIN_INFO,
+				"To help with the support, please provide as much information as possible:" + "\n"
+						+ "- The version of the plugin" + "\n" + "- The version of your server" + "\n"
+						+ "- The list of your plugins" + "\n" + "- Logs, if you have errors" + "\n"
+						+ "- Your configuration files, if you have a configuration problem" + "\n\n"
+						+ "To share your files or logs you can use https://pastebin.com/");
+		
 		return usMessage;
 
 	}
