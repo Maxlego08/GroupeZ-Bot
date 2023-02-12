@@ -23,7 +23,7 @@ public class TicketOrder extends Step {
 
 		this.event.editMessageEmbeds(builder.build()).setActionRow(this.createCloseButton()).queue();
 
-		this.endQuestions(guild, ticket.getName() + "-custom", true);
+		this.endQuestions(guild, ticket.getName() + "-custom", true, guild.getMember(user), null);
 	}
 
 	@Override

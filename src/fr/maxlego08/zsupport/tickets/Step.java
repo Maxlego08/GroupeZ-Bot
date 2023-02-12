@@ -173,9 +173,10 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 	 * 
 	 * @param guild
 	 * @param ticketName
+	 * @param member
 	 */
-	protected void endQuestions(Guild guild, String ticketName) {
-		this.endQuestions(guild, ticketName, false);
+	protected void endQuestions(Guild guild, String ticketName, Member member) {
+		this.endQuestions(guild, ticketName, false, member, null);
 	}
 
 	/**
@@ -185,22 +186,25 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 	 * @param ticketName
 	 * @param move
 	 */
-	protected void endQuestions(Guild guild, String ticketName, boolean move) {
+	protected void endQuestions(Guild guild, String ticketName, boolean move, Member member, Runnable after) {
 
 		this.ticket.setWaiting(false);
 
 		TextChannel channel = this.ticket.getTextChannel(guild);
 		PermissionOverrideAction permissionOverrideAction = channel.putPermissionOverride(member);
-		permissionOverrideAction.setAllow(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue();
 
-		ChannelManager channelManager = channel.getManager();
-		channelManager.setName(ticketName).queue(e -> {
-			if (move) {
-				Category category = guild.getCategoryById(Config.ticketOrderChannel);
-				channelManager.setParent(category).queue();
-			}
+		permissionOverrideAction.setAllow(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue(z -> {
+			
+			if (after != null) after.run();
+			
+			ChannelManager channelManager = channel.getManager();
+			channelManager.setName(ticketName).queue(e -> {
+				if (move) {
+					Category category = guild.getCategoryById(Config.ticketOrderChannel);
+					channelManager.setParent(category).queue();
+				}
+			});
 		});
-
 	}
 
 	public void preMessage(TicketManager ticketManager, MessageReceivedEvent event, User user, Guild guild,

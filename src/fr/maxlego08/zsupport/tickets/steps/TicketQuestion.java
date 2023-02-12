@@ -49,7 +49,7 @@ public class TicketQuestion extends Step {
 
 		});
 		
-		this.endQuestions(guild, ticket.getName() + "-question");
+		this.endQuestions(guild, ticket.getName() + "-question", guild.getMember(user));
 	}
 
 	@Override

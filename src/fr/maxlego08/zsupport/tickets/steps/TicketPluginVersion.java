@@ -76,31 +76,31 @@ public class TicketPluginVersion extends Step {
 			PluginManager.fetchResource(ticket.getPlugin(), resource -> {
 
 				boolean isGoodVersion = content.equals(resource.getVersion().getVersion());
-				
-				if (isGoodVersion){
-					
-					msg.editMessage("You are using the latest version of the plugin.").queue(m -> m.delete().queueAfter(20, TimeUnit.SECONDS));
-					
-					Step step = TicketStep.PLUGIN.getStep();
-					this.ticket.setStep(step);
-					step.preProcess(this.manager, this.ticket, channel, guild, user, this.event, null);
-					
+
+				if (isGoodVersion) {
+
+					msg.editMessage("You are using the latest version of the plugin.").queueAfter(1, TimeUnit.SECONDS,
+							m -> {
+								Step step = TicketStep.PLUGIN.getStep();
+								this.ticket.setStep(step);
+								step.preProcess(this.manager, this.ticket, channel, guild, user, this.event, null);
+
+								m.delete().queueAfter(20, TimeUnit.SECONDS);
+							});
+
 				} else {
-					
+
 					EmbedBuilder builder = this.createEmbed();
 					builder.setDescription(this.ticket.getMessage(Message.TICKET_PLUGIN_VERSION_ERROR));
-					
-					msg.editMessageEmbeds(builder.build()).queue(m -> {									
-						ticket.setClose(true);						
-						
+
+					msg.editMessageEmbeds(builder.build()).queue(m -> {
+						ticket.setClose(true);
 						m.delete().queueAfter(30, TimeUnit.SECONDS, v -> {
-							
-							PermissionOverrideAction permissionOverrideActionLocal = textChannel.putPermissionOverride(event.getMember());
-							permissionOverrideActionLocal.clear(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue();
-							
-							ChannelManager channelManager = textChannel.getManager();
-							channelManager.setName(ticket.getName() + "-close").queue();
-							
+							PermissionOverrideAction a = textChannel.putPermissionOverride(event.getMember());
+							a.clear(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue(e -> {
+								ChannelManager channelManager = textChannel.getManager();
+								channelManager.setName(ticket.getName() + "-close").queue();
+							});
 						});
 					});
 				}

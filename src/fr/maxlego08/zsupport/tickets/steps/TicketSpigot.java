@@ -55,7 +55,7 @@ public class TicketSpigot extends Step {
 
 		});
 		
-		this.endQuestions(guild, ticket.getName() + "-spigot");
+		this.endQuestions(guild, ticket.getName() + "-spigot", guild.getMember(user));
 	}
 
 	@Override
