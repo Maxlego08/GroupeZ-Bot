@@ -60,11 +60,12 @@ public class MessageFR {
 		frMessage.put(Message.TICKET_CHOOSE,
 				"Veuillez choisir le type de votre ticket:" + "\n" + "\n" + ":dollar: Pour passer une commande" + "\n"
 						+ ":question: Pour demander de l'aide sur un plugin" + "\n"
-						+ "%s Pour demander l'accès sur spigot" + "\n");
+						+ "%s Pour demander l'accès sur spigot" + "\n" + ":wave: Questions avant achat" + "\n");
 
 		frMessage.put(Message.TICKET_CHOOSE_ORDER, "Passer une commande");
 		frMessage.put(Message.TICKET_CHOOSE_PLUGIN, "Support plugins");
 		frMessage.put(Message.TICKET_CHOOSE_SPIGOT, "Demander l'accès sur spigot");
+		frMessage.put(Message.TICKET_CHOOSE_BEFORE_PURCHASE, "Questions avant achat");
 
 		frMessage.put(Message.TICKET_SPIGOT,
 				"Pour demander l'accès vous devez fournir le nom de votre compte spigot ainsi que la liste des plugins où vous voulez l'accès.");
@@ -89,10 +90,13 @@ public class MessageFR {
 						+ "Si oui, vous pourrez alors créer un nouveau ticket." + "\n\n"
 						+ "Fermeture de votre ticket dans **30** secondes.");
 
-		frMessage.put(Message.TICKET_PLUGIN_RULES,
-				"\n" + "Merci de ne pas **mentionner** l'équipe de GroupeZ sous peine de sanction." + "\n"
-						+ "N'oubliez pas de désactiver les mentions lorsque vous faites une réponse !" + "\n" + "\n"
-						+ "Si votre ticket ne reçoit aucun message au bout de **48 heures**, il sera automatiquement fermé !");
+		frMessage.put(Message.TICKET_PLUGIN_RULES, "\n"
+				+ "Merci de ne pas **mentionner** l'équipe de GroupeZ sous peine de sanction." + "\n"
+				+ "N'oubliez pas de désactiver les mentions lorsque vous faites une réponse !" + "\n" + "\n"
+				+ "Si votre ticket ne reçoit aucun message au bout de **48 heures**, il sera automatiquement fermé !");
+
+		frMessage.put(Message.TICKET_QUESTION,
+				"Vous pouvez poser des questions avant l'achat d'un plugin. Vous ne pouvez pas demander du support dans ce ticket.");
 
 		return frMessage;
 	}

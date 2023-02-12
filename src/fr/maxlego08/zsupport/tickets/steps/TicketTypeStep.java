@@ -53,14 +53,18 @@ public class TicketTypeStep extends Step {
 						Emoji.fromUnicode("U+1F4B5"));
 
 				Button buttonHelp = new ButtonImpl(BUTTON_CHOOSE_SUPPORT,
-						this.ticket.getMessage(Message.TICKET_CHOOSE_PLUGIN), ButtonStyle.SECONDARY, false,
+						this.ticket.getMessage(Message.TICKET_CHOOSE_PLUGIN), ButtonStyle.PRIMARY, false,
 						Emoji.fromUnicode("U+2753"));
 
 				Button buttonSpigot = new ButtonImpl(BUTTON_CHOOSE_SPIGOT,
 						this.ticket.getMessage(Message.TICKET_CHOOSE_SPIGOT), ButtonStyle.SECONDARY, false,
 						Emoji.fromEmote(emote));
 
-				action.setActionRow(buttonHelp, buttonOrder, buttonSpigot);
+				Button buttonBeforePurchase = new ButtonImpl(BUTTON_CHOOSE_BEFORE_PURCHASE,
+						this.ticket.getMessage(Message.TICKET_CHOOSE_BEFORE_PURCHASE), ButtonStyle.SECONDARY, false,
+						Emoji.fromUnicode("U+1F44B"));
+
+				action.setActionRow(buttonOrder, buttonHelp, buttonSpigot, buttonBeforePurchase);
 				action.queue();
 
 			});
@@ -80,8 +84,9 @@ public class TicketTypeStep extends Step {
 
 		String buttonId = button.getId();
 		Step step = (buttonId.equals(BUTTON_CHOOSE_ORDER) ? TicketStep.ORDER
-				: buttonId.equals(BUTTON_CHOOSE_SPIGOT) ? TicketStep.CHOOSE_SPIGOT : TicketStep.CHOOSE_PLUGIN)
-						.getStep();
+				: buttonId.equals(BUTTON_CHOOSE_SPIGOT) ? TicketStep.CHOOSE_SPIGOT
+						: buttonId.equals(BUTTON_CHOOSE_BEFORE_PURCHASE) ? TicketStep.QUESTION
+								: TicketStep.CHOOSE_PLUGIN).getStep();
 		ticket.setStep(step);
 
 		step.preProcess(this.manager, ticket, messageChannel, guild, user, event, null);

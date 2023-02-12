@@ -56,11 +56,13 @@ public class MessageEN {
 
 		usMessage.put(Message.TICKET_CHOOSE,
 				"Please choose the type of your ticket:" + "\n" + "\n" + ":dollar: To take an order" + "\n"
-						+ ":question: To request help on a plugin" + "\n" + "%s To request access on spigot" + "\n");
+						+ ":question: To request help on a plugin" + "\n" + "%s To request access on spigot" + "\n"
+						+ ":wave: Questions before purchase" + "\n");
 
 		usMessage.put(Message.TICKET_CHOOSE_ORDER, "Take an order");
 		usMessage.put(Message.TICKET_CHOOSE_PLUGIN, "Plugin support");
 		usMessage.put(Message.TICKET_CHOOSE_SPIGOT, "Request access on spigot");
+		usMessage.put(Message.TICKET_CHOOSE_BEFORE_PURCHASE, "Questions before buying");
 
 		usMessage.put(Message.TICKET_SPIGOT,
 				"To request access you need to provide the name of your spigot account as well as the list of plugins where you want access.");
@@ -84,6 +86,8 @@ public class MessageEN {
 				+ "Don't forget to disable mentions when you make a reply!" + "\n" + "\n"
 				+ "If your ticket does not receive any messages after **48 hours**, it will be automatically closed !");
 
+		usMessage.put(Message.TICKET_QUESTION, "You can ask questions before purchasing a plugin. You cannot request support in this ticket.");
+		
 		return usMessage;
 
 	}

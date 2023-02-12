@@ -18,6 +18,7 @@ public interface Constant {
 	final String BUTTON_FR = "btn:FR";
 	final String BUTTON_EN = "btn:EN";
 
+	final String BUTTON_CHOOSE_BEFORE_PURCHASE = "btn:bpurchase";
 	final String BUTTON_CHOOSE_SPIGOT = "btn:spigot";
 	final String BUTTON_CHOOSE_ORDER = "btn:order";
 	final String BUTTON_CHOOSE_SUPPORT = "btn:help";
