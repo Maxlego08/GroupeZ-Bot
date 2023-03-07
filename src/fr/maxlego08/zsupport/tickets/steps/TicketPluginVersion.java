@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.managers.ChannelManager;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 public class TicketPluginVersion extends Step {
@@ -37,7 +36,11 @@ public class TicketPluginVersion extends Step {
 
 		TextChannel channel = this.ticket.getTextChannel(guild);
 		PermissionOverrideAction permissionOverrideAction = channel.putPermissionOverride(member);
-		permissionOverrideAction.setAllow(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue();
+		permissionOverrideAction.setAllow(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queueAfter(15,
+				TimeUnit.SECONDS);
+
+		messageChannel.sendMessage(this.ticket.getMessage(Message.TICKET_PLUGIN_VERSION_READ))
+				.queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
 
 		EmbedBuilder builder = this.createEmbed();
 		builder.setDescription(this.ticket.getMessage(
@@ -90,19 +93,14 @@ public class TicketPluginVersion extends Step {
 
 				} else {
 
-					EmbedBuilder builder = this.createEmbed();
-					builder.setDescription(this.ticket.getMessage(Message.TICKET_PLUGIN_VERSION_ERROR));
+					this.isVerify = false;
 
-					msg.editMessageEmbeds(builder.build()).queue(m -> {
-						ticket.setClose(true);
-						m.delete().queueAfter(30, TimeUnit.SECONDS, v -> {
-							PermissionOverrideAction a = textChannel.putPermissionOverride(event.getMember());
-							a.clear(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue(e -> {
-								ChannelManager channelManager = textChannel.getManager();
-								channelManager.setName(ticket.getName() + "-close").queue();
-							});
-						});
+					msg.editMessage(this.ticket.getMessage(Message.TICKET_PLUGIN_VERSION_ERROR)).queue(e -> {
+						event.getMessage().delete().queue();
+						permissionOverrideAction.setAllow(Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)
+								.queue(m -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
 					});
+
 				}
 			});
 		});

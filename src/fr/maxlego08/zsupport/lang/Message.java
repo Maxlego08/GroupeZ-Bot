@@ -40,5 +40,6 @@ public enum Message {
 	
 	TICKET_HOUR,
 	TICKET_PLUGIN_RULES,
+	TICKET_PLUGIN_VERSION_READ
 	
 }

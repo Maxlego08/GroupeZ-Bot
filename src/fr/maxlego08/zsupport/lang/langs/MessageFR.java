@@ -84,12 +84,14 @@ public class MessageFR {
 				"Pour accélérer le support, veuillez écrire la version du plugin." + "\n"
 						+ "Pour obtenir la version du plugin regardez dans la console." + "\n" + "\n"
 						+ "Par exemple, dans l'image ci-dessous, la version est 3.1.0.7, vous devez donc écrire juste la version: ``3.1.0.7``");
+		
+		frMessage.put(Message.TICKET_PLUGIN_VERSION_READ,
+				":arrow_up: Veuillez correctement lire le message du dessus et suivre les instructions ! Vous pourrez écrire la version du plugin dans **15 secondes**.");
 
 		frMessage.put(Message.TICKET_PLUGIN_VERSION_ERROR,
-				"Vous n'utilisez pas la dernière version du plugin." + "\n"
+				":x: Vous n'utilisez pas la dernière version du plugin." + "\n"
 						+ "Mettez à jour le plugin, vérifier si votre problème est toujours présent." + "\n"
-						+ "Si oui, vous pourrez alors créer un nouveau ticket." + "\n\n"
-						+ "Fermeture de votre ticket dans **30** secondes.");
+						+ "Si oui, alors vous devez écrire correctement la bonne version du plugin.");
 
 		frMessage.put(Message.TICKET_PLUGIN_RULES, "\n"
 				+ "Merci de ne pas **mentionner** l'équipe de GroupeZ sous peine de sanction." + "\n"

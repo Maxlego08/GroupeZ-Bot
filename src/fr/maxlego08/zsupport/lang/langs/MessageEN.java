@@ -79,11 +79,14 @@ public class MessageEN {
 				"To speed up support, please write the plugin version. To get the plugin version look in the console."
 						+ "\n" + "\n"
 						+ "For example, in the image below, the version is 3.1.0.7, so you should write just the version: ``3.1.0.7``.");
+		
+		usMessage.put(Message.TICKET_PLUGIN_VERSION_READ,
+				":arrow_up: Please read the message above correctly and follow the instructions ! You will be able to write the plugin version in **15 seconds**.");
 
 		usMessage.put(Message.TICKET_PLUGIN_VERSION_ERROR,
-				"You are not using the latest version of the plugin." + "\n"
+				":x: You are not using the latest version of the plugin." + "\n"
 						+ "Update the plugin, check if your problem is still present." + "\n"
-						+ "If so, you can create a new ticket." + "\n\n" + "Closing of your ticket in **30** seconds.");
+						+ "If so, then you must write the correct version of the plugin.");
 
 		usMessage.put(Message.TICKET_PLUGIN_RULES, "\n"
 				+ "Please do not **mention** the GroupeZ team under penalty of punishment." + "\n"
