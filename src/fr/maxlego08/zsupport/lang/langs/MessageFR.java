@@ -77,12 +77,13 @@ public class MessageFR {
 
 		frMessage.put(Message.TICKET_PLUGIN_VERSION_COMMAND,
 				"Pour accélérer le support, veuillez écrire la version du plugin." + "\n"
-						+ "Pour obtenir la version du plugin faite la commande suivante: **/%s version**" + "\n"
-						+ "Example:");
+						+ "Pour obtenir la version du plugin faite la commande suivante: **/%s version**" + "\n" + "\n"
+						+ "Par exemple, dans l'image ci-dessous, la version est 3.1.0.7, vous devez donc écrire juste la version: ``3.1.0.7``");
 
 		frMessage.put(Message.TICKET_PLUGIN_VERSION_CONSOLE,
 				"Pour accélérer le support, veuillez écrire la version du plugin." + "\n"
-						+ "Pour obtenir la version du plugin regardez dans la console." + "\n" + "Example:");
+						+ "Pour obtenir la version du plugin regardez dans la console." + "\n" + "\n"
+						+ "Par exemple, dans l'image ci-dessous, la version est 3.1.0.7, vous devez donc écrire juste la version: ``3.1.0.7``");
 
 		frMessage.put(Message.TICKET_PLUGIN_VERSION_ERROR,
 				"Vous n'utilisez pas la dernière version du plugin." + "\n"

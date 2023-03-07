@@ -17,6 +17,7 @@ import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.lang.LangType;
 import fr.maxlego08.zsupport.lang.Message;
+import fr.maxlego08.zsupport.tickets.ChannelInfo.ChannelType;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.ZUtils;
@@ -27,6 +28,7 @@ import fr.maxlego08.zsupport.verify.VerifyManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -43,11 +45,10 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	private static List<Ticket> tickets = new ArrayList<Ticket>();
 	private transient Map<Long, Long> cooldownMessages = new HashMap<Long, Long>();
 
-	private static long messageTicketId;
-	private static long lastSendTicketMessage;
+	private static Map<Long, ChannelInfo> channels = new HashMap<>();
 
 	// 48 hours
-	private long ticketCloseAfterMilliseconds = 1000 * 60 * 60 * 24 * 2;
+	private transient long ticketCloseAfterMilliseconds = 1000 * 60 * 60 * 24 * 2;
 
 	public TicketManager(ZSupport support) {
 		super();
@@ -91,7 +92,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.setTitle("GroupeZ - Support");
-			builder.setColor(Color.getHSBColor(45, 45, 45));
+			builder.setColor(new Color(45, 45, 45));
 			builder.setFooter("2023 - " + guild.getName(), guild.getIconUrl());
 			builder.setTimestamp(OffsetDateTime.now());
 
@@ -416,56 +417,64 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 		}
 	}
 
-	public void sendTicketUse(MessageReceivedEvent event, TextChannel textChannel) {
+	public void sendTicketUse(MessageReceivedEvent event, TextChannel textChannel, ChannelType channelType) {
 
-		if (messageTicketId == 0) {
+		ChannelInfo channelInfo = getInfo(textChannel);
+		
+		if (channelInfo.getMessageId() == 0) {
 
-			sendTicketInformations(textChannel);
+			sendTicketInformations(textChannel, channelType, channelInfo);
 
 		} else {
 
-			textChannel.getHistoryAround(messageTicketId, 3).queue(history -> {
-				net.dv8tion.jda.api.entities.Message message = history.getMessageById(messageTicketId);
+			textChannel.getHistoryAround(channelInfo.getMessageId(), 99).queue(history -> {
+				net.dv8tion.jda.api.entities.Message message = history.getMessageById(channelInfo.getMessageId());
 				if (message != null) {
-					if (System.currentTimeMillis() - lastSendTicketMessage > (1000 * (60 * 10))) {
+					if (System.currentTimeMillis() > channelInfo.getMessageAt()) {
 						message.delete().queue(s -> {
-							sendTicketInformations(textChannel);
+							sendTicketInformations(textChannel, channelType, channelInfo);
 						});
 					}
 
 				} else {
-					sendTicketInformations(textChannel);
+					sendTicketInformations(textChannel, channelType, channelInfo);
 				}
 			});
 		}
 	}
 
-	public void sendTicketInformations(TextChannel channel) {
+	public void sendTicketInformations(TextChannel channel, ChannelType channelType, ChannelInfo channelInfo) {
 
-		if (System.currentTimeMillis() - lastSendTicketMessage > (1000 * (60 * 10))) {
+		if (channelInfo.getMessageAt() > System.currentTimeMillis()) {
 			return;
 		}
 
-		lastSendTicketMessage = System.currentTimeMillis();
+		channelInfo.setMessageAt(System.currentTimeMillis() + (1000 * 60 * 10));
 
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle("How to get help ?");
+		builder.setTitle(channelType.getTitle());
 		builder.setColor(new Color(45, 200, 45));
 		builder.setTimestamp(OffsetDateTime.now());
 		builder.setFooter("2023 - " + channel.getGuild().getName(), channel.getGuild().getIconUrl());
 
 		TextChannel ticketChannel = channel.getGuild().getTextChannelById(Config.ticketChannel);
-
-		String desc = "Do you need help? Please create a " + ticketChannel.getAsMention()
-				+ " and do not request help here.";
-
-		builder.setDescription(desc);
+		builder.setDescription(String.format(channelType.getDescription(), ticketChannel.getAsMention()));
 
 		channel.sendMessageEmbeds(builder.build()).queue(message -> {
-			messageTicketId = message.getIdLong();
-			lastSendTicketMessage = System.currentTimeMillis();
+			channelInfo.setMessageId(message.getIdLong());
 		});
 
+	}
+
+	private ChannelInfo getInfo(long channelId) {
+		if (!channels.containsKey(channelId)) {
+			channels.put(channelId, new ChannelInfo());
+		}
+		return channels.get(channelId);
+	}
+
+	private ChannelInfo getInfo(ISnowflake iSnowflake) {
+		return getInfo(iSnowflake.getIdLong());
 	}
 
 }

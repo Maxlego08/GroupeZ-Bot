@@ -23,7 +23,7 @@ public class CommandDocumentation extends VCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Server Info");
 		builder.setColor(Color.getHSBColor(45, 45, 45));
-		builder.setFooter("2022 - " + this.guild.getName(), this.guild.getIconUrl());
+		builder.setFooter("2023 - " + this.guild.getName(), this.guild.getIconUrl());
 		builder.setDescription("zAuctionHouse documentation: https://zauctionhouse.groupez.dev" + "\n"
 				+ "zShop documentation: https://github.com/Maxlego08/zShop-API/wiki" + "\n"
 				+ "zMenu documentation: https://zmenu.groupez.dev/" + "\n"

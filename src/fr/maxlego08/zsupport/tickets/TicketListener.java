@@ -2,8 +2,10 @@ package fr.maxlego08.zsupport.tickets;
 
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.lang.LangType;
+import fr.maxlego08.zsupport.tickets.ChannelInfo.ChannelType;
 import fr.maxlego08.zsupport.utils.Constant;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
@@ -32,15 +34,18 @@ public class TicketListener extends ListenerAdapter implements Constant {
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
-		// 	
+
+		TextChannel channel = event.getTextChannel();
+		
 		if (event.getChannel().getName().contains("ticket-") && !event.getAuthor().isBot()) {
 
-			this.manager.sendInformations(event, event.getTextChannel(), event.getAuthor());
+			this.manager.sendInformations(event, channel, event.getAuthor());
 			this.manager.stepMessage(event, event.getAuthor(), event.getGuild(), event.getChannel());
 			
-		} else if (event.getChannel().getIdLong() == Config.generalChannel && !event.getAuthor().isBot()) {
+		} else if (!event.getAuthor().isBot() && Config.channelsWithInformations.containsKey(channel.getIdLong())) {
 			
-			this.manager.sendTicketUse(event, event.getTextChannel());
+			ChannelType channelType = Config.channelsWithInformations.get(channel.getIdLong());
+			this.manager.sendTicketUse(event, channel, channelType);
 			
 		}
 	}

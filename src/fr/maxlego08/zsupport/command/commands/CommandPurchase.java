@@ -32,7 +32,7 @@ public class CommandPurchase extends VCommand {
 		builder.setTitle("How to buy ?");
 		builder.setColor(new Color(45, 200, 45));
 		builder.setTimestamp(OffsetDateTime.now());
-		builder.setFooter("2022 - " + this.guild.getName(), this.guild.getIconUrl());
+		builder.setFooter("2023 - " + this.guild.getName(), this.guild.getIconUrl());
 
 		TextChannel channel = this.guild.getTextChannelById(Config.ticketChannel);
 

@@ -1,9 +1,12 @@
 package fr.maxlego08.zsupport;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import fr.maxlego08.zsupport.tickets.ChannelInfo.ChannelType;
 import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.storage.Persist;
 import fr.maxlego08.zsupport.utils.storage.Saveable;
@@ -27,6 +30,7 @@ public class Config implements Saveable {
 	public static String DASHBOARD_URL = "https://groupez.dev/dashboard/users/%s";
 	
 	public static List<Plugin> plugins = new ArrayList<>();
+	public static Map<Long, ChannelType> channelsWithInformations = new HashMap<>();
 
 	static {
 
@@ -44,6 +48,9 @@ public class Config implements Saveable {
 		plugins.add(new Plugin("zVoteParty", 879471509930926121l, 0l, 124, 0, "zvoteparty"));
 		plugins.add(new Plugin("zOldEnchant", 941724257132634152l, 0l, 221, 0, null));
 
+		channelsWithInformations.put(774320653892976692l, ChannelType.FREE);
+		channelsWithInformations.put(879813851959427112l, ChannelType.FREE);
+		channelsWithInformations.put(511516467615760407l, ChannelType.GENERAL);
 	}
 
 	public static Optional<Plugin> getPlugin(int plugin_id) {
