@@ -26,7 +26,7 @@ public class CommandDocumentation extends VCommand {
 		builder.setFooter("2023 - " + this.guild.getName(), this.guild.getIconUrl());
 		builder.setDescription("zAuctionHouse documentation: https://zauctionhouse.groupez.dev" + "\n"
 				+ "zShop documentation: https://github.com/Maxlego08/zShop-API/wiki" + "\n"
-				+ "zMenu documentation: https://zmenu.groupez.dev/" + "\n"
+				+ "zMenu documentation: https://docs.zmenu.dev/" + "\n"
 				+ "GroupeZ website documentation: https://docs.groupez.dev");
 		event.replyEmbeds(builder.build()).queue();
 		
