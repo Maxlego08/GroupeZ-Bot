@@ -420,7 +420,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	public void sendTicketUse(MessageReceivedEvent event, TextChannel textChannel, ChannelType channelType) {
 
 		ChannelInfo channelInfo = getInfo(textChannel);
-		
+
 		if (channelInfo.getMessageId() == 0) {
 
 			sendTicketInformations(textChannel, channelType, channelInfo);
@@ -431,24 +431,29 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 				net.dv8tion.jda.api.entities.Message message = history.getMessageById(channelInfo.getMessageId());
 				if (message != null) {
 					if (System.currentTimeMillis() > channelInfo.getMessageAt()) {
+						channelInfo.setMessageId(0);
 						message.delete().queue(s -> {
 							sendTicketInformations(textChannel, channelType, channelInfo);
 						});
+						return;
 					}
-
-				} else {
-					sendTicketInformations(textChannel, channelType, channelInfo);
 				}
+				sendTicketInformations(textChannel, channelType, channelInfo);
 			});
 		}
 	}
 
 	public void sendTicketInformations(TextChannel channel, ChannelType channelType, ChannelInfo channelInfo) {
 
+		System.out.println("Je peux envoyer l'info ? " + channelType + " - "
+				+ (channelInfo.getMessageAt() > System.currentTimeMillis()) + " -> " + channelInfo.getMessageAt() + " "
+				+ System.currentTimeMillis());
+
 		if (channelInfo.getMessageAt() > System.currentTimeMillis()) {
 			return;
 		}
 
+		System.out.println("Je vais sauvegardé !");
 		channelInfo.setMessageAt(System.currentTimeMillis() + (1000 * 60 * 10));
 
 		EmbedBuilder builder = new EmbedBuilder();
