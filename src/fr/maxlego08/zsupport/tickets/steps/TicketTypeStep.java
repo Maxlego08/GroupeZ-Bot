@@ -65,7 +65,9 @@ public class TicketTypeStep extends Step {
 						Emoji.fromUnicode("U+1F44B"));
 
 				action.setActionRow(buttonOrder, buttonHelp, buttonSpigot, buttonBeforePurchase);
-				action.queue();
+				action.queue(e2 -> {
+					permissionOverrideAction1.setAllow(Permission.MESSAGE_READ).queue();
+				});
 
 			});
 
