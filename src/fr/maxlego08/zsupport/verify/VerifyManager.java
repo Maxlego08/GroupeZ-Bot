@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
@@ -381,6 +382,92 @@ public class VerifyManager extends ZUtils {
 		}
 
 		textChannel.sendMessageEmbeds(builder.build()).queue();
+	}
+
+	public void updateUserAsync(User user, PlayerSender sender, Interaction event, Member targetUser, long pluginId) {
+		new Thread(() -> this.updateUser(user, sender, event, targetUser, pluginId, event.getGuild())).start();
+	}
+
+	private void updateUser(User user, PlayerSender sender, Interaction event, Member targetUser, long pluginId,
+			Guild guild) {
+
+		try {
+
+			String urlAsString = String.format(Config.API_URL_VERIFY_CUSTOMER, targetUser.getIdLong(), pluginId);
+
+			URL url = new URL(urlAsString);
+
+			String jsonPayload = "{\"custom_password\": \"" + Config.CUSTOM_KEY + "\"}";
+
+			HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+
+			// add reuqest header
+			con.setRequestMethod("POST");
+			con.setRequestProperty("User-Agent", this.USER__AGENT);
+			con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+			con.setRequestProperty("Content-Type", "application/json");
+
+			// Send post request
+			con.setDoOutput(true);
+
+			OutputStream os = con.getOutputStream();
+			byte[] input = jsonPayload.getBytes("utf-8");
+			os.write(input, 0, input.length);
+
+			DataOutputStream wr = new DataOutputStream(os);
+
+			wr.flush();
+			wr.close();
+
+			int responseCode = con.getResponseCode();
+
+			// If the query returned an error
+			if (responseCode != 200) {
+				event.reply("Erreur, impossible de faire ceci. (Client ou plugin introuvable)").setEphemeral(true).queue();
+				return;
+			}
+
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+			String inputLine;
+			StringBuffer response = new StringBuffer();
+
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+
+			Gson gson = ZSupport.instance.getGson();
+
+			Type listType = new TypeToken<Map<String, Object>>() {
+			}.getType();
+
+			Map<String, Object> values = gson.fromJson(response.toString(), listType);
+
+			String result = (String) values.get("message");
+			if (result.equals("ok")) {
+				Optional<Plugin> optional = Config.getPlugin((int) pluginId);
+				if (optional.isPresent()) {
+					Plugin plugin = optional.get();
+					event.reply("Confirmation de l'achat du plugin **" + plugin.getName() + "** par le client "
+							+ targetUser.getAsMention() + ", ajout du rôle.").queue();
+
+					Role role = guild.getRoleById(plugin.getRole());
+					if (!hasRole(targetUser, plugin.getRole())) {
+						guild.addRoleToMember(targetUser, role).queue();
+						System.out.println("Ajout du rôle " + role.getName() + " à l'utilisateur " + user.getAsTag());
+					}
+				} else {
+					event.reply("Impossible de trouver le plugin avec l'ID " + pluginId).setEphemeral(true).queue();
+				}
+
+			} else {
+				event.reply("Impossible d'ajouter le plugin, le client doit déjà l'avoir.").setEphemeral(true).queue();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

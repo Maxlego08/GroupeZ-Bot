@@ -454,7 +454,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 		}
 
 		System.out.println("Je vais sauvegardé !");
-		channelInfo.setMessageAt(System.currentTimeMillis() + (1000 * 60 * 10));
+		channelInfo.setMessageAt(System.currentTimeMillis() + (1000 * 60 * 15));
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle(channelType.getTitle());

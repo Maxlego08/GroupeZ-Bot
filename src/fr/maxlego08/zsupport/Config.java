@@ -24,7 +24,9 @@ public class Config implements Saveable {
 	public static long spigotEmote = 942107776883257364l;
 	public static long generalChannel = 511516467615760407l;
 	
+	public static String CUSTOM_KEY = "sdfsdkfsldkfsdfdsfkmsdlmf,mdslkflsdk;fkùljzedioahrnduidgstjhqsbgvdiyqsdgqksjdzapoçfmazflpoâicjozefdpzokfdozpefijz,fkezfljsdklfzeoirfsndlkfjkezf6+ze5f+zef2+ezf5s3fzef2zef+zfe56z+etfg+rf4+sfg";
 	public static String API_URL = "https://groupez.dev/api/v1/discord/%s";
+	public static String API_URL_VERIFY_CUSTOMER = "https://groupez.dev/api/v1/discord/%s/apply/%s";
 	public static String API_RESOURCE_URL = "https://groupez.dev/api/v1/resource/%s";
 	public static String RESOURCE_URL = "https://groupez.dev/resources/%s";
 	public static String DASHBOARD_URL = "https://groupez.dev/dashboard/users/%s";

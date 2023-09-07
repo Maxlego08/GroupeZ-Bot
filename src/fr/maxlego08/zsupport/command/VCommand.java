@@ -94,10 +94,10 @@ public abstract class VCommand extends Arguments implements Constant {
 			}
 		}
 
-		if (this.argsMinLength != 0 && this.argsMaxLength != 0
+		/*if (this.argsMinLength != 0 && this.argsMaxLength != 0
 				&& !(args.length >= this.argsMinLength && args.length <= this.argsMaxLength)) {
 			return CommandType.SYNTAX_ERROR;
-		}
+		}*/
 
 		this.sender = commandSender;
 		if (this.sender instanceof PlayerSender) {

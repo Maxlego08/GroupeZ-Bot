@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 public class CommandListener extends ListenerAdapter implements Constant, Runnable {
@@ -34,47 +35,55 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 		Guild guild = event.getGuild();
 		List<CommandData> commands = new ArrayList<>();
 		this.instance.getCommandManager().getCommands().forEach(command -> {
-			if (!command.isPlayerCanUse()) return;
+			if (!command.isPlayerCanUse())
+				return;
 			String cmd = command.getSubCommands().get(0);
 			System.out.println("Enregistrement de la commande " + cmd + " (" + command.getDescription() + ")");
 			// guild.upsertCommand(cmd, command.getDescription()).queue();
-			commands.add(new CommandData(cmd, command.getDescription()));
+			CommandData commandData = new CommandData(cmd, command.getDescription());
+			if (command.getRequireArgs().size() == 2) {
+				commandData.addOption(OptionType.USER, "utilisateur", "Joueur qui va recevoir le rôle");
+				commandData.addOption(OptionType.INTEGER, "plugin", "ID du plugin");
+			}
+			commands.add(commandData);
 		});
-		
+
 		guild.updateCommands().addCommands(commands).queue();
 	}
-	
+
 	@Override
 	public void onSlashCommand(SlashCommandEvent event) {
 		String commandString = event.getCommandPath();
-		
+
 		User user = event.getUser();
 		Member member = event.getMember();
-		
+
 		PlayerSender sender = new DiscordPlayer(user, member, event.getTextChannel());
+		
+		
 		this.instance.getCommandManager().onCommand(sender, commandString, new String[0], event);
 	}
 
-	/*@Override
-	public void onMessageReceived(MessageReceivedEvent event) {
-
-		User user = event.getAuthor();
-		Member member = event.getMember();
-		Message message = event.getMessage();
-		String command = message.getContentDisplay();
-
-		if (command.startsWith(COMMAND_PREFIX)) {
-
-			command = command.replaceFirst(COMMAND_PREFIX, "");
-
-			String commands = command.split(" ")[0];
-			command = command.replaceFirst(commands, "");
-			String[] args = command.length() != 0 ? get(command.split(" ")) : new String[0];
-			PlayerSender sender = new DiscordPlayer(user, member, event.getTextChannel());
-			this.instance.getCommandManager().onCommand(sender, commands, args, event);
-		}
-
-	}*/
+	/*
+	 * @Override public void onMessageReceived(MessageReceivedEvent event) {
+	 * 
+	 * User user = event.getAuthor(); Member member = event.getMember(); Message
+	 * message = event.getMessage(); String command =
+	 * message.getContentDisplay();
+	 * 
+	 * if (command.startsWith(COMMAND_PREFIX)) {
+	 * 
+	 * command = command.replaceFirst(COMMAND_PREFIX, "");
+	 * 
+	 * String commands = command.split(" ")[0]; command =
+	 * command.replaceFirst(commands, ""); String[] args = command.length() != 0
+	 * ? get(command.split(" ")) : new String[0]; PlayerSender sender = new
+	 * DiscordPlayer(user, member, event.getTextChannel());
+	 * this.instance.getCommandManager().onCommand(sender, commands, args,
+	 * event); }
+	 * 
+	 * }
+	 */
 
 	@SuppressWarnings("unused")
 	private String[] get(String[] tableau) {
@@ -111,7 +120,7 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 		System.out.println(PREFIX_CONSOLE + "Disconnect !");
 		System.exit(0);
 	}
-	
+
 	public boolean isRunning() {
 		return isRunning;
 	}
