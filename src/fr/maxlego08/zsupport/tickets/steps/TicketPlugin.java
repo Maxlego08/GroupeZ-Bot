@@ -12,6 +12,7 @@ import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.tickets.Step;
 import fr.maxlego08.zsupport.tickets.Ticket;
 import fr.maxlego08.zsupport.tickets.TicketStep;
+import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import fr.maxlego08.zsupport.utils.image.ImageHelper;
@@ -92,7 +93,7 @@ public class TicketPlugin extends Step {
 						EmbedBuilder localBuilder = new EmbedBuilder();
 
 						localBuilder.setColor(new Color(240, 10, 10));
-						localBuilder.setFooter("2023 - " + guild.getName(), guild.getIconUrl());
+						localBuilder.setFooter(Constant.YEAR + " - " + guild.getName(), guild.getIconUrl());
 
 						localBuilder.setDescription("Impossible to check if you have purchased the plugin." + "\n"
 								+ "\n"

@@ -6,6 +6,7 @@ import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.command.CommandManager;
 import fr.maxlego08.zsupport.command.CommandType;
 import fr.maxlego08.zsupport.command.VCommand;
+import fr.maxlego08.zsupport.utils.Constant;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 public class CommandServer extends VCommand {
@@ -23,7 +24,7 @@ public class CommandServer extends VCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Server Info");
 		builder.setColor(Color.getHSBColor(45, 45, 45));
-		builder.setFooter("2023 - " + guild.getName(), guild.getIconUrl());
+		builder.setFooter(Constant.YEAR + " - " + guild.getName(), guild.getIconUrl());
 
 		builder.addField("Name of discord", guild.getName(), true);
 		builder.addField("Founder of discord", guild.getMemberById(522359210844094479l).getAsMention(), true);

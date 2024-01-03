@@ -25,6 +25,7 @@ import com.google.gson.reflect.TypeToken;
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.lang.BasicMessage;
+import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.utils.commands.PlayerSender;
@@ -179,7 +180,7 @@ public class VerifyManager extends ZUtils {
 	 * @param runnableError
 	 */
 	public void userIsLink(User user, Runnable runnableSuccess, Runnable runnableError) {
-		try {
+		try {		
 			String url = String.format(Config.API_URL, user.getIdLong());
 			URL obj = new URL(url);
 			HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
@@ -325,7 +326,7 @@ public class VerifyManager extends ZUtils {
 
 				builder.setTitle("GroupeZ - " + user.getAsTag(), gUser.getDashboardURL());
 				builder.setColor(Color.getHSBColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
-				builder.setFooter("2023 - " + guild.getName(), guild.getIconUrl());
+				builder.setFooter(Constant.YEAR + " - " + guild.getName(), guild.getIconUrl());
 				builder.setThumbnail(gUser.getAvatar());
 
 				String footer = "\n\n\nUse ``/verify`` to verify your account.";
@@ -362,7 +363,7 @@ public class VerifyManager extends ZUtils {
 		EmbedBuilder builder = new EmbedBuilder();
 
 		builder.setColor(new Color(240, 10, 10));
-		builder.setFooter("2023 - " + guild.getName(), guild.getIconUrl());
+		builder.setFooter(Constant.YEAR + " - " + guild.getName(), guild.getIconUrl());
 
 		String desc = basicMessage.getMessage();
 

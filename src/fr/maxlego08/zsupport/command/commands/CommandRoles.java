@@ -7,6 +7,7 @@ import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.command.CommandManager;
 import fr.maxlego08.zsupport.command.CommandType;
 import fr.maxlego08.zsupport.command.VCommand;
+import fr.maxlego08.zsupport.utils.Constant;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Role;
 
@@ -25,7 +26,7 @@ public class CommandRoles extends VCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Roles");
 		builder.setColor(Color.getHSBColor(5, 255, 5));
-		builder.setFooter("2023 - " + this.guild.getName(), this.guild.getIconUrl());
+		builder.setFooter(Constant.YEAR + " - " + this.guild.getName(), this.guild.getIconUrl());
 		Config.plugins.forEach(plugin -> {
 			Role role = this.guild.getRoleById(plugin.getRole());
 			if (role != null) {

@@ -96,7 +96,7 @@ public class MessageFR {
 		frMessage.put(Message.TICKET_PLUGIN_RULES, "\n"
 				+ "Merci de ne pas **mentionner** l'équipe de GroupeZ sous peine de sanction." + "\n"
 				+ "N'oubliez pas de désactiver les mentions lorsque vous faites une réponse !" + "\n" + "\n"
-				+ "Si votre ticket ne reçoit aucun message au bout de **48 heures**, il sera automatiquement fermé !");
+				+ "Si votre ticket ne reçoit aucun message au bout de **4 jours**, il sera automatiquement fermé !");
 
 		frMessage.put(Message.TICKET_QUESTION,
 				"Vous pouvez poser des questions avant l'achat d'un plugin. Vous ne pouvez pas demander du support dans ce ticket.");

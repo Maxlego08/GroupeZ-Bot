@@ -8,6 +8,7 @@ import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.command.CommandManager;
 import fr.maxlego08.zsupport.command.CommandType;
 import fr.maxlego08.zsupport.command.VCommand;
+import fr.maxlego08.zsupport.utils.Constant;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 
@@ -78,7 +79,7 @@ public class CommandRules extends VCommand {
 		builder.setTitle("Discord Rules");
 		builder.setThumbnail(this.guild.getIconUrl());
 		builder.setColor(new Color(40, 221, 237));
-		builder.setFooter("2023 - " + this.guild.getName(), this.guild.getIconUrl());
+		builder.setFooter(Constant.YEAR + " - " + this.guild.getName(), this.guild.getIconUrl());
 
 		for (int a = 0; a != rules.size(); a++) {
 			int index = a + 1;

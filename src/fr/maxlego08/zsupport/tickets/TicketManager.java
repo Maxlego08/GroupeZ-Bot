@@ -34,6 +34,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -48,7 +49,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	private static Map<Long, ChannelInfo> channels = new HashMap<>();
 
 	// 48 hours
-	private transient long ticketCloseAfterMilliseconds = 1000 * 60 * 60 * 24 * 2;
+	private transient long ticketCloseAfterMilliseconds = 1000 * 60 * 60 * 24 * 4;
 
 	public TicketManager(ZSupport support) {
 		super();
@@ -93,7 +94,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.setTitle("GroupeZ - Support");
 			builder.setColor(new Color(45, 45, 45));
-			builder.setFooter("2023 - " + guild.getName(), guild.getIconUrl());
+			builder.setFooter(Constant.YEAR + " - " + guild.getName(), guild.getIconUrl());
 			builder.setTimestamp(OffsetDateTime.now());
 
 			builder.setDescription("Closing your ticket for inactivity in **30 seconds**.");
@@ -193,7 +194,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.setTitle("GroupeZ - Support");
 			builder.setColor(Color.getHSBColor(45, 45, 45));
-			builder.setFooter("2023 - " + guild.getName(), guild.getIconUrl());
+			builder.setFooter(Constant.YEAR + " - " + guild.getName(), guild.getIconUrl());
 			builder.setTimestamp(OffsetDateTime.now());
 
 			builder.setDescription(this.getMessage(type, Message.TICKET_CREATE_WAIT));
@@ -397,6 +398,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 			Ticket ticket = optional.get();
 			ticket.setLastMessageAt(System.currentTimeMillis());
+			ticket.logMessage(user, event.getMessage().getContentRaw());
 
 			Calendar calendar = Calendar.getInstance();
 			int hour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -415,6 +417,19 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 			}
 		}
+	}
+
+	public void logTicket(MessageReceivedEvent event, TextChannel textChannel, User user) {
+		Optional<Ticket> optional = this.getByChannel(textChannel);
+		optional.ifPresent(ticket -> {
+			ticket.setLastMessageAt(System.currentTimeMillis());
+
+			String content = event.getMessage().getContentRaw();
+			for (Attachment attachment : event.getMessage().getAttachments()) {
+				content += attachment.getFileName() + "." + attachment.getFileExtension() + ": " + attachment.getUrl();
+			}
+			ticket.logMessage(user, content);
+		});
 	}
 
 	public void sendTicketUse(MessageReceivedEvent event, TextChannel textChannel, ChannelType channelType) {
@@ -460,7 +475,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 		builder.setTitle(channelType.getTitle());
 		builder.setColor(new Color(45, 200, 45));
 		builder.setTimestamp(OffsetDateTime.now());
-		builder.setFooter("2023 - " + channel.getGuild().getName(), channel.getGuild().getIconUrl());
+		builder.setFooter(Constant.YEAR + " - " + channel.getGuild().getName(), channel.getGuild().getIconUrl());
 
 		TextChannel ticketChannel = channel.getGuild().getTextChannelById(Config.ticketChannel);
 		builder.setDescription(String.format(channelType.getDescription(), ticketChannel.getAsMention()));

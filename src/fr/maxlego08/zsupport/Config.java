@@ -23,6 +23,7 @@ public class Config implements Saveable {
 	public static long groupezEmote = 710806746779615233l;
 	public static long spigotEmote = 942107776883257364l;
 	public static long generalChannel = 511516467615760407l;
+	public static long ticketLogChannel = 1192064697428627456l;
 	
 	public static String CUSTOM_KEY = "sdfsdkfsldkfsdfdsfkmsdlmf,mdslkflsdk;fkùljzedioahrnduidgstjhqsbgvdiyqsdgqksjdzapoçfmazflpoâicjozefdpzokfdozpefijz,fkezfljsdklfzeoirfsndlkfjkezf6+ze5f+zef2+ezf5s3fzef2zef+zfe56z+etfg+rf4+sfg";
 	public static String API_URL = "https://groupez.dev/api/v1/discord/%s";

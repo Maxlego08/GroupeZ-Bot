@@ -1,5 +1,8 @@
 package fr.maxlego08.zsupport.tickets;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.lang.LangType;
@@ -9,6 +12,7 @@ import fr.maxlego08.zsupport.utils.ZUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 
 public class Ticket extends ZUtils {
 
@@ -22,6 +26,7 @@ public class Ticket extends ZUtils {
 	private TicketStep ticketStep;
 	private String pluginName;
 	private long lastMessageAt;
+	private List<TicketMessage> messages = new ArrayList<TicketMessage>();
 
 	private transient net.dv8tion.jda.api.entities.Message firstMessage;
 
@@ -42,6 +47,13 @@ public class Ticket extends ZUtils {
 		this.name = name;
 	}
 
+	public List<TicketMessage> getMessages() {
+		if (this.messages == null) {
+			this.messages = new ArrayList<>();
+		}
+		return this.messages;
+	}
+
 	/**
 	 * @return the isClose
 	 */
@@ -55,6 +67,8 @@ public class Ticket extends ZUtils {
 	 */
 	public void setClose(boolean isClose) {
 		this.isClose = isClose;
+		
+		TranscriptManager.sendTranscript(this, ZSupport.instance.getJda());
 	}
 
 	/**
@@ -262,6 +276,11 @@ public class Ticket extends ZUtils {
 	 */
 	public void setLastMessageAt(long lastMessageAt) {
 		this.lastMessageAt = lastMessageAt;
+	}
+
+	public void logMessage(User user, String content) {
+		TicketMessage ticketMessage = new TicketMessage(user.getIdLong(), user.getName(), content);
+		this.getMessages().add(ticketMessage);
 	}
 
 }

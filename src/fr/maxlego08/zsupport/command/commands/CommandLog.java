@@ -9,28 +9,25 @@ import fr.maxlego08.zsupport.command.VCommand;
 import fr.maxlego08.zsupport.utils.Constant;
 import net.dv8tion.jda.api.EmbedBuilder;
 
-public class CommandDocumentation extends VCommand {
+public class CommandLog extends VCommand {
 
-	public CommandDocumentation(CommandManager commandManager) {
+	public CommandLog(CommandManager commandManager) {
 		super(commandManager);
 		this.consoleCanUse = false;
-		this.onlyInCommandChannel = false;
-		this.description = "Display plugin documentation";
+		this.onlyInCommandChannel = true;
+		this.description = "Send log informations";
 	}
 
 	@Override
 	protected CommandType perform(ZSupport main) {
-
+		
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Server Info");
 		builder.setColor(Color.getHSBColor(45, 45, 45));
 		builder.setFooter(Constant.YEAR + " - " + this.guild.getName(), this.guild.getIconUrl());
-		builder.setDescription("zAuctionHouse documentation: https://zauctionhouse.groupez.dev" + "\n"
-				+ "zShop documentation: https://github.com/Maxlego08/zShop-API/wiki" + "\n"
-				+ "zMenu documentation: https://docs.zmenu.dev/" + "\n"
-				+ "GroupeZ website documentation: https://docs.groupez.dev");
+		builder.setDescription("Paste your logs on https://mclo.gs/");
 		event.replyEmbeds(builder.build()).queue();
-		
+
 		return CommandType.SUCCESS;
 	}
 

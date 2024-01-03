@@ -8,6 +8,7 @@ import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.command.CommandManager;
 import fr.maxlego08.zsupport.command.CommandType;
 import fr.maxlego08.zsupport.command.VCommand;
+import fr.maxlego08.zsupport.utils.Constant;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -32,7 +33,7 @@ public class CommandPurchase extends VCommand {
 		builder.setTitle("How to buy ?");
 		builder.setColor(new Color(45, 200, 45));
 		builder.setTimestamp(OffsetDateTime.now());
-		builder.setFooter("2023 - " + this.guild.getName(), this.guild.getIconUrl());
+		builder.setFooter(Constant.YEAR + " - " + this.guild.getName(), this.guild.getIconUrl());
 
 		TextChannel channel = this.guild.getTextChannelById(Config.ticketChannel);
 

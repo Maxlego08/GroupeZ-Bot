@@ -91,7 +91,7 @@ public class MessageEN {
 		usMessage.put(Message.TICKET_PLUGIN_RULES, "\n"
 				+ "Please do not **mention** the GroupeZ team under penalty of punishment." + "\n"
 				+ "Don't forget to disable mentions when you make a reply!" + "\n" + "\n"
-				+ "If your ticket does not receive any messages after **48 hours**, it will be automatically closed !");
+				+ "If your ticket does not receive any messages after **4 days**, it will be automatically closed !");
 
 		usMessage.put(Message.TICKET_QUESTION,
 				"You can ask questions before purchasing a plugin. You cannot request support in this ticket.");

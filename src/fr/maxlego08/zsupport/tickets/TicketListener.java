@@ -39,6 +39,7 @@ public class TicketListener extends ListenerAdapter implements Constant {
 		
 		if (event.getChannel().getName().contains("ticket-") && !event.getAuthor().isBot()) {
 
+			this.manager.logTicket(event, channel, event.getAuthor());
 			this.manager.sendInformations(event, channel, event.getAuthor());
 			this.manager.stepMessage(event, event.getAuthor(), event.getGuild(), event.getChannel());
 			
