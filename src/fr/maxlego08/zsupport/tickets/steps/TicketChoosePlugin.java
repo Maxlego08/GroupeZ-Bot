@@ -10,32 +10,30 @@ import fr.maxlego08.zsupport.tickets.TicketManager;
 import fr.maxlego08.zsupport.tickets.TicketStep;
 import fr.maxlego08.zsupport.utils.Plugin;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu.Builder;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
 public class TicketChoosePlugin extends Step {
 
 	@Override
 	public void process(Ticket ticket, MessageChannel messageChannel, Guild guild, User user, Interaction interaction) {
 
-		Builder selectionMenu = SelectionMenu.create(BUTTON_SELECT_PLUGIN);
+		StringSelectMenu.Builder selectionMenu = StringSelectMenu.create(BUTTON_SELECT_PLUGIN);
 		Config.plugins.forEach(plugin -> {
 
-			Emote emote = guild.getEmoteById(plugin.getEmoteId());
-			selectionMenu.addOption(plugin.getName(), plugin.getName(), Emoji.fromEmote(emote));
+			Emoji emote = guild.getEmojiById(plugin.getEmoteId());
+			selectionMenu.addOption(plugin.getName(), plugin.getName(), emote);
 
 		});
 
-		selectionMenu.addOption(this.ticket.getMessage(Message.OTHER), "other", Emoji.fromMarkdown("U+1F6AB"));
+		selectionMenu.addOption(this.ticket.getMessage(Message.OTHER), "other", Emoji.fromUnicode("U+1F6AB"));
 
 		EmbedBuilder builder = this.createEmbed();
 
@@ -50,11 +48,11 @@ public class TicketChoosePlugin extends Step {
 
 	@Override
 	public void buttonClick(Ticket ticket, MessageChannel messageChannel, Guild guild, User user, Button button,
-			ButtonClickEvent event) {
+			ButtonInteractionEvent event) {
 	}
 
 	@Override
-	public void selectionClick(TicketManager ticketManager, SelectionMenuEvent event, User user, Guild guild,
+	public void selectionClick(TicketManager ticketManager, StringSelectInteractionEvent event, User user, Guild guild,
 			MessageChannel messageChannel) {
 
 		List<String> strings = event.getValues();

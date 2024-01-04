@@ -22,12 +22,11 @@ import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.utils.image.ImageHelper;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
-import net.dv8tion.jda.internal.interactions.ButtonImpl;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.internal.interactions.component.ButtonImpl;
 
 public class PluginManager extends ZUtils implements Constant {
 
@@ -102,7 +101,7 @@ public class PluginManager extends ZUtils implements Constant {
 			builder.setDescription(resource.getTag());
 
 			Button button = new ButtonImpl("btn:link:resource", "Access to the plugin", ButtonStyle.LINK,
-					resource.getResourceUrl(), false, Emoji.fromEmote(plugin.getEmote(guild)));
+					resource.getResourceUrl(), false, plugin.getEmote(guild));
 			channel.sendMessageEmbeds(builder.build()).setActionRow(button).queue();
 
 		} catch (Exception e) {

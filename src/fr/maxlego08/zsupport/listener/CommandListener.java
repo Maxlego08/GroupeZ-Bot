@@ -14,10 +14,12 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 public class CommandListener extends ListenerAdapter implements Constant, Runnable {
 
@@ -40,7 +42,7 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 			String cmd = command.getSubCommands().get(0);
 			System.out.println("Enregistrement de la commande " + cmd + " (" + command.getDescription() + ")");
 			// guild.upsertCommand(cmd, command.getDescription()).queue();
-			CommandData commandData = new CommandData(cmd, command.getDescription());
+			SlashCommandData commandData = Commands.slash(cmd, command.getDescription());
 			if (command.getRequireArgs().size() == 2) {
 				commandData.addOption(OptionType.USER, "utilisateur", "Joueur qui va recevoir le rôle");
 				commandData.addOption(OptionType.INTEGER, "plugin", "ID du plugin");
@@ -52,13 +54,13 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
 	}
 
 	@Override
-	public void onSlashCommand(SlashCommandEvent event) {
-		String commandString = event.getCommandPath();
+	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+		String commandString = event.getName();
 
 		User user = event.getUser();
 		Member member = event.getMember();
 
-		PlayerSender sender = new DiscordPlayer(user, member, event.getTextChannel());
+		PlayerSender sender = new DiscordPlayer(user, member, event.getChannel());
 		
 		
 		this.instance.getCommandManager().onCommand(sender, commandString, new String[0], event);

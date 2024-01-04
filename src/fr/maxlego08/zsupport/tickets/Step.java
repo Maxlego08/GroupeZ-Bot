@@ -10,20 +10,20 @@ import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.GenericComponentInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.Component;
-import net.dv8tion.jda.api.managers.ChannelManager;
+import net.dv8tion.jda.api.interactions.components.ItemComponent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 public abstract class Step extends ZUtils implements Constant, Cloneable {
@@ -40,7 +40,7 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 			Interaction interaction);
 
 	public abstract void buttonClick(Ticket ticket, MessageChannel messageChannel, Guild guild, User user,
-			Button button, ButtonClickEvent event);
+			Button button, ButtonInteractionEvent event);
 
 	public abstract TicketStep getStep();
 
@@ -73,7 +73,7 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 		return stringBuilder;
 	}
 
-	public void preButtonClick(TicketManager ticketManager, ButtonClickEvent event, User user, Guild guild,
+	public void preButtonClick(TicketManager ticketManager, ButtonInteractionEvent event, User user, Guild guild,
 			MessageChannel channel) {
 
 		this.guild = guild;
@@ -98,7 +98,7 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 	 * @param guild
 	 * @param messageChannel
 	 */
-	public void selectionClick(TicketManager ticketManager, SelectionMenuEvent event, User user, Guild guild,
+	public void selectionClick(TicketManager ticketManager, StringSelectInteractionEvent event, User user, Guild guild,
 			MessageChannel messageChannel) {
 	}
 
@@ -114,7 +114,7 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 	 * @param runnable
 	 */
 	public void preProcess(TicketManager ticketManager, Ticket ticket, MessageChannel messageChannel, Guild guild,
-			User user, GenericComponentInteractionCreateEvent event, Runnable runnable) {
+			User user, StringSelectInteractionEvent event, Runnable runnable) {
 
 		this.manager = ticketManager;
 		this.ticket = ticket;
@@ -126,7 +126,7 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 		this.process(ticket, messageChannel, guild, user, event);
 	}
 
-	public Component createCloseButton() {
+	public ItemComponent createCloseButton() {
 		return Button.danger(BUTTON_CLOSE, this.ticket.getMessage(Message.TICKET_CLOSE_BUTTON));
 	}
 
@@ -136,7 +136,7 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 	 * @param ticket
 	 * @param event
 	 */
-	protected void closeTicket(Ticket ticket, ButtonClickEvent event) {
+	protected void closeTicket(Ticket ticket, ButtonInteractionEvent event) {
 		EmbedBuilder builder = this.createEmbed();
 		builder.setDescription(ticket.getMessage(Message.TICKET_CLOSE, 10, "s"));
 
@@ -153,11 +153,11 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 					builder.setDescription(ticket.getMessage(Message.TICKET_CLOSE, 1, ""));
 					e.editOriginalEmbeds(builder.build()).queueAfter(1, TimeUnit.SECONDS, e4 -> {
 
-						TextChannel channel = event.getTextChannel();
-						PermissionOverrideAction permissionOverrideAction = channel.putPermissionOverride(this.member);
-						permissionOverrideAction.clear(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue();
+						TextChannel channel = (TextChannel) event.getChannel();
+						PermissionOverrideAction permissionOverrideAction = channel.upsertPermissionOverride(this.member);
+						permissionOverrideAction.clear(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL).queue();
 
-						ChannelManager channelManager = channel.getManager();
+						TextChannelManager channelManager = channel.getManager();
 						channelManager.setName(ticket.getName() + "-close").queue();
 
 						e4.delete().queue();
@@ -191,13 +191,12 @@ public abstract class Step extends ZUtils implements Constant, Cloneable {
 		this.ticket.setWaiting(false);
 
 		TextChannel channel = this.ticket.getTextChannel(guild);
-		PermissionOverrideAction permissionOverrideAction = channel.putPermissionOverride(member);
-
-		permissionOverrideAction.setAllow(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue(z -> {
+		PermissionOverrideAction permissionOverrideAction = channel.upsertPermissionOverride(member);
+		permissionOverrideAction.setAllowed(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL).queue(z -> {
 			
 			if (after != null) after.run();
 			
-			ChannelManager channelManager = channel.getManager();
+			TextChannelManager channelManager = channel.getManager();
 			channelManager.setName(ticketName).queue(e -> {
 				if (move) {
 					Category category = guild.getCategoryById(Config.ticketOrderChannel);

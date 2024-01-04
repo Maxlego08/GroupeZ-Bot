@@ -10,8 +10,9 @@ import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import fr.maxlego08.zsupport.utils.commands.Sender;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public abstract class VCommand extends Arguments implements Constant {
 
@@ -45,8 +46,8 @@ public abstract class VCommand extends Arguments implements Constant {
 	private CommandManager commandManager;
 	protected ZSupport instance;
 
-	protected SlashCommandEvent event;
-	protected TextChannel textChannel;
+	protected SlashCommandInteractionEvent event;
+	protected MessageChannelUnion textChannel;
 	protected Guild guild;
 
 	public boolean isOnlyInCommandChannel() {
@@ -70,7 +71,7 @@ public abstract class VCommand extends Arguments implements Constant {
 	 * @param args
 	 * @return {@link CommandType}
 	 */
-	public CommandType prePerform(ZSupport main, Sender commandSender, String[] args, SlashCommandEvent event) {
+	public CommandType prePerform(ZSupport main, Sender commandSender, String[] args, SlashCommandInteractionEvent event) {
 
 		// We update the number of arguments according to the number of parents
 
@@ -106,7 +107,7 @@ public abstract class VCommand extends Arguments implements Constant {
 
 		this.event = event;
 		if (event != null) {
-			this.textChannel = event.getTextChannel();
+			this.textChannel = event.getChannel();
 			this.guild = event.getGuild();
 		}
 

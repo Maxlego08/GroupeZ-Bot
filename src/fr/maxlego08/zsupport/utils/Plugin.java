@@ -1,7 +1,7 @@
 package fr.maxlego08.zsupport.utils;
 
-import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 public class Plugin {
 
@@ -61,8 +61,8 @@ public class Plugin {
 		return role;
 	}
 
-	public Emote getEmote(Guild guild){
-		return guild.getEmoteById(this.emoteId);
+	public Emoji getEmote(Guild guild){
+		return guild.getEmojiById(this.emoteId);
 	}
 	
 	public boolean isReal() {

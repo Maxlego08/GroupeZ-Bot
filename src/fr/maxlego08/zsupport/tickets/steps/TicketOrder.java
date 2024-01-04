@@ -6,11 +6,11 @@ import fr.maxlego08.zsupport.tickets.Ticket;
 import fr.maxlego08.zsupport.tickets.TicketStep;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class TicketOrder extends Step {
 
@@ -28,7 +28,7 @@ public class TicketOrder extends Step {
 
 	@Override
 	public void buttonClick(Ticket ticket, MessageChannel messageChannel, Guild guild, User user, Button button,
-			ButtonClickEvent event) {
+			ButtonInteractionEvent event) {
 	}
 
 	@Override

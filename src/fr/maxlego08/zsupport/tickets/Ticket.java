@@ -11,8 +11,8 @@ import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class Ticket extends ZUtils {
 

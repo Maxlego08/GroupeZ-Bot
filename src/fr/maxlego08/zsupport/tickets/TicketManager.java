@@ -21,7 +21,6 @@ import fr.maxlego08.zsupport.tickets.ChannelInfo.ChannelType;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.ZUtils;
-import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import fr.maxlego08.zsupport.utils.storage.Persist;
 import fr.maxlego08.zsupport.utils.storage.Saveable;
 import fr.maxlego08.zsupport.verify.VerifyManager;
@@ -30,15 +29,15 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.entities.Message.Attachment;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.managers.ChannelManager;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 public class TicketManager extends ZUtils implements Constant, Saveable {
@@ -111,10 +110,10 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 					builder.setDescription("Closing your ticket for inactivity in **now**.");
 					msg.editMessageEmbeds(builder.build()).queueAfter(15, TimeUnit.SECONDS, e3 -> {
-						PermissionOverrideAction permissionOverrideAction = channel.putPermissionOverride(member);
-						permissionOverrideAction.clear(Permission.MESSAGE_WRITE, Permission.MESSAGE_READ).queue();
+						PermissionOverrideAction permissionOverrideAction = channel.upsertPermissionOverride(member);
+						permissionOverrideAction.clear(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL).queue();
 
-						ChannelManager channelManager = channel.getManager();
+						TextChannelManager channelManager = channel.getManager();
 						channelManager.setName(ticket.getName() + "-close").queue();
 					});
 				});
@@ -148,7 +147,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 * @param user
 	 * @return
 	 */
-	public Optional<Ticket> getByChannel(TextChannel channel) {
+	public Optional<Ticket> getByChannel(MessageChannel channel) {
 		ticketIsValid();
 		return tickets.stream().filter(ticket -> ticket.getChannelId() == channel.getIdLong()).findAny();
 	}
@@ -174,8 +173,8 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 * @param messageChannel
 	 * @param event
 	 */
-	public void createTicket(User user, Guild guild, LangType type, MessageChannel messageChannel,
-			ButtonClickEvent event) {
+	public void createTicket(User user, Guild guild, LangType type, MessageChannelUnion messageChannel,
+			ButtonInteractionEvent event) {
 
 		Optional<Ticket> optional = getByUser(user);
 		if (optional.isPresent()) {
@@ -287,28 +286,6 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 		 */
 	}
 
-	public void createVocal(PlayerSender player, TextChannel textChannel, Guild guild) {
-		if (player.hasPermission(Permission.MANAGE_CHANNEL)) {
-
-			Optional<Ticket> optional = getByChannel(textChannel);
-			if (!optional.isPresent()) {
-				System.out.println("Impossible de trouver le ticket.");
-				return;
-			}
-
-			Ticket ticket = optional.get();
-			Member member = guild.getMemberById(ticket.getUserId());
-
-			VoiceChannel channel = guild.getCategoryById(Config.ticketCategoryId)
-					.createVoiceChannel("vocal-" + ticket.getName()).complete();
-			PermissionOverrideAction permissionOverrideAction = channel.createPermissionOverride(member);
-			permissionOverrideAction.setAllow(Permission.VOICE_CONNECT, Permission.VOICE_SPEAK, Permission.MESSAGE_READ)
-					.complete();
-
-		} else
-			player.sendMessage("You don't have permission");
-	}
-
 	/**
 	 * Call when user leave discord with a ticket
 	 * 
@@ -322,7 +299,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 			Ticket ticket = optional.get();
 
 			TextChannel channel = guild.getTextChannelById(ticket.getChannelId());
-			ChannelManager channelManager = channel.getManager();
+			TextChannelManager channelManager = channel.getManager();
 			channelManager.setName("user-leave").queue();
 
 		}
@@ -335,7 +312,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 * @param guild
 	 * @param channel
 	 */
-	public void stepButton(ButtonClickEvent event, User user, Guild guild, MessageChannel channel) {
+	public void stepButton(ButtonInteractionEvent event, User user, Guild guild, MessageChannelUnion channel) {
 
 		Optional<Ticket> optional = this.getByUser(user);
 		if (optional.isPresent()) {
@@ -371,7 +348,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 	 * @param guild
 	 * @param channel
 	 */
-	public void stepSelectionMenu(SelectionMenuEvent event, User user, Guild guild, MessageChannel channel) {
+	public void stepSelectionMenu(StringSelectInteractionEvent event, User user, Guild guild, MessageChannel channel) {
 
 		Optional<Ticket> optional = this.getByUser(user);
 		if (optional.isPresent()) {
@@ -398,8 +375,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 
 			Ticket ticket = optional.get();
 			ticket.setLastMessageAt(System.currentTimeMillis());
-			ticket.logMessage(user, event.getMessage().getContentRaw());
-
+			
 			Calendar calendar = Calendar.getInstance();
 			int hour = calendar.get(Calendar.HOUR_OF_DAY);
 
@@ -419,7 +395,7 @@ public class TicketManager extends ZUtils implements Constant, Saveable {
 		}
 	}
 
-	public void logTicket(MessageReceivedEvent event, TextChannel textChannel, User user) {
+	public void logTicket(MessageReceivedEvent event, MessageChannel textChannel, User user) {
 		Optional<Ticket> optional = this.getByChannel(textChannel);
 		optional.ifPresent(ticket -> {
 			ticket.setLastMessageAt(System.currentTimeMillis());

@@ -1,8 +1,8 @@
 package fr.maxlego08.zsupport.utils.commands;
 
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 public interface PlayerSender extends Sender {
 
@@ -10,6 +10,6 @@ public interface PlayerSender extends Sender {
 	
 	Member getMember();
 	
-	TextChannel getTextChannel();
+	MessageChannel getTextChannel();
 	
 }

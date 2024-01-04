@@ -15,9 +15,6 @@ import fr.maxlego08.zsupport.command.CommandManager;
 import fr.maxlego08.zsupport.listener.CommandListener;
 import fr.maxlego08.zsupport.listener.MemberListener;
 import fr.maxlego08.zsupport.role.RoleManager;
-import fr.maxlego08.zsupport.suggestions.SuggestionManager;
-import fr.maxlego08.zsupport.suggestions.listeners.SuggestInteraction;
-import fr.maxlego08.zsupport.suggestions.listeners.SuggestListener;
 import fr.maxlego08.zsupport.tickets.TicketListener;
 import fr.maxlego08.zsupport.tickets.TicketManager;
 import fr.maxlego08.zsupport.utils.Constant;
@@ -39,7 +36,6 @@ public class ZSupport implements Constant {
 	private final Persist persist;
 	private final TicketManager ticketManager;
 	private final TicketListener ticketListener;
-	private final SuggestListener suggestListener;
 	private final MemberListener memberListener;
 	public static ZSupport instance;
 	// private final XpListener xpListener;
@@ -63,13 +59,11 @@ public class ZSupport implements Constant {
 		this.memberListener = new MemberListener();
 		this.ticketManager = new TicketManager(this);
 		this.ticketListener = new TicketListener(this.ticketManager);
-		this.suggestListener = new SuggestListener();
 		// xpListener = new XpListener(this);
 
 		this.saveables.add(Config.getInstance());
 		this.saveables.add(this.ticketManager);
 		this.saveables.add(RoleManager.getInstance());
-		this.saveables.add(new SuggestionManager());
 
 		Thread thread = new Thread(this.commandListener, "bot");
 		thread.start();
@@ -81,7 +75,7 @@ public class ZSupport implements Constant {
 		List<GatewayIntent> list = new ArrayList<>();
 
 		list.add(GatewayIntent.GUILD_MEMBERS);
-		list.add(GatewayIntent.GUILD_EMOJIS);
+		list.add(GatewayIntent.GUILD_EMOJIS_AND_STICKERS);
 		list.add(GatewayIntent.DIRECT_MESSAGES);
 		list.add(GatewayIntent.GUILD_MESSAGE_REACTIONS);
 		list.add(GatewayIntent.GUILD_MESSAGES);
@@ -94,8 +88,6 @@ public class ZSupport implements Constant {
 		this.jda.addEventListener(this.commandListener);
 		this.jda.addEventListener(this.ticketListener);
 		this.jda.addEventListener(this.memberListener);
-		this.jda.addEventListener(this.suggestListener);
-		this.jda.addEventListener(new SuggestInteraction());
 
 		/**
 		 * 

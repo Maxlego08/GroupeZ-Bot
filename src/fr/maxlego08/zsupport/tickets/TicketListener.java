@@ -5,14 +5,15 @@ import fr.maxlego08.zsupport.lang.LangType;
 import fr.maxlego08.zsupport.tickets.ChannelInfo.ChannelType;
 import fr.maxlego08.zsupport.utils.Constant;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 public class TicketListener extends ListenerAdapter implements Constant {
 
@@ -24,36 +25,44 @@ public class TicketListener extends ListenerAdapter implements Constant {
 	}
 
 	@Override
-	public void onSelectionMenu(SelectionMenuEvent event) {
-		if (event.getChannel().getName().contains("ticket-") && !event.getUser().isBot()) {
+	public void onStringSelectInteraction(StringSelectInteractionEvent event) {
 
-			this.manager.stepSelectionMenu(event, event.getUser(), event.getGuild(), event.getChannel());
-			
-		}
+		System.out.println(">>>>> " + event.getResponseNumber());
+
 	}
+
+	/*
+	 * @Override public void onSelectionMenu(SelectionMenuEvent event) { if
+	 * (event.getChannel().getName().contains("ticket-") &&
+	 * !event.getUser().isBot()) {
+	 * 
+	 * this.manager.stepSelectionMenu(event, event.getUser(), event.getGuild(),
+	 * event.getChannel());
+	 * 
+	 * } }
+	 */
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
 
-		TextChannel channel = event.getTextChannel();
-		
+		MessageChannel channel = event.getChannel();
+
 		if (event.getChannel().getName().contains("ticket-") && !event.getAuthor().isBot()) {
 
 			this.manager.logTicket(event, channel, event.getAuthor());
-			this.manager.sendInformations(event, channel, event.getAuthor());
+			this.manager.sendInformations(event, (TextChannel) channel, event.getAuthor());
 			this.manager.stepMessage(event, event.getAuthor(), event.getGuild(), event.getChannel());
-			
+
 		} else if (!event.getAuthor().isBot() && Config.channelsWithInformations.containsKey(channel.getIdLong())) {
-			
+
 			ChannelType channelType = Config.channelsWithInformations.get(channel.getIdLong());
-			this.manager.sendTicketUse(event, channel, channelType);
-			
+			this.manager.sendTicketUse(event, (TextChannel) channel, channelType);
+
 		}
 	}
-	
-	@Override
-	public void onButtonClick(ButtonClickEvent event) {
 
+	@Override
+	public void onButtonInteraction(ButtonInteractionEvent event) {
 		Button button = event.getButton();
 
 		if (event.getChannel().getIdLong() == Config.ticketChannel && !event.getUser().isBot()) {
@@ -66,7 +75,6 @@ public class TicketListener extends ListenerAdapter implements Constant {
 			this.manager.stepButton(event, event.getUser(), event.getGuild(), event.getChannel());
 
 		}
-
 	}
 
 	@Override
@@ -75,7 +83,7 @@ public class TicketListener extends ListenerAdapter implements Constant {
 		User user = event.getUser();
 		Guild guild = event.getGuild();
 		this.manager.userLeave(guild, user);
-		
+
 	}
 
 }

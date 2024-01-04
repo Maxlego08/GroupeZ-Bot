@@ -33,9 +33,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.Interaction;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 /**
  * Class to optimize to avoid making the same request several times
@@ -73,7 +73,7 @@ public class VerifyManager extends ZUtils {
 		return instance;
 	}
 
-	public void submitData(User user, TextChannel textChannel, PlayerSender sender, boolean delete, Interaction event) {
+	public void submitData(User user, TextChannel textChannel, PlayerSender sender, boolean delete, SlashCommandInteractionEvent event) {
 		this.submitData(user, textChannel, sender, delete, null, event);
 	}
 
@@ -86,7 +86,7 @@ public class VerifyManager extends ZUtils {
 	 * @param delete
 	 */
 	public void submitData(User user, TextChannel textChannel, PlayerSender sender, boolean delete,
-			Consumer<GUser> consumer, Interaction event) {
+			Consumer<GUser> consumer, SlashCommandInteractionEvent event) {
 		new Thread(() -> this.sendData(user, textChannel, sender, delete, consumer, event)).start();
 	}
 
@@ -220,7 +220,7 @@ public class VerifyManager extends ZUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	private void sendData(User user, TextChannel textChannel, PlayerSender sender, boolean delete,
-			Consumer<GUser> consumer, Interaction event) {
+			Consumer<GUser> consumer, SlashCommandInteractionEvent event) {
 
 		try {
 
@@ -312,7 +312,7 @@ public class VerifyManager extends ZUtils {
 
 			roles.forEach(role -> {
 				guild.addRoleToMember(member, role).queue();
-				System.out.println("Ajout du rôle " + roles.get(0).getName() + " à l'utilisateur " + user.getAsTag());
+				System.out.println("Ajout du rôle " + roles.get(0).getName() + " à l'utilisateur " + user.getName());
 			});
 
 			if (consumer != null) {
@@ -324,7 +324,7 @@ public class VerifyManager extends ZUtils {
 				Random random = new Random();
 				EmbedBuilder builder = new EmbedBuilder();
 
-				builder.setTitle("GroupeZ - " + user.getAsTag(), gUser.getDashboardURL());
+				builder.setTitle("GroupeZ - " + user.getName(), gUser.getDashboardURL());
 				builder.setColor(Color.getHSBColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)));
 				builder.setFooter(Constant.YEAR + " - " + guild.getName(), guild.getIconUrl());
 				builder.setThumbnail(gUser.getAvatar());
@@ -358,7 +358,7 @@ public class VerifyManager extends ZUtils {
 	 * @param guild
 	 * @param basicMessage
 	 */
-	private void sendErrorMessage(Interaction event, TextChannel textChannel, User user, Guild guild,
+	private void sendErrorMessage(SlashCommandInteractionEvent event, TextChannel textChannel, User user, Guild guild,
 			BasicMessage basicMessage, GUser gUser) {
 		EmbedBuilder builder = new EmbedBuilder();
 
@@ -376,20 +376,20 @@ public class VerifyManager extends ZUtils {
 		builder.setDescription(desc);
 
 		if (gUser != null) {
-			builder.setTitle("GroupeZ - " + user.getAsTag(), gUser.getDashboardURL());
+			builder.setTitle("GroupeZ - " + user.getName(), gUser.getDashboardURL());
 			builder.setThumbnail(gUser.getAvatar());
 		} else {
-			builder.setTitle("GroupeZ - " + user.getAsTag());
+			builder.setTitle("GroupeZ - " + user.getName());
 		}
 
 		textChannel.sendMessageEmbeds(builder.build()).queue();
 	}
 
-	public void updateUserAsync(User user, PlayerSender sender, Interaction event, Member targetUser, long pluginId) {
+	public void updateUserAsync(User user, PlayerSender sender, SlashCommandInteractionEvent event, Member targetUser, long pluginId) {
 		new Thread(() -> this.updateUser(user, sender, event, targetUser, pluginId, event.getGuild())).start();
 	}
 
-	private void updateUser(User user, PlayerSender sender, Interaction event, Member targetUser, long pluginId,
+	private void updateUser(User user, PlayerSender sender, SlashCommandInteractionEvent event, Member targetUser, long pluginId,
 			Guild guild) {
 
 		try {
@@ -424,6 +424,7 @@ public class VerifyManager extends ZUtils {
 
 			// If the query returned an error
 			if (responseCode != 200) {
+				
 				event.reply("Erreur, impossible de faire ceci. (Client ou plugin introuvable)").setEphemeral(true).queue();
 				return;
 			}
@@ -456,7 +457,7 @@ public class VerifyManager extends ZUtils {
 					Role role = guild.getRoleById(plugin.getRole());
 					if (!hasRole(targetUser, plugin.getRole())) {
 						guild.addRoleToMember(targetUser, role).queue();
-						System.out.println("Ajout du rôle " + role.getName() + " à l'utilisateur " + user.getAsTag());
+						System.out.println("Ajout du rôle " + role.getName() + " à l'utilisateur " + user.getName());
 					}
 				} else {
 					event.reply("Impossible de trouver le plugin avec l'ID " + pluginId).setEphemeral(true).queue();

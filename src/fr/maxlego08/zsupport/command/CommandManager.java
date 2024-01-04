@@ -18,7 +18,6 @@ import fr.maxlego08.zsupport.command.commands.CommandServer;
 import fr.maxlego08.zsupport.command.commands.CommandStop;
 import fr.maxlego08.zsupport.command.commands.CommandVerify;
 import fr.maxlego08.zsupport.command.commands.tickets.CommandTicketSet;
-import fr.maxlego08.zsupport.command.commands.tickets.CommandTicketVocal;
 import fr.maxlego08.zsupport.lang.BasicMessage;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.ZUtils;
@@ -26,8 +25,9 @@ import fr.maxlego08.zsupport.utils.commands.ConsoleSender;
 import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import fr.maxlego08.zsupport.utils.commands.Sender;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class CommandManager extends ZUtils implements Constant {
 
@@ -40,7 +40,6 @@ public class CommandManager extends ZUtils implements Constant {
 
 		registetCommand("stop", new CommandStop(this), "end");
 		registetCommand("ticketset", new CommandTicketSet(this));
-		registetCommand("vocal", new CommandTicketVocal(this));
 		registetCommand("server", new CommandServer(this));
 		registetCommand("roles", new CommandRoles(this));
 		registetCommand("documentation", new CommandDocumentation(this), "d", "doc", "docs");
@@ -77,7 +76,7 @@ public class CommandManager extends ZUtils implements Constant {
 	 * @param event
 	 * @return
 	 */
-	public boolean onCommand(Sender sender, String cmd, String[] args, SlashCommandEvent event) {
+	public boolean onCommand(Sender sender, String cmd, String[] args, SlashCommandInteractionEvent event) {
 		for (VCommand command : this.commands) {
 			if (command.getSubCommands().contains(cmd.toLowerCase())) {
 				if ((args.length == 0 || command.isIgnoreParent()) && command.getParent() == null) {
@@ -145,7 +144,7 @@ public class CommandManager extends ZUtils implements Constant {
 	 * @return
 	 */
 	private CommandType processRequirements(VCommand command, Sender sender, String[] strings,
-			SlashCommandEvent event) {
+			SlashCommandInteractionEvent event) {
 
 		if (!(sender instanceof PlayerSender) && !command.isConsoleCanUse()) {
 			sender.sendMessage(event, BasicMessage.COMMAND_NO_CONSOLE);
@@ -157,7 +156,7 @@ public class CommandManager extends ZUtils implements Constant {
 		}
 		if (sender instanceof PlayerSender && command.isOnlyInCommandChannel()) {
 
-			TextChannel channel = event.getTextChannel();
+			MessageChannelUnion channel = event.getChannel();
 
 			if (channel.getIdLong() != Config.commandChannel) {
 				EmbedBuilder builder = new EmbedBuilder();

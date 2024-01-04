@@ -7,7 +7,8 @@ import java.io.PrintWriter;
 
 import fr.maxlego08.zsupport.Config;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 public class TranscriptManager {
 
@@ -28,8 +29,9 @@ public class TranscriptManager {
 			InputStream is = new ByteArrayInputStream(baos.toByteArray());
 
 			TextChannel channel = jda.getTextChannelById(Config.ticketLogChannel);
-
-			channel.sendMessage("Transcription du ticket: " + ticket.getName()).addFile(is, ticket.getName() + ".log")
+			
+			FileUpload fileUpload = FileUpload.fromData(is, ticket.getName() + ".log");
+			channel.sendMessage("Transcription du ticket: " + ticket.getName()).addFiles(fileUpload)
 					.queue(m -> {
 						System.out.println("Envoie effectué avec succès !");
 					});

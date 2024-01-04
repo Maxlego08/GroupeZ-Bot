@@ -9,17 +9,17 @@ import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.Interaction;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 public class DiscordPlayer extends ZUtils implements PlayerSender {
 
 	private final User user;
 	private final Member member;
-	private final TextChannel channel;
+	private final MessageChannel channel;
 
-	public DiscordPlayer(User user, Member member, TextChannel channel) {
+	public DiscordPlayer(User user, Member member, MessageChannel channel) {
 		super();
 		this.user = user;
 		this.member = member;
@@ -42,7 +42,7 @@ public class DiscordPlayer extends ZUtils implements PlayerSender {
 	}
 
 	@Override
-	public TextChannel getTextChannel() {
+	public MessageChannel getTextChannel() {
 		return channel;
 	}
 
@@ -90,17 +90,17 @@ public class DiscordPlayer extends ZUtils implements PlayerSender {
 	}
 
 	@Override
-	public void sendMessage(Interaction interaction, BasicMessage message) {
+	public void sendMessage(SlashCommandInteractionEvent interaction, BasicMessage message) {
 		interaction.reply(message.getMessage()).setEphemeral(true).queue();
 	}
 
 	@Override
-	public void sendMessage(Interaction interaction, BasicMessage message, boolean delete, Object... args) {
+	public void sendMessage(SlashCommandInteractionEvent interaction, BasicMessage message, boolean delete, Object... args) {
 		interaction.reply(String.format(message.getMessage(), args)).setEphemeral(true).queue();		
 	}
 
 	@Override
-	public void sendEmbed(Interaction interaction, BasicMessage message) {
+	public void sendEmbed(SlashCommandInteractionEvent interaction, BasicMessage message) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setColor(Color.RED);
 		builder.setDescription(message.getMessage());

@@ -11,12 +11,11 @@ import fr.maxlego08.zsupport.command.VCommand;
 import fr.maxlego08.zsupport.utils.Constant;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.entities.Emote;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
-import net.dv8tion.jda.internal.interactions.ButtonImpl;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.internal.interactions.component.ButtonImpl;
 
 public class CommandPurchase extends VCommand {
 
@@ -55,9 +54,9 @@ public class CommandPurchase extends VCommand {
 
 		builder.setDescription(desc);
 
-		Emote emote = this.guild.getEmoteById(Config.groupezEmote);
+		Emoji emote = this.guild.getEmojiById(Config.groupezEmote);
 		Button buttonUrl = new ButtonImpl("btn:url", "Click to access the marketplace", ButtonStyle.LINK,
-				"https://groupez.dev/resources", false, Emoji.fromEmote(emote));
+				"https://groupez.dev/resources", false, emote);
 
 		this.textChannel.sendMessageEmbeds(builder.build()).setActionRow(buttonUrl).queue(message -> {
 			this.event.deferReply(true).setContent("Envoie de la commande effectué avec succès.").queue();
