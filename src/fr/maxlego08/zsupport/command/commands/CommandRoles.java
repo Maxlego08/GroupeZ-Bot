@@ -25,8 +25,8 @@ public class CommandRoles extends VCommand {
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Roles");
-		builder.setColor(Color.getHSBColor(5, 255, 5));
-		builder.setFooter(Constant.YEAR + " - " + this.guild.getName(), this.guild.getIconUrl());
+		setEmbedFooter(this.guild, builder, Color.getHSBColor(5, 255, 5));
+
 		Config.plugins.forEach(plugin -> {
 			Role role = this.guild.getRoleById(plugin.getRole());
 			if (role != null) {

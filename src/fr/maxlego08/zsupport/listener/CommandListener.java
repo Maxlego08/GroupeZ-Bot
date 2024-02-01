@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 import java.util.ArrayList;
@@ -44,7 +45,9 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
             SlashCommandData commandData = Commands.slash(cmd, command.getDescription());
 
             command.getRequireArgs().forEach(commandArgument -> {
-                commandData.addOption(commandArgument.optionType(), commandArgument.name(), commandArgument.description());
+                OptionData optionData = new OptionData(commandArgument.optionType(), commandArgument.name(), commandArgument.description());
+                commandArgument.choices().forEach(choice -> optionData.addChoice(choice.name(), choice.value()));
+                commandData.addOptions(optionData);
             });
 
             command.getOptionalArgs().forEach(commandArgument -> {

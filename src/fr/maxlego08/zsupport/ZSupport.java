@@ -40,18 +40,19 @@ public class ZSupport implements Constant {
 
         this.gson = getGsonBuilder().create();
         this.persist = new Persist(this);
+
+        this.saveables.add(Config.getInstance());
+        this.saveables.add(RoleManager.getInstance());
+
+        this.saveables.forEach(save -> save.load(this.persist));
+
         this.commandManager = new CommandManager(this);
         this.commandListener = new CommandListener(this);
         this.memberListener = new MemberListener();
         // xpListener = new XpListener(this);
 
-        this.saveables.add(Config.getInstance());
-        this.saveables.add(RoleManager.getInstance());
-
         Thread thread = new Thread(this.commandListener, "bot");
         thread.start();
-
-        this.saveables.forEach(save -> save.load(this.persist));
 
         System.out.println(PREFIX_CONSOLE + "Chargement du bot");
 

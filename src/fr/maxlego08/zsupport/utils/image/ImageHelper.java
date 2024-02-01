@@ -9,13 +9,6 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class ImageHelper {
 
-	/**
-	 * Download an image and get dominant color
-	 * 
-	 * @param url
-	 * @return
-	 * @throws IOException 
-	 */
 	public static int[] getHexColor(String url) throws IOException{
 		URL urlImage = new URL(url);
 		HttpsURLConnection conImage = (HttpsURLConnection) urlImage.openConnection();

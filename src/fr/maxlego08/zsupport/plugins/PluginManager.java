@@ -1,20 +1,7 @@
 package fr.maxlego08.zsupport.plugins;
 
-import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.net.URL;
-import java.time.OffsetDateTime;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.function.Consumer;
-
-import javax.net.ssl.HttpsURLConnection;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.utils.Constant;
@@ -28,134 +15,143 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.internal.interactions.component.ButtonImpl;
 
+import javax.net.ssl.HttpsURLConnection;
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
+
 public class PluginManager extends ZUtils implements Constant {
 
-	private static ExecutorService executor = Executors.newFixedThreadPool(2);
+    private static ExecutorService executor = Executors.newFixedThreadPool(2);
 
-	/**
-	 * Display plugins informations
-	 * 
-	 * @param guild
-	 */
-	public void displayPlugins(Guild guild) {
-		Thread thread = new Thread(() -> Config.plugins.forEach(plugin -> this.displayPlugin(guild, plugin)));
-		thread.start();
-	}
+    public static void fetchResource(Plugin plugin, Consumer<Resource> consumer) {
 
-	/**
-	 * Display plugin informations
-	 * 
-	 * @param guild
-	 * @param plugin
-	 */
-	public void displayPlugin(Guild guild, Plugin plugin) {
+        executor.execute(() -> {
 
-		TextChannel channel = guild.getTextChannelById(Config.pluginsChannel);
+            try {
 
-		try {
+                String urlAsString = String.format(Config.API_RESOURCE_URL, plugin.getPlugin_id());
+                URL url = new URL(urlAsString);
 
-			String urlAsString = String.format(Config.API_RESOURCE_URL, plugin.getPlugin_id());
-			URL url = new URL(urlAsString);
+                HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
-			HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+                // add reuqest header
+                con.setRequestMethod("GET");
+                con.setRequestProperty("User-Agent", "Mozilla/5.0");
+                con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-			// add reuqest header
-			con.setRequestMethod("GET");
-			con.setRequestProperty("User-Agent", "Mozilla/5.0");
-			con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+                int responseCode = con.getResponseCode();
 
-			int responseCode = con.getResponseCode();
+                if (responseCode != 200) {
+                    System.out.println("Erreur : " + responseCode);
+                    return;
+                }
 
-			if (responseCode != 200) {
-				System.out.println("Erreur : " + responseCode);
-				return;
-			}
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			String inputLine;
-			StringBuffer response = new StringBuffer();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
 
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
+                Gson gson = ZSupport.instance.getGson();
 
-			Gson gson = ZSupport.instance.getGson();
+                Type resourceType = new TypeToken<Resource>() {
+                }.getType();
 
-			Type resourceType = new TypeToken<Resource>() {
-			}.getType();
+                Resource resource = gson.fromJson(response.toString(), resourceType);
+                consumer.accept(resource);
 
-			Resource resource = gson.fromJson(response.toString(), resourceType);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-			int[] colorRGB = ImageHelper.getHexColor(resource.getLogo());
+        });
 
-			EmbedBuilder builder = new EmbedBuilder();
-			if (colorRGB.length == 3) {
-				builder.setColor(new Color(colorRGB[0], colorRGB[1], colorRGB[2]));
-			}
-			builder.setTimestamp(OffsetDateTime.now());
-			builder.setFooter("2022 - " + guild.getName(), guild.getIconUrl());
+    }
 
-			builder.setThumbnail(resource.getLogo());
-			builder.setTitle(resource.getName(), resource.getResourceUrl());
-			builder.setDescription(resource.getTag());
+    /**
+     * Display plugins informations
+     *
+     * @param guild
+     */
+    public void displayPlugins(Guild guild) {
+        Thread thread = new Thread(() -> Config.plugins.forEach(plugin -> this.displayPlugin(guild, plugin)));
+        thread.start();
+    }
 
-			Button button = new ButtonImpl("btn:link:resource", "Access to the plugin", ButtonStyle.LINK,
-					resource.getResourceUrl(), false, plugin.getEmote(guild));
-			channel.sendMessageEmbeds(builder.build()).setActionRow(button).queue();
+    /**
+     * Display plugin informations
+     *
+     * @param guild
+     * @param plugin
+     */
+    public void displayPlugin(Guild guild, Plugin plugin) {
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+        TextChannel channel = guild.getTextChannelById(Config.pluginsChannel);
 
-	}
+        try {
 
-	public static void fetchResource(Plugin plugin, Consumer<Resource> consumer) {
+            String urlAsString = String.format(Config.API_RESOURCE_URL, plugin.getPlugin_id());
+            URL url = new URL(urlAsString);
 
-		executor.execute(() -> {
+            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
-			try {
+            con.setRequestMethod("GET");
+            con.setRequestProperty("User-Agent", "Mozilla/5.0");
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-				String urlAsString = String.format(Config.API_RESOURCE_URL, plugin.getPlugin_id());
-				URL url = new URL(urlAsString);
+            int responseCode = con.getResponseCode();
 
-				HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+            if (responseCode != 200) {
+                System.out.println("Erreur : " + responseCode);
+                return;
+            }
 
-				// add reuqest header
-				con.setRequestMethod("GET");
-				con.setRequestProperty("User-Agent", "Mozilla/5.0");
-				con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
 
-				int responseCode = con.getResponseCode();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
 
-				if (responseCode != 200) {
-					System.out.println("Erreur : " + responseCode);
-					return;
-				}
+            Gson gson = ZSupport.instance.getGson();
 
-				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-				String inputLine;
-				StringBuffer response = new StringBuffer();
+            Type resourceType = new TypeToken<Resource>() {
+            }.getType();
 
-				while ((inputLine = in.readLine()) != null) {
-					response.append(inputLine);
-				}
-				in.close();
+            Resource resource = gson.fromJson(response.toString(), resourceType);
 
-				Gson gson = ZSupport.instance.getGson();
+            int[] colorRGB = ImageHelper.getHexColor(resource.getLogo());
 
-				Type resourceType = new TypeToken<Resource>() {
-				}.getType();
+            EmbedBuilder builder = new EmbedBuilder();
+            Color color = new Color(45, 45, 45);
+            if (colorRGB.length == 3) color = new Color(colorRGB[0], colorRGB[1], colorRGB[2]);
 
-				Resource resource = gson.fromJson(response.toString(), resourceType);
-				consumer.accept(resource);
+            setEmbedFooter(guild, builder, color);
 
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+            builder.setThumbnail(resource.getLogo());
+            builder.setTitle(resource.getName(), resource.getResourceUrl());
+            builder.setDescription(resource.getTag());
 
-		});
+            Button button = new ButtonImpl("btn:link:resource", "Access to the plugin", ButtonStyle.LINK,
+                    resource.getResourceUrl(), false, plugin.getEmote(guild));
+            if (channel != null) {
+                channel.sendMessageEmbeds(builder.build()).setActionRow(button).queue();
+            }
 
-	}
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
 
 }

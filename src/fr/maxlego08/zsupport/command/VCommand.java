@@ -10,12 +10,14 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class VCommand extends Arguments implements Constant {
 
+    private final CommandManager commandManager;
     /**
      * Permission used for the command, if it is a null then everyone can
      * execute the command
@@ -42,7 +44,7 @@ public abstract class VCommand extends Arguments implements Constant {
     protected SlashCommandInteractionEvent event;
     protected MessageChannelUnion textChannel;
     protected Guild guild;
-    private final CommandManager commandManager;
+
     public VCommand(CommandManager commandManager) {
         super();
         this.commandManager = commandManager;
@@ -255,8 +257,12 @@ public abstract class VCommand extends Arguments implements Constant {
     /*
      * Ajouter un argument obligatoire
      */
-    protected void addRequireArg(CommandArgument commandArgument) {
-        this.requireArgs.add(commandArgument);
+    protected void addRequireArg(OptionType optionType, String name, String description) {
+        this.addRequireArg(optionType, name, description, new ArrayList<>());
+    }
+
+    protected void addRequireArg(OptionType optionType, String name, String description, List<CommandChoice> choices) {
+        this.requireArgs.add(new CommandArgument(optionType, name, description, choices));
         this.ignoreParent = parent == null;
         this.ignoreArgs = true;
     }

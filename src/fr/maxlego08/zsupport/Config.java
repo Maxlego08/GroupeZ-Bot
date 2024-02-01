@@ -31,6 +31,7 @@ public class Config implements Saveable {
     public static String API_RESOURCE_URL = "https://groupez.dev/api/v1/resource/%s";
     public static String RESOURCE_URL = "https://groupez.dev/resources/%s";
     public static String DASHBOARD_URL = "https://groupez.dev/dashboard/users/%s";
+    public static Map<String, String> documentations = new HashMap<>();
 
     public static List<Plugin> plugins = new ArrayList<>();
     public static Map<Long, ChannelType> channelsWithInformations = new HashMap<>();
@@ -58,6 +59,12 @@ public class Config implements Saveable {
         channelsWithInformations.put(774320653892976692L, ChannelType.FREE);
         channelsWithInformations.put(879813851959427112L, ChannelType.FREE);
         channelsWithInformations.put(511516467615760407L, ChannelType.GENERAL);
+
+        documentations.put("zMenu", "https://docs.zmenu.dev/");
+        documentations.put("zAuctionHouse", "https://zauctionhouse.groupez.dev/");
+        documentations.put("zShop", "https://zshop.groupez.dev/");
+        documentations.put("zKoth", "https://zkoth.groupez.dev/");
+        documentations.put("zDrawer", "https://zdrawer.groupez.dev/");
     }
 
     /**

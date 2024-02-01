@@ -14,7 +14,8 @@ public class CommandClear extends VCommand {
     public CommandClear(CommandManager commandManager) {
         super(commandManager);
         this.consoleCanUse = false;
-        this.addRequireArg(new CommandArgument(OptionType.STRING, "amount", "Number of messages to delete."));
+        this.onlyInCommandChannel = false;
+        this.addRequireArg(OptionType.STRING, "amount", "Number of messages to delete.");
         this.permission = Permission.MESSAGE_MANAGE;
         this.description = "Delete messages";
     }

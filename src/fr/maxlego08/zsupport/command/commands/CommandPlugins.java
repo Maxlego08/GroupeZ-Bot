@@ -20,7 +20,7 @@ public class CommandPlugins extends VCommand {
 
 		PluginManager manager = new PluginManager();
 		manager.displayPlugins(this.guild);
-		this.event.deferReply(true).setContent("Envoie de la commande effectué avec succès.").queue();
+		this.event.deferReply(true).setContent("Envoi de la commande effectuÃ©e avec succÃ¨s.").queue();
 
 		return CommandType.SUCCESS;
 	}

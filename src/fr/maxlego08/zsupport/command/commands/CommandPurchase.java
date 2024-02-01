@@ -30,36 +30,26 @@ public class CommandPurchase extends VCommand {
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("How to buy ?");
-		builder.setColor(new Color(45, 200, 45));
-		builder.setTimestamp(OffsetDateTime.now());
-		builder.setFooter(Constant.YEAR + " - " + this.guild.getName(), this.guild.getIconUrl());
+		setEmbedFooter(this.guild, builder, new Color(45, 200, 45));
 
 		TextChannel channel = this.guild.getTextChannelById(Config.ticketChannel);
 
-		String desc = "";
-
-		desc += ":flag_fr: Pour acheter un plugin vous devez vous rendre sur https://groupez.dev/resources";
-		desc += "\n";
-		desc += "Vous pouvez payer par **Paypal** les plugins de GroupeZ en utilisant Spigot, mais vous aurez une différence de prix.";
-		desc += "\n";
-		desc += "Après l'achat vous pouvez créer un ticket dans " + channel.getAsMention()
-				+ " pour demander l'accès sur spigot.";
-		desc += "\n";
-		desc += "\n";
-		desc += ":flag_us: To purchase a plugin you must go to https://groupez.dev/resources";
-		desc += "\n";
-		desc += "You can pay by **Paypal** for GroupeZ plugins using Spigot, but you will have a price difference.";
-		desc += "\n";
-		desc += "After purchase you can create a ticket in " + channel.getAsMention() + " to request access on spigot.";
-
-		builder.setDescription(desc);
+		setDescription(builder,
+				":flag_fr: Pour acheter un plugin vous devez vous rendre sur https://groupez.dev/resources",
+				"Vous pouvez payer par **Paypal** les plugins de GroupeZ en utilisant Spigot, mais vous aurez une diffÃ©rence de prix.",
+				"AprÃ¨s l'achat vous pouvez crÃ©er un ticket dans " + channel.getAsMention() + " pour demander l'accÃ¨s sur spigot.",
+				"",
+				":flag_us: To purchase a plugin you must go to https://groupez.dev/resources",
+				"You can pay by **Paypal** for GroupeZ plugins using Spigot, but you will have a price difference.",
+				"After purchase you can create a ticket in " + channel.getAsMention() + " to request access on spigot."
+		);
 
 		Emoji emote = this.guild.getEmojiById(Config.groupezEmote);
 		Button buttonUrl = new ButtonImpl("btn:url", "Click to access the marketplace", ButtonStyle.LINK,
 				"https://groupez.dev/resources", false, emote);
 
 		this.textChannel.sendMessageEmbeds(builder.build()).setActionRow(buttonUrl).queue(message -> {
-			this.event.deferReply(true).setContent("Envoie de la commande effectué avec succès.").queue();
+			this.event.deferReply(true).setContent("Envoie de la commande effectuï¿½ avec succï¿½s.").queue();
 		});
 
 		return CommandType.SUCCESS;
