@@ -17,7 +17,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.stream.Collectors;
 
-public class ZUtils {
+public class ZUtils implements Constant{
 
     protected void schedule(long delay, Runnable runnable) {
         new Timer().schedule(new TimerTask() {

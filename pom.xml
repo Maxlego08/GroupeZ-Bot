@@ -41,5 +41,11 @@
 			<artifactId>JDA</artifactId>
 			<version>5.0.0-beta.20</version>
 		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.33</version> <!-- Utilisez la version la plus récente ou celle qui est compatible avec votre version de MySQL -->
+		</dependency>
+
 	</dependencies>
 </project>

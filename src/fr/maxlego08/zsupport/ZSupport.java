@@ -6,9 +6,11 @@ import fr.maxlego08.zsupport.command.CommandManager;
 import fr.maxlego08.zsupport.listener.CommandListener;
 import fr.maxlego08.zsupport.listener.MemberListener;
 import fr.maxlego08.zsupport.role.RoleManager;
+import fr.maxlego08.zsupport.tickets.TicketListener;
+import fr.maxlego08.zsupport.tickets.TicketManager;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.storage.Persist;
-import fr.maxlego08.zsupport.utils.storage.Saveable;
+import fr.maxlego08.zsupport.utils.storage.Savable;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -29,7 +31,8 @@ public class ZSupport implements Constant {
     private final JDA jda;
     private final CommandManager commandManager;
     private final CommandListener commandListener;
-    private final List<Saveable> saveables = new ArrayList<Saveable>();
+    private final TicketManager ticketManager;
+    private final List<Savable> savables = new ArrayList<>();
     private final Persist persist;
     private final MemberListener memberListener;
     // private final XpListener xpListener;
@@ -41,11 +44,12 @@ public class ZSupport implements Constant {
         this.gson = getGsonBuilder().create();
         this.persist = new Persist(this);
 
-        this.saveables.add(Config.getInstance());
-        this.saveables.add(RoleManager.getInstance());
+        this.savables.add(Config.getInstance());
+        this.savables.add(RoleManager.getInstance());
 
-        this.saveables.forEach(save -> save.load(this.persist));
+        this.savables.forEach(save -> save.load(this.persist));
 
+        this.ticketManager = new TicketManager(this);
         this.commandManager = new CommandManager(this);
         this.commandListener = new CommandListener(this);
         this.memberListener = new MemberListener();
@@ -71,6 +75,7 @@ public class ZSupport implements Constant {
         this.jda.getPresence().setActivity(Activity.playing("/help V" + VERSION));
         this.jda.addEventListener(this.commandListener);
         this.jda.addEventListener(this.memberListener);
+        this.jda.addEventListener(new TicketListener(this.ticketManager));
 
         /**
          *
@@ -92,12 +97,14 @@ public class ZSupport implements Constant {
 
         System.out.println(PREFIX_CONSOLE + "Bot lancé avec succés !");
 
+        this.ticketManager.load();
+
         Timer timer = new Timer();
         long period = 1000 * 60 * 30;
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                saveables.forEach(save -> save.save(persist));
+                savables.forEach(save -> save.save(persist));
             }
         }, period, period);
     }
@@ -128,10 +135,11 @@ public class ZSupport implements Constant {
     }
 
     public void onDisable() {
-        this.saveables.forEach(save -> {
+        this.savables.forEach(save -> {
             System.out.println("Sauvegarde de " + save.getClass().getName());
             save.save(persist);
         });
+        this.ticketManager.save();
         System.out.println("Shutdown de JDA");
         jda.shutdownNow();
     }
@@ -143,8 +151,8 @@ public class ZSupport implements Constant {
     /**
      * @return the saveables
      */
-    public List<Saveable> getSaveables() {
-        return saveables;
+    public List<Savable> getSaveables() {
+        return savables;
     }
 
     /**
@@ -156,7 +164,10 @@ public class ZSupport implements Constant {
 
 
     public void save() {
-        this.saveables.forEach(save -> save.save(persist));
+        this.savables.forEach(save -> save.save(persist));
     }
 
+    public TicketManager getTicketManager() {
+        return ticketManager;
+    }
 }

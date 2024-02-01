@@ -49,7 +49,7 @@ public class CommandPurchase extends VCommand {
 				"https://groupez.dev/resources", false, emote);
 
 		this.textChannel.sendMessageEmbeds(builder.build()).setActionRow(buttonUrl).queue(message -> {
-			this.event.deferReply(true).setContent("Envoie de la commande effectu� avec succ�s.").queue();
+			this.event.deferReply(true).setContent("Envoi de la commande effectuée avec succès.").queue();
 		});
 
 		return CommandType.SUCCESS;

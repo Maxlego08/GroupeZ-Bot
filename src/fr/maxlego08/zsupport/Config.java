@@ -1,9 +1,12 @@
 package fr.maxlego08.zsupport;
 
+import fr.maxlego08.zsupport.tickets.storage.SqlConfiguration;
 import fr.maxlego08.zsupport.utils.ChannelType;
 import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.storage.Persist;
-import fr.maxlego08.zsupport.utils.storage.Saveable;
+import fr.maxlego08.zsupport.utils.storage.Savable;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class Config implements Saveable {
+public class Config implements Savable {
 
     public static String botToken = "groupez.dev.token.secret";
     public static int ticketNumber = 1;
@@ -25,7 +28,7 @@ public class Config implements Saveable {
     public static long generalChannel = 1202649374740447285L;
     public static long ticketLogChannel = 1202652708335788084L;
 
-    public static String CUSTOM_KEY = "sdfsdkfsldkfsdfdsfkmsdlmf,mdslkflsdk;fkùljzedioahrnduidgstjhqsbgvdiyqsdgqksjdzapoçfmazflpoâicjozefdpzokfdozpefijz,fkezfljsdklfzeoirfsndlkfjkezf6+ze5f+zef2+ezf5s3fzef2zef+zfe56z+etfg+rf4+sfg";
+    public static String CUSTOM_KEY = "sdfsdkfsldkfsdfdsfkmsdlmf,mdslkflsdk;fkï¿½ljzedioahrnduidgstjhqsbgvdiyqsdgqksjdzapoï¿½fmazflpoï¿½icjozefdpzokfdozpefijz,fkezfljsdklfzeoirfsndlkfjkezf6+ze5f+zef2+ezf5s3fzef2zef+zfe56z+etfg+rf4+sfg";
     public static String API_URL = "https://groupez.dev/api/v1/discord/%s";
     public static String API_URL_VERIFY_CUSTOMER = "https://groupez.dev/api/v1/discord/%s/apply/%s";
     public static String API_RESOURCE_URL = "https://groupez.dev/api/v1/resource/%s";
@@ -35,6 +38,9 @@ public class Config implements Saveable {
 
     public static List<Plugin> plugins = new ArrayList<>();
     public static Map<Long, ChannelType> channelsWithInformations = new HashMap<>();
+
+    public static SqlConfiguration sqlConfiguration = new SqlConfiguration("homestead", "secret", "192.168.10.10", "zsupport", 3306);
+
     /**
      * static Singleton instance.
      */
@@ -74,7 +80,7 @@ public class Config implements Saveable {
     }
 
     public static Optional<Plugin> getPlugin(int plugin_id) {
-        return plugins.stream().filter(e -> e.getPlugin_id() == plugin_id).findFirst();
+        return plugins.stream().filter(e -> e.getPluginId() == plugin_id).findFirst();
     }
 
     /**
@@ -100,6 +106,10 @@ public class Config implements Saveable {
     @Override
     public void load(Persist persist) {
         persist.loadOrSaveDefault(getInstance(), Config.class);
+    }
+
+    public static Emoji getSpigotEmoji(Guild guild){
+        return guild.getEmojiById(Config.spigotEmote);
     }
 
 }

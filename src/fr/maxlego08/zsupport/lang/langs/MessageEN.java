@@ -50,8 +50,8 @@ public class MessageEN {
 				"In order to place an order you must provide all the information about the project." + "\n"
 						+ "For example:" + "\n" + "- The name of your server" + "\n" + "- The version of your server"
 						+ "\n" + "- Delivery time" + "\n" + "- The complete description of your plugin" + "\n" + "\n"
-						+ "Informations:" + "\n" + "Rate: **20€/h**" + "\n"
-						+ "Purchase of the source code: **50%** of the price (for example, for a 100€ plugin the sources will be sold at 50€)"
+						+ "Informations:" + "\n" + "Rate: **20â‚¬/h**" + "\n"
+						+ "Purchase of the source code: **50%** of the price (for example, for a 100â‚¬ plugin the sources will be sold at 50â‚¬)"
 						+ "\n" + "Siret: 88761749600013");
 
 		usMessage.put(Message.TICKET_CHOOSE,

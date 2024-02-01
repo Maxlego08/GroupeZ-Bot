@@ -24,7 +24,7 @@ public class CommandCustomerVerify extends VCommand {
         this.description = "Allows you to check your purchases on groupez.dev";
         this.permission = Permission.MESSAGE_MANAGE;
         this.addRequireArg(OptionType.USER, "utilisateur", "Player who will receive the role");
-        List<CommandChoice> commandChoices = Config.plugins.stream().filter(Plugin::isPremium).map(plugin -> new CommandChoice(plugin.getName(), String.valueOf(plugin.getPlugin_id()))).toList();
+        List<CommandChoice> commandChoices = Config.plugins.stream().filter(Plugin::isPremium).map(plugin -> new CommandChoice(plugin.getName(), String.valueOf(plugin.getPluginId()))).toList();
         this.addRequireArg(OptionType.STRING, "plugin", "Plugin name", commandChoices);
     }
 

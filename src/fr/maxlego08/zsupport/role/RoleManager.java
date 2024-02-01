@@ -6,12 +6,12 @@ import java.util.Map;
 
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.utils.storage.Persist;
-import fr.maxlego08.zsupport.utils.storage.Saveable;
+import fr.maxlego08.zsupport.utils.storage.Savable;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 
-public class RoleManager implements Saveable {
+public class RoleManager implements Savable {
 
 	private static Map<Long, RoleUser> roles = new HashMap<Long, RoleUser>();
 

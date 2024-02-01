@@ -35,7 +35,7 @@ public class PluginManager extends ZUtils implements Constant {
 
             try {
 
-                String urlAsString = String.format(Config.API_RESOURCE_URL, plugin.getPlugin_id());
+                String urlAsString = String.format(Config.API_RESOURCE_URL, plugin.getPluginId());
                 URL url = new URL(urlAsString);
 
                 HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
@@ -99,7 +99,7 @@ public class PluginManager extends ZUtils implements Constant {
 
         try {
 
-            String urlAsString = String.format(Config.API_RESOURCE_URL, plugin.getPlugin_id());
+            String urlAsString = String.format(Config.API_RESOURCE_URL, plugin.getPluginId());
             URL url = new URL(urlAsString);
 
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
