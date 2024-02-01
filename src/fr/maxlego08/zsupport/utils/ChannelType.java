@@ -1,41 +1,6 @@
-package fr.maxlego08.zsupport.tickets;
+package fr.maxlego08.zsupport.utils;
 
-public class ChannelInfo {
-
-	private long messageId;
-	private long messageAt;
-
-	/**
-	 * @return the messageId
-	 */
-	public long getMessageId() {
-		return messageId;
-	}
-
-	/**
-	 * @return the messageAt
-	 */
-	public long getMessageAt() {
-		return messageAt;
-	}
-
-	/**
-	 * @param messageId
-	 *            the messageId to set
-	 */
-	public void setMessageId(long messageId) {
-		this.messageId = messageId;
-	}
-
-	/**
-	 * @param messageAt
-	 *            the messageAt to set
-	 */
-	public void setMessageAt(long messageAt) {
-		this.messageAt = messageAt;
-	}
-
-	public enum ChannelType {
+public enum ChannelType {
 
 		FREE("Community support", "You are in a community support channel for a free plugin.\nPlease check if someone hasn't already asked your question in the channel.\nPlease don't **mention the staff**. Please wait for an answer."), 
 		
@@ -70,5 +35,3 @@ public class ChannelInfo {
 		}
 
 	}
-
-}

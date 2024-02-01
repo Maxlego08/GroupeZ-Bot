@@ -1,6 +1,7 @@
 package fr.maxlego08.zsupport.command.commands;
 
 import fr.maxlego08.zsupport.ZSupport;
+import fr.maxlego08.zsupport.command.CommandArgument;
 import fr.maxlego08.zsupport.command.CommandManager;
 import fr.maxlego08.zsupport.command.CommandType;
 import fr.maxlego08.zsupport.command.VCommand;
@@ -8,6 +9,7 @@ import fr.maxlego08.zsupport.verify.VerifyManager;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 public class CommandCustomerVerify extends VCommand {
 
@@ -17,8 +19,8 @@ public class CommandCustomerVerify extends VCommand {
 		this.onlyInCommandChannel = false;
 		this.description = "Allows you to check your purchases on groupez.dev";
 		this.permission = Permission.MESSAGE_MANAGE;
-		this.addRequireArg("utilisateur");
-		this.addRequireArg("plugin");
+		this.addRequireArg(new CommandArgument(OptionType.USER, "utilisateur", "Joueur qui va recevoir le rôle"));
+		this.addRequireArg(new CommandArgument(OptionType.INTEGER, "plugin", "ID du plugin"));
 	}
 
 	@Override
