@@ -30,7 +30,7 @@ public class CommandFaqRegister extends VCommand {
 
         String name = Objects.requireNonNull(this.event.getOption("name")).getAsString();
         String title = Objects.requireNonNull(this.event.getOption("title")).getAsString();
-        String description = Objects.requireNonNull(this.event.getOption("description")).getAsString();
+        String description = Objects.requireNonNull(this.event.getOption("content")).getAsString();
 
         faqManager.createFaq(event, name, title, description);
 

@@ -3,12 +3,14 @@ package fr.maxlego08.zsupport.faq;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.command.CommandChoice;
 import fr.maxlego08.zsupport.command.CommandManager;
+import fr.maxlego08.zsupport.command.VCommand;
 import fr.maxlego08.zsupport.command.commands.faq.CommandFaq;
 import fr.maxlego08.zsupport.command.commands.faq.CommandFaqDelete;
 import fr.maxlego08.zsupport.command.commands.faq.CommandFaqRegister;
 import fr.maxlego08.zsupport.tickets.storage.SqlManager;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
@@ -32,6 +34,8 @@ public class FaqManager extends ZUtils {
      * A list of FAQs currently loaded.
      */
     private List<Faq> faqs = new ArrayList<>();
+
+    private VCommand faqCommand;
 
     /**
      * Constructs a new FAQ Manager.
@@ -66,11 +70,12 @@ public class FaqManager extends ZUtils {
      */
     public void selectFqa() {
         SqlManager.service.execute(() -> {
+
             this.faqs = this.sqlManager.getAllFaqs();
             CommandManager commandManager = ZSupport.instance.getCommandManager();
-            commandManager.registetCommand("faq", new CommandFaq(commandManager, this));
-            commandManager.registetCommand("faq-create", new CommandFaqRegister(commandManager, this));
-            commandManager.registetCommand("faq-delete", new CommandFaqDelete(commandManager, this));
+            commandManager.registerCommand("faq", this.faqCommand = new CommandFaq(commandManager, this));
+            commandManager.registerCommand("fcreate", new CommandFaqRegister(commandManager, this));
+            commandManager.registerCommand("fdelete", new CommandFaqDelete(commandManager, this));
         });
     }
 
@@ -115,7 +120,21 @@ public class FaqManager extends ZUtils {
         this.faqs.add(faq);
         this.sqlManager.addFaq(faq);
 
+        updateFaq(Objects.requireNonNull(event.getGuild()));
+
         event.reply(":white_check_mark: You just create the FAQ:" + name).setEphemeral(true).queue();
+    }
+
+    private void updateFaq(Guild guild) {
+        guild.upsertCommand(this.faqCommand.getCommandData()).queue(command -> {
+            guild.deleteCommandById(command.getIdLong()).queue(s -> {
+                CommandManager commandManager = ZSupport.instance.getCommandManager();
+                this.faqCommand = new CommandFaq(commandManager, this);
+                this.faqCommand.addSubCommand("faq");
+                System.out.println("Mise à jour de la commande FAQ");
+                guild.updateCommands().addCommands(this.faqCommand.toCommandData()).queue();
+            });
+        });
     }
 
     /**

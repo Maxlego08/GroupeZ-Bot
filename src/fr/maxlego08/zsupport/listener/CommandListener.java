@@ -1,5 +1,6 @@
 package fr.maxlego08.zsupport.listener;
 
+import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.api.DiscordConsoleSender;
 import fr.maxlego08.zsupport.api.DiscordPlayer;
@@ -35,25 +36,19 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
     @Override
     public void onGuildReady(GuildReadyEvent event) {
         Guild guild = event.getGuild();
+
+        if (guild.getIdLong() != Config.guildId) return;
+
+        this.instance.getCommandManager().setGuild(guild);
+
         List<CommandData> commands = new ArrayList<>();
         this.instance.getCommandManager().getCommands().forEach(command -> {
-            if (!command.isPlayerCanUse())
-                return;
+
+            if (!command.isPlayerCanUse()) return;
+
             String cmd = command.getSubCommands().get(0);
             System.out.println("Enregistrement de la commande " + cmd + " (" + command.getDescription() + ")");
-
-            SlashCommandData commandData = Commands.slash(cmd, command.getDescription());
-
-            command.getRequireArgs().forEach(commandArgument -> {
-                OptionData optionData = new OptionData(commandArgument.optionType(), commandArgument.name(), commandArgument.description());
-                commandArgument.choices().forEach(choice -> optionData.addChoice(choice.name(), choice.value()));
-                commandData.addOptions(optionData);
-            });
-
-            command.getOptionalArgs().forEach(commandArgument -> {
-                commandData.addOption(commandArgument.optionType(), commandArgument.name(), commandArgument.description(), false);
-            });
-            commands.add(commandData);
+            commands.add(command.toCommandData());
         });
 
         guild.updateCommands().addCommands(commands).queue();
@@ -67,7 +62,6 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
         Member member = event.getMember();
 
         PlayerSender sender = new DiscordPlayer(user, member, event.getChannel());
-
 
         this.instance.getCommandManager().onCommand(sender, commandString, new String[0], event);
     }

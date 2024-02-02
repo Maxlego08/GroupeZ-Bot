@@ -11,6 +11,10 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +48,7 @@ public abstract class VCommand extends Arguments implements Constant {
     protected SlashCommandInteractionEvent event;
     protected MessageChannelUnion textChannel;
     protected Guild guild;
+    private SlashCommandData commandData;
 
     public VCommand(CommandManager commandManager) {
         super();
@@ -55,7 +60,7 @@ public abstract class VCommand extends Arguments implements Constant {
     }
 
     /**
-     * Permet de savoir le nombre de parent de façon récursive
+     * Permet de savoir le nombre de parent de faï¿½on rï¿½cursive
      *
      * @param defaultParent
      * @return
@@ -89,8 +94,7 @@ public abstract class VCommand extends Arguments implements Constant {
 
         if (defaultString != null) {
             for (VCommand subCommand : subVCommands) {
-                if (subCommand.getSubCommands().contains(defaultString.toLowerCase()))
-                    return CommandType.CONTINUE;
+                if (subCommand.getSubCommands().contains(defaultString.toLowerCase())) return CommandType.CONTINUE;
             }
         }
 
@@ -304,11 +308,25 @@ public abstract class VCommand extends Arguments implements Constant {
      */
     @Override
     public String toString() {
-        return "VCommand [permission=" + permission + ", parent=" + parent + ", subCommands=" + subCommands
-                + ", requireArgs=" + requireArgs + ", optionalArgs=" + optionalArgs + ", consoleCanUse=" + consoleCanUse
-                + ", ignoreParent=" + ignoreParent + ", ignoreArgs=" + ignoreArgs + ", syntaxe=" + syntaxe
-                + ", description=" + description + ", argsMinLength=" + argsMinLength + ", argsMaxLength="
-                + argsMaxLength + "]";
+        return "VCommand [permission=" + permission + ", parent=" + parent + ", subCommands=" + subCommands + ", requireArgs=" + requireArgs + ", optionalArgs=" + optionalArgs + ", consoleCanUse=" + consoleCanUse + ", ignoreParent=" + ignoreParent + ", ignoreArgs=" + ignoreArgs + ", syntaxe=" + syntaxe + ", description=" + description + ", argsMinLength=" + argsMinLength + ", argsMaxLength=" + argsMaxLength + "]";
     }
 
+    public SlashCommandData toCommandData() {
+        this.commandData = Commands.slash(this.getSubCommands().get(0), this.getDescription());
+
+        this.getRequireArgs().forEach(commandArgument -> {
+            OptionData optionData = new OptionData(commandArgument.optionType(), commandArgument.name(), commandArgument.description());
+            commandArgument.choices().forEach(choice -> optionData.addChoice(choice.name(), choice.value()));
+            this.commandData.addOptions(optionData);
+        });
+
+        this.getOptionalArgs().forEach(commandArgument -> {
+            this.commandData.addOption(commandArgument.optionType(), commandArgument.name(), commandArgument.description(), false);
+        });
+        return this.commandData;
+    }
+
+    public SlashCommandData getCommandData() {
+        return commandData;
+    }
 }

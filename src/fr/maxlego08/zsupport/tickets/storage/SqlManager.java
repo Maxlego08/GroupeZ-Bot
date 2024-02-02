@@ -225,7 +225,8 @@ public class SqlManager {
             try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO ticket_faqs (name, title, answer) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
                 preparedStatement.setString(1, faq.getName());
                 preparedStatement.setString(2, faq.getTitle());
-                preparedStatement.setString(3, faq.getTitle());
+                preparedStatement.setString(3, faq.getAnswer());
+                preparedStatement.executeUpdate();
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         long faqId = generatedKeys.getLong(1);

@@ -104,9 +104,7 @@ public class ZSupport implements Constant {
 
         System.out.println(PREFIX_CONSOLE + "Bot lancé avec succès !");
 
-        this.ticketManager.load(() -> {
-            this.faqManager.selectFqa();
-        });
+        this.ticketManager.load(this.faqManager::selectFqa);
 
         Timer timer = new Timer();
         long period = 1000 * 60 * 30;

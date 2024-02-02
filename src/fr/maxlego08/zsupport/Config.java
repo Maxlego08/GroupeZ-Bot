@@ -40,6 +40,7 @@ public class Config implements Savable {
     public static Map<Long, ChannelType> channelsWithInformations = new HashMap<>();
 
     public static SqlConfiguration sqlConfiguration = new SqlConfiguration("homestead", "secret", "192.168.10.10", "zsupport", 3306);
+    public static long guildId = 1202649373465382923L;
 
     /**
      * static Singleton instance.
