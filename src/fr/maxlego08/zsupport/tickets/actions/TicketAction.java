@@ -95,7 +95,7 @@ public abstract class TicketAction extends ZUtils {
         if (ticketStatus.getChannelName() != null) {
             TextChannelManager channelManager = this.textChannel.getManager();
             String channelName = ticketStatus.getChannelName();
-            channelName = channelName.replace("%id%", String.valueOf(ticket.getId()));
+            channelName = channelName.replace("%id%", String.format("%04d", ticket.getId()));
             channelName = channelName.replace("%plugin%", ticket.getPlugin().getName());
             channelManager.setName("ticket-" + channelName).queue();
         }

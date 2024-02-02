@@ -13,12 +13,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-
 public class TicketOpen extends TicketAction {
+
     @Override
     public void process(Interaction interaction) {
         PermissionOverrideAction permissionOverrideAction = textChannel.upsertPermissionOverride(this.member);
@@ -48,36 +44,24 @@ public class TicketOpen extends TicketAction {
 
             if (attachment.isImage() || attachment.isVideo()) return;
 
-            String extension = attachment.getFileExtension();
-            String url = attachment.getProxyUrl();
-            System.out.println(attachment.getFileName() + " - " + extension + " - " + attachment.getContentType() + " -" + url);
-
-            SqlManager.service.execute(() -> {
-
-
-                HttpClient client = HttpClient.newHttpClient();
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(url))
-                        .build();
-
-                try {
-                    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                    String content = response.body();
-
-                    MclogsClient mclogsClient = ZSupport.instance.getMclogsClient();
-                    mclogsClient.uploadLog(content).thenAccept(uploadLogResponse -> {
-                        System.out.println(uploadLogResponse.isSuccess());
-                        System.out.println(uploadLogResponse);
-                        System.out.println(uploadLogResponse.getUrl());
-                        System.out.println(uploadLogResponse.getRawUrl());
-                    });
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-
-            });
+            String fileExtension = attachment.getFileExtension();
+            if (fileExtension != null && (fileExtension.equals("yml") || fileExtension.equals("log") || fileExtension.equals("txt"))) {
+                SqlManager.service.execute(() -> {
+                    String content = readContentFromURL(attachment.getProxy().getUrl());
+                    try {
+                        MclogsClient mclogsClient = ZSupport.instance.getMclogsClient();
+                        mclogsClient.uploadLog(content).thenAccept(uploadLogResponse -> {
+                            if (uploadLogResponse.isSuccess()) {
+                                event.getMessage().reply(":open_file_folder: " + attachment.getFileName() + ": https://mclo.gs/" + uploadLogResponse.getId()).queue(success -> {
+                                    success.suppressEmbeds(true).queue();
+                                });
+                            }
+                        });
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
+            }
         });
     }
 

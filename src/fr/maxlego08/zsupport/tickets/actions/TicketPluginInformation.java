@@ -20,6 +20,7 @@ import net.dv8tion.jda.internal.interactions.component.ButtonImpl;
 
 import java.awt.*;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class TicketPluginInformation extends TicketAction {
     @Override
@@ -104,8 +105,11 @@ public class TicketPluginInformation extends TicketAction {
 
             this.textChannel.sendMessageEmbeds(builder.build()).queue(message -> processNextAction(TicketStatus.OPEN));
 
-            Message message = event.getMessage();
-            if (message != null) message.delete().queue();
+            event.reply("In order for the support response to be effective, please provide all the requested information.").setEphemeral(true).queue(response -> {
+                Message message = event.getMessage();
+                if (message != null) message.delete().queueAfter(5, TimeUnit.SECONDS);
+            });
+
         }
     }
 

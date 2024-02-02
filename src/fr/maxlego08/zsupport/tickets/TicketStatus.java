@@ -23,7 +23,7 @@ public enum TicketStatus {
     SPIGOT_ACCESS,
     QUESTION,
     WAITING,
-    OPEN(TicketOpen.class, "%player%-%id%"),
+    OPEN(TicketOpen.class, "#%id%-%plugin%"),
     CLOSE,
 
     ;

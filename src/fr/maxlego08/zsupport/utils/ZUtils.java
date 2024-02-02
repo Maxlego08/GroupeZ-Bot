@@ -8,6 +8,10 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -81,6 +85,23 @@ public class ZUtils implements Constant{
 
     public void setDescription(EmbedBuilder embedBuilder, List<String> description) {
         embedBuilder.setDescription(description.stream().map(line -> line + "\n").collect(Collectors.joining()).trim());
+    }
+
+    protected String readContentFromURL(String urlString) {
+        StringBuilder content = new StringBuilder();
+        try {
+            URL url = new URL(urlString);
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
+                String inputLine;
+                while ((inputLine = in.readLine()) != null) {
+                    content.append(inputLine);
+                    content.append(System.lineSeparator());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return content.toString();
     }
 
 }
