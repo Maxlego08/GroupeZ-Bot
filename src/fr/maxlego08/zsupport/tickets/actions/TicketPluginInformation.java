@@ -39,22 +39,22 @@ public class TicketPluginInformation extends TicketAction {
     }
 
     private void openModal() {
-        TextInput pluginVersion = TextInput.create("pluginVersion", "Version du Plugin", TextInputStyle.SHORT)
-                .setPlaceholder("Entrez la version de votre plugin ici")
-                .setMinLength(1)
+        TextInput pluginVersion = TextInput.create("pluginVersion", "Plugin Version", TextInputStyle.SHORT)
+                .setPlaceholder("Enter the version of your plugin here")
+                .setMinLength(3)
                 .setMaxLength(50)
                 .build();
 
-        TextInput serverVersion = TextInput.create("serverVersion", "Version du Serveur", TextInputStyle.SHORT)
-                .setPlaceholder("Entrez la version de votre serveur ici")
-                .setMinLength(1)
+        TextInput serverVersion = TextInput.create("serverVersion", "Server Version", TextInputStyle.SHORT)
+                .setPlaceholder("Enter your server version here")
+                .setMinLength(3)
                 .setMaxLength(50)
                 .build();
 
-        TextInput problemDescription = TextInput.create("description", "Description du Problème", TextInputStyle.PARAGRAPH)
-                .setPlaceholder("Décrivez le problème que vous rencontrez")
+        TextInput problemDescription = TextInput.create("description", "Description of the problem", TextInputStyle.PARAGRAPH)
+                .setPlaceholder("Describe the problem you are experiencing")
                 .setMinLength(10)
-                .setMaxLength(1000)
+                .setMaxLength(10000)
                 .build();
 
         Modal modal = Modal.create(MODAL_PLUGIN_INFORMATIONS, "Informations")
@@ -80,37 +80,33 @@ public class TicketPluginInformation extends TicketAction {
     @Override
     public void onModal(ModalInteractionEvent event) {
 
-        if (event.getModalId().equals(MODAL_PLUGIN_INFORMATIONS)) {
+        if (!event.getModalId().equals(MODAL_PLUGIN_INFORMATIONS)) return;
 
-            String pluginVersion = event.getValue("pluginVersion").getAsString();
-            String serverVersion = event.getValue("serverVersion").getAsString();
-            String description = event.getValue("description").getAsString();
+        String pluginVersion = event.getValue("pluginVersion").getAsString();
+        String serverVersion = event.getValue("serverVersion").getAsString();
+        String description = event.getValue("description").getAsString();
 
-            EmbedBuilder builder = new EmbedBuilder();
-            builder.setTitle("GroupeZ - Support");
-            setEmbedFooter(guild, builder, new Color(26, 237, 148));
-            setDescription(builder,
-                    "**Plugin Version**:",
-                    "```" + pluginVersion + "```",
-                    "**Server Version**:",
-                    "```" + serverVersion + "```",
-                    "**Description**:",
-                    "```" + description + "```",
-                    "",
-                    "You can send additional information, logs, configurations, or other information to help your problem.",
-                    "```ansi\n" +
-                            "\u001B[2;31m\u001B[1;31mIn order for the support response to be effective, please provide all the requested information.\u001B[0m\u001B[2;31m\u001B[0m\n" +
-                            "```"
-            );
+        EmbedBuilder builder = createEmbed();
+        setDescription(builder,
+                "**Plugin Version**:",
+                "```" + pluginVersion + "```",
+                "**Server Version**:",
+                "```" + serverVersion + "```",
+                "**Description**:",
+                "```" + description + "```",
+                "",
+                "You can send additional information, logs, configurations, or other information to help your problem.",
+                "```ansi\n" +
+                        "\u001B[2;31m\u001B[1;31mIn order for the support response to be effective, please provide all the requested information.\u001B[0m\u001B[2;31m\u001B[0m\n" +
+                        "```"
+        );
 
-            this.textChannel.sendMessageEmbeds(builder.build()).queue(message -> processNextAction(TicketStatus.OPEN));
+        this.textChannel.sendMessageEmbeds(builder.build()).queue(message -> processNextAction(TicketStatus.OPEN));
 
-            event.reply("In order for the support response to be effective, please provide all the requested information.").setEphemeral(true).queue(response -> {
-                Message message = event.getMessage();
-                if (message != null) message.delete().queueAfter(5, TimeUnit.SECONDS);
-            });
-
-        }
+        event.reply("In order for the support response to be effective, please provide all the requested information.").setEphemeral(true).queue(response -> {
+            Message message = event.getMessage();
+            if (message != null) message.delete().queueAfter(3, TimeUnit.SECONDS);
+        });
     }
 
     @Override

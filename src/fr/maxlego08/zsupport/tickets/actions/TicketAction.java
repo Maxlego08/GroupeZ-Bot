@@ -1,6 +1,5 @@
 package fr.maxlego08.zsupport.tickets.actions;
 
-import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.tickets.Ticket;
 import fr.maxlego08.zsupport.tickets.TicketManager;
 import fr.maxlego08.zsupport.tickets.TicketStatus;
@@ -10,6 +9,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.PermissionOverride;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -25,10 +25,12 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import net.dv8tion.jda.internal.interactions.component.ButtonImpl;
 
 import java.awt.*;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public abstract class TicketAction extends ZUtils {
 
@@ -133,7 +135,7 @@ public abstract class TicketAction extends ZUtils {
     }
 
     protected ItemComponent createCloseButton() {
-        return Button.danger(BUTTON_CLOSE, getMessage(this.ticket.getLangType(), Message.TICKET_CLOSE_BUTTON));
+        return new ButtonImpl(BUTTON_CLOSE, "Close", ButtonStyle.DANGER, false, Emoji.fromUnicode("U+26A0"));
     }
 
     public void preModalAction(ModalInteractionEvent event, Member member, Guild guild, TicketManager ticketManager, Ticket ticket) {
@@ -163,8 +165,7 @@ public abstract class TicketAction extends ZUtils {
         builder.setTitle("GroupeZ - Support");
         setDescription(builder, ":question: A member of the team will check your purchase, please wait.");
         setEmbedFooter(this.guild, builder, new Color(220, 111, 18));
-        Button button = new ButtonImpl(BUTTON_MODERATOR_ACCEPT, "Verify the purchase", ButtonStyle.SUCCESS, false,
-                Emoji.fromUnicode("U+2705"));
+        Button button = new ButtonImpl(BUTTON_MODERATOR_ACCEPT, "Verify the purchase", ButtonStyle.SUCCESS, false, Emoji.fromUnicode("U+2705"));
         this.textChannel.sendMessageEmbeds(builder.build()).setActionRow(button).queue();
     }
 
@@ -191,5 +192,25 @@ public abstract class TicketAction extends ZUtils {
     protected boolean isAuthor() {
         return this.ticket.getUserId() == this.member.getIdLong();
     }
+
+    protected void updatePermission(Consumer<PermissionOverride> consumer, Permission... permission) {
+        PermissionOverrideAction permissionOverrideAction = textChannel.upsertPermissionOverride(this.member);
+        permissionOverrideAction.setAllowed(permission).queue(consumer);
+    }
+
+    public void startConfirmClose() {
+
+        EmbedBuilder builder = createEmbed();
+        setDescription(builder, ":warning: Do you really want to close the ticket ?");
+        Button buttonConfirm = new ButtonImpl(BUTTON_CLOSE_CONFIRM, "Yes I want to close the ticket", ButtonStyle.DANGER, false, Emoji.fromUnicode("U+26A0"));
+
+        this.textChannel.sendMessageEmbeds(builder.build()).setActionRow(buttonConfirm).queue(message -> {
+            schedule(10000, () -> {
+                // The user has not closed the ticket.
+                if (ticket.getTicketStatus() != TicketStatus.CLOSE) message.delete().queue();
+            });
+        });
+    }
+
 
 }

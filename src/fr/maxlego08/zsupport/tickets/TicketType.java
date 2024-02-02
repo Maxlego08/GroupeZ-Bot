@@ -5,6 +5,7 @@ public enum TicketType {
     WAITING,
     PLUGIN,
     VERIFICATION,
+    SPIGOT,
     QUESTION,
 
 }

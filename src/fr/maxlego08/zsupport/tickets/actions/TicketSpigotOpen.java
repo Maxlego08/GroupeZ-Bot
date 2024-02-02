@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
 
-public class TicketOpen extends TicketAction {
+public class TicketSpigotOpen extends TicketAction {
 
     @Override
     public void process(Interaction interaction) {

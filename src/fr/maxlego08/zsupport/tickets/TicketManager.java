@@ -8,6 +8,7 @@ import fr.maxlego08.zsupport.tickets.actions.TicketAction;
 import fr.maxlego08.zsupport.tickets.storage.SqlManager;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.verify.VerifyManager;
+import gs.mclo.api.MclogsClient;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
@@ -25,6 +26,7 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class TicketManager extends ZUtils {
@@ -65,12 +67,14 @@ public class TicketManager extends ZUtils {
         if (optional.isPresent()) {
 
             Ticket ticket = optional.get();
-            ticket.sendMessage(guild, Message.TICKET_ALREADY_CREATE);
+            if (ticket.getTicketStatus() != TicketStatus.CLOSE) {
+                ticket.sendMessage(guild, Message.TICKET_ALREADY_CREATE);
 
-            String replyContent = this.getMessage(langType, Message.TICKET_ALREADY_CREATE_REPLY, ticket.getTextChannel(guild).getAsMention());
-            event.deferReply(true).setContent(replyContent).queue();
+                String replyContent = this.getMessage(langType, Message.TICKET_ALREADY_CREATE_REPLY, ticket.getTextChannel(guild).getAsMention());
+                event.deferReply(true).setContent(replyContent).queue();
 
-            return;
+                return;
+            }
         }
 
         VerifyManager manager = VerifyManager.getInstance();
@@ -109,8 +113,7 @@ public class TicketManager extends ZUtils {
 
             EmbedBuilder builderCreateChannel = new EmbedBuilder();
             builderCreateChannel.setTitle("GroupeZ - Support");
-            builderCreateChannel.setDescription(this.getMessage(langType, Message.TICKET_CREATE_SUCCESS)
-                    + ticketChannel.getAsMention());
+            builderCreateChannel.setDescription(this.getMessage(langType, Message.TICKET_CREATE_SUCCESS) + ticketChannel.getAsMention());
             setEmbedFooter(guild, builderCreateChannel, new Color(45, 250, 45));
             message.editOriginalEmbeds(builderCreateChannel.build()).queue();
 
@@ -133,6 +136,21 @@ public class TicketManager extends ZUtils {
         if (optional.isPresent()) {
 
             Ticket ticket = optional.get();
+
+            if (Objects.equals(event.getButton().getId(), BUTTON_CLOSE)) {
+                TicketAction action = ticket.getTicketAction();
+                if (action != null) action.startConfirmClose();
+                event.reply(":warning: Please confirm that the ticket is closed.").setEphemeral(true).queue();
+                return;
+            }
+
+            if (Objects.equals(event.getButton().getId(), BUTTON_CLOSE_CONFIRM)) {
+                ticket.close(guild);
+                this.sqlManager.updateTicket(ticket);
+                event.reply(event.getUser().getAsMention() + " just closed the ticket.").queue();
+                return;
+            }
+
             TicketAction ticketAction = ticket.getTicketAction();
             if (ticketAction == null) return;
 
@@ -193,13 +211,39 @@ public class TicketManager extends ZUtils {
         if (optional.isPresent()) {
 
             Ticket ticket = optional.get();
-            ticket.close(guild);
-            this.sqlManager.updateTicket(ticket);
-
-            event.reply(":white_check_mark: " + member.getAsMention() + " just closed the ticket.").queue();
-
+            TicketAction action = ticket.getTicketAction();
+            if (action != null) action.startConfirmClose();
+            event.reply(":warning: Please confirm that the ticket is closed.").setEphemeral(true).queue();
         } else {
+
             event.reply(":x: Unable to find the ticket, you cannot use this command.").setEphemeral(true).queue();
         }
+    }
+
+    public void processMessageUpload(MessageReceivedEvent event) {
+        net.dv8tion.jda.api.entities.Message message = event.getMessage();
+        message.getAttachments().forEach(attachment -> {
+
+            if (attachment.isImage() || attachment.isVideo()) return;
+
+            String fileExtension = attachment.getFileExtension();
+            if (fileExtension != null && (fileExtension.equals("yml") || fileExtension.equals("log") || fileExtension.equals("txt"))) {
+                SqlManager.service.execute(() -> {
+                    String content = readContentFromURL(attachment.getProxy().getUrl());
+                    try {
+                        MclogsClient mclogsClient = ZSupport.instance.getMclogsClient();
+                        mclogsClient.uploadLog(content).thenAccept(uploadLogResponse -> {
+                            if (uploadLogResponse.isSuccess()) {
+                                event.getMessage().reply(":open_file_folder: " + attachment.getFileName() + ": https://mclo.gs/" + uploadLogResponse.getId()).queue(success -> {
+                                    success.suppressEmbeds(true).queue();
+                                });
+                            }
+                        });
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                });
+            }
+        });
     }
 }

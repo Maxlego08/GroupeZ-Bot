@@ -99,7 +99,7 @@ public class ZSupport implements Constant {
          * action.queue();
          */
 
-        System.out.println(PREFIX_CONSOLE + "Bot lancé avec succés !");
+        System.out.println(PREFIX_CONSOLE + "Bot lancé avec succès !");
 
         this.ticketManager.load();
 
@@ -150,25 +150,6 @@ public class ZSupport implements Constant {
 
     public CommandListener getCommandListener() {
         return commandListener;
-    }
-
-    /**
-     * @return the saveables
-     */
-    public List<Savable> getSaveables() {
-        return savables;
-    }
-
-    /**
-     * @return the persist
-     */
-    public Persist getPersist() {
-        return persist;
-    }
-
-
-    public void save() {
-        this.savables.forEach(save -> save.save(persist));
     }
 
     public TicketManager getTicketManager() {

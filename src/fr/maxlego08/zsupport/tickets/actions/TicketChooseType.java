@@ -36,7 +36,7 @@ public class TicketChooseType extends TicketAction {
                     "**Please choose the type of your ticket**:",
                     ":white_check_mark: To verify your purchase",
                     ":question: To request help on a plugin",
-                    emoji.getFormatted()+ " To request access on spigot",
+                    emoji.getFormatted() + " To request access on spigot",
                     ":wave: Questions before purchase",
                     "",
                     "```ansi\n" +
@@ -90,6 +90,10 @@ public class TicketChooseType extends TicketAction {
             case BUTTON_CHOOSE_VERIFY -> {
                 ticket.setTicketType(TicketType.VERIFICATION);
                 processNextAction(TicketStatus.VERIFY_PURCHASE);
+            }
+            case BUTTON_CHOOSE_SPIGOT -> {
+                ticket.setTicketType(TicketType.SPIGOT);
+                processNextAction(TicketStatus.SPIGOT_ACCESS_MODAL);
             }
 
             default -> event.reply("Impossible de trouver l'intéraction.").setEphemeral(true).queue();

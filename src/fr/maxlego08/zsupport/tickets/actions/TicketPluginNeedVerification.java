@@ -27,10 +27,7 @@ public class TicketPluginNeedVerification extends TicketAction {
                 "Please wait for someone to verify your purchase."
         );
 
-        this.textChannel.sendMessageEmbeds(builder.build()).queue(msg -> {
-            PermissionOverrideAction permissionOverrideAction = textChannel.upsertPermissionOverride(this.member);
-            permissionOverrideAction.setAllowed(Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL).queue();
-        });
+        this.textChannel.sendMessageEmbeds(builder.build()).queue(msg -> updatePermission(null, Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL));
     }
 
     @Override

@@ -14,7 +14,7 @@ public class CommandStop extends VCommand {
 
 	@Override
 	protected CommandType perform(ZSupport main) {
-		this.sender.sendMessage("Désactivation du bot.");
+		this.sender.sendMessage("DÃ©sactivation du bot.");
 		main.getCommandListener().onDisable();
 		return CommandType.SUCCESS;
 	}

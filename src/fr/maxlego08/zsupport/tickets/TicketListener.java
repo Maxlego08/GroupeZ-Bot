@@ -55,6 +55,8 @@ public class TicketListener extends ListenerAdapter implements Constant {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
 
+        if (!event.getAuthor().isBot()) this.ticketManager.processMessageUpload(event);
+
         if (event.getChannel() instanceof ICategorizableChannel iCategorizableChannel && iCategorizableChannel.getParentCategoryIdLong() == Config.ticketCategoryId && !event.getAuthor().isBot()) {
 
             this.ticketManager.onMessage(event, event.getGuild());

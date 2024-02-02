@@ -18,11 +18,13 @@ public interface Constant {
     long ADMIN_ROLE = 720573324836470884L;
 
     String MODAL_PLUGIN_INFORMATIONS = "pluginInformations";
+    String MODAL_SPIGOT_INFORMATIONS = "spigotInformations";
 
     String BUTTON_FR = "btn:FR";
     String BUTTON_EN = "btn:EN";
 
-    String BUTTON_OPEN_MODAL_PLUGIN = "btn:open:plugin:model";
+    String BUTTON_OPEN_MODAL_PLUGIN = "btn:open:plugin:modal";
+    String BUTTON_OPEN_MODAL_SPIGOT = "btn:open:spigot:model";
     String BUTTON_CHOOSE_BEFORE_PURCHASE = "btn:purchase";
     String BUTTON_CHOOSE_SPIGOT = "btn:spigot";
     String BUTTON_CHOOSE_VERIFY = "btn:choose:verify";
@@ -30,6 +32,7 @@ public interface Constant {
 
     String BUTTON_SELECT_PLUGIN = "select:plugin";
     String BUTTON_CLOSE = "btn:close";
+    String BUTTON_CLOSE_CONFIRM = "btn:close:confirm";
 
     String BUTTON_MODERATOR_ACCEPT = "btn:moderator:accept";
 }

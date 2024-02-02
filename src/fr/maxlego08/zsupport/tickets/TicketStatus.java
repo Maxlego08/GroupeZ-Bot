@@ -7,22 +7,21 @@ import fr.maxlego08.zsupport.tickets.actions.TicketPluginInformation;
 import fr.maxlego08.zsupport.tickets.actions.TicketPluginNeedVerification;
 import fr.maxlego08.zsupport.tickets.actions.TicketPluginVerifyPurchase;
 import fr.maxlego08.zsupport.tickets.actions.TicketSelectPlugin;
+import fr.maxlego08.zsupport.tickets.actions.TicketSpigotModal;
+import fr.maxlego08.zsupport.tickets.actions.TicketSpigotOpen;
+import fr.maxlego08.zsupport.tickets.actions.TicketVerification;
 
 public enum TicketStatus {
 
-    // Choisir le type du ticket
     CHOOSE_TYPE(TicketChooseType.class, "waiting"),
-    // Choisir le plugin
     CHOOSE_PLUGIN(TicketSelectPlugin.class),
-    // Vérifier si le client a acheté le plugin
     PLUGIN_VERIFY_PURCHASE(TicketPluginVerifyPurchase.class),
-    // Si le plugin est acheté, Demander les informations pour le support
     PLUGIN_INFORMATION(TicketPluginInformation.class),
     PLUGIN_VERIFY_NEED_INFORMATION(TicketPluginNeedVerification.class),
-    VERIFY_PURCHASE,
-    SPIGOT_ACCESS,
-    QUESTION,
-    WAITING,
+    VERIFY_PURCHASE(TicketVerification.class, "#%id%-verify"),
+    SPIGOT_ACCESS_MODAL(TicketSpigotModal.class),
+    SPIGOT_ACCESS(TicketSpigotOpen.class, "#%id%-spigot"),
+    QUESTION("#%id%-question"),
     OPEN(TicketOpen.class, "#%id%-%plugin%"),
     CLOSE("#%id%-close"),
 

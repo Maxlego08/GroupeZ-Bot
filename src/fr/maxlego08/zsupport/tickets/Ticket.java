@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 public class Ticket extends ZUtils {
@@ -141,5 +142,8 @@ public class Ticket extends ZUtils {
         Member member = guild.getMemberById(this.userId);
         PermissionOverrideAction permissionOverrideAction = textChannel.upsertPermissionOverride(member);
         permissionOverrideAction.clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
+
+        TextChannelManager manager = textChannel.getManager();
+        manager.setName("ticket-close").queue();
     }
 }
