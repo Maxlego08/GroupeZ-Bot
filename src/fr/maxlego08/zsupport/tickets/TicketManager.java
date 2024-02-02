@@ -22,9 +22,12 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,7 +36,7 @@ public class TicketManager extends ZUtils {
 
     private final ZSupport instance;
     private final SqlManager sqlManager = new SqlManager();
-    private final List<Ticket> tickets = new ArrayList<>();
+    private List<Ticket> tickets = new ArrayList<>();
 
     public TicketManager(ZSupport instance) {
         this.instance = instance;
@@ -44,24 +47,26 @@ public class TicketManager extends ZUtils {
     }
 
     public void load() {
-        this.sqlManager.createTable();
+        this.sqlManager.createTable(tickets -> this.tickets = tickets);
     }
 
     public List<Ticket> getTickets() {
         return tickets;
     }
 
-    public Optional<Ticket> getByUser(User user) {
+    public Optional<Ticket> getByUser(User user, Guild guild) {
+        verifyTickets(guild);
         return tickets.stream().filter(ticket -> ticket.getUserId() == user.getIdLong()).findAny();
     }
 
-    public Optional<Ticket> getByChannel(ISnowflake channel) {
+    public Optional<Ticket> getByChannel(ISnowflake channel, Guild guild) {
+        verifyTickets(guild);
         return tickets.stream().filter(ticket -> ticket.getChannelId() == channel.getIdLong()).findAny();
     }
 
     public void createTicket(User user, Guild guild, LangType langType, ButtonInteractionEvent event) {
 
-        Optional<Ticket> optional = getByUser(user);
+        Optional<Ticket> optional = getByUser(user, guild);
 
         // The user already has an open ticket
         if (optional.isPresent()) {
@@ -131,7 +136,7 @@ public class TicketManager extends ZUtils {
 
     public void buttonAction(ButtonInteractionEvent event, Guild guild) {
 
-        Optional<Ticket> optional = getByChannel(event.getChannel());
+        Optional<Ticket> optional = getByChannel(event.getChannel(), guild);
 
         if (optional.isPresent()) {
 
@@ -159,7 +164,7 @@ public class TicketManager extends ZUtils {
     }
 
     public void selectionAction(StringSelectInteractionEvent event, Guild guild) {
-        Optional<Ticket> optional = getByChannel(event.getChannel());
+        Optional<Ticket> optional = getByChannel(event.getChannel(), guild);
 
         if (optional.isPresent()) {
 
@@ -172,7 +177,7 @@ public class TicketManager extends ZUtils {
     }
 
     public void modalAction(ModalInteractionEvent event, Guild guild) {
-        Optional<Ticket> optional = getByChannel(event.getChannel());
+        Optional<Ticket> optional = getByChannel(event.getChannel(), guild);
 
         if (optional.isPresent()) {
 
@@ -190,7 +195,7 @@ public class TicketManager extends ZUtils {
 
     public void onMessage(MessageReceivedEvent event, Guild guild) {
 
-        Optional<Ticket> optional = getByChannel(event.getChannel());
+        Optional<Ticket> optional = getByChannel(event.getChannel(), guild);
 
         if (optional.isPresent()) {
 
@@ -206,7 +211,7 @@ public class TicketManager extends ZUtils {
 
     public void closeTicket(SlashCommandInteractionEvent event, Guild guild, Member member) {
 
-        Optional<Ticket> optional = getByChannel(event.getChannel());
+        Optional<Ticket> optional = getByChannel(event.getChannel(), guild);
 
         if (optional.isPresent()) {
 
@@ -234,9 +239,9 @@ public class TicketManager extends ZUtils {
                         MclogsClient mclogsClient = ZSupport.instance.getMclogsClient();
                         mclogsClient.uploadLog(content).thenAccept(uploadLogResponse -> {
                             if (uploadLogResponse.isSuccess()) {
-                                event.getMessage().reply(":open_file_folder: " + attachment.getFileName() + ": https://mclo.gs/" + uploadLogResponse.getId()).queue(success -> {
-                                    success.suppressEmbeds(true).queue();
-                                });
+                                MessageCreateAction action = event.getMessage().reply(":open_file_folder: " + attachment.getFileName() + ": https://mclo.gs/" + uploadLogResponse.getId());
+                                action.setSuppressEmbeds(true);
+                                action.queue();
                             }
                         });
                     } catch (Exception exception) {
@@ -245,5 +250,31 @@ public class TicketManager extends ZUtils {
                 });
             }
         });
+    }
+
+    private void verifyTickets(Guild guild) {
+        Iterator<Ticket> ticketIterator = this.tickets.iterator();
+        while (ticketIterator.hasNext()) {
+            Ticket ticket = ticketIterator.next();
+            if (ticket.getTextChannel(guild) == null) {
+                ticket.setTicketStatus(TicketStatus.CLOSE);
+                this.sqlManager.updateTicket(ticket);
+                ticketIterator.remove();
+            }
+        }
+    }
+
+    public void userLeave(Guild guild, User user) {
+        Optional<Ticket> optional = this.getByUser(user, guild);
+        if (optional.isPresent()) {
+
+            Ticket ticket = optional.get();
+            ticket.setTicketStatus(TicketStatus.CLOSE);
+            this.sqlManager.updateTicket(ticket);
+
+            TextChannel channel = ticket.getTextChannel(guild);
+            TextChannelManager channelManager = channel.getManager();
+            channelManager.setName("user-leave").queue();
+        }
     }
 }

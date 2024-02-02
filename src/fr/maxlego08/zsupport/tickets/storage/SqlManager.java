@@ -1,6 +1,9 @@
 package fr.maxlego08.zsupport.tickets.storage;
 
+import fr.maxlego08.zsupport.lang.LangType;
 import fr.maxlego08.zsupport.tickets.Ticket;
+import fr.maxlego08.zsupport.tickets.TicketStatus;
+import fr.maxlego08.zsupport.tickets.TicketType;
 import net.dv8tion.jda.api.entities.Message;
 
 import java.sql.Connection;
@@ -13,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 public class SqlManager {
 
@@ -33,7 +37,7 @@ public class SqlManager {
         return connection.getConnection();
     }
 
-    public void createTable() {
+    public void createTable(Consumer<List<Ticket>> consumer) {
         service.execute(() -> {
             try (PreparedStatement preparedStatement = this.connection.getConnection().prepareStatement(createRequest)) {
                 preparedStatement.execute();
@@ -46,6 +50,8 @@ public class SqlManager {
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
+
+            selectTicketsNotClosed(consumer);
         });
     }
 
@@ -106,31 +112,34 @@ public class SqlManager {
         });
     }
 
-    public List<Ticket> selectTicketsNotClosed() {
-        String sql = "SELECT * FROM tickets WHERE ticketStatus <> 'CLOSE'";
-        List<Ticket> tickets = new ArrayList<>();
+    public void selectTicketsNotClosed(Consumer<List<Ticket>> consumer) {
+        service.execute(() -> {
+            String sql = "SELECT * FROM tickets WHERE ticketStatus <> 'CLOSE'";
+            List<Ticket> tickets = new ArrayList<>();
 
-        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql); ResultSet rs = preparedStatement.executeQuery()) {
+            try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql); ResultSet resultSet = preparedStatement.executeQuery()) {
 
-            while (rs.next()) {
-                long id = rs.getLong("id");
-                String langType = rs.getString("langType");
-                long channelId = rs.getLong("channelId");
-                long userId = rs.getLong("userId");
-                String ticketStatus = rs.getString("ticketStatus");
-                String ticketType = rs.getString("ticketType");
-                Timestamp createdAt = rs.getTimestamp("createdAt");
-                Timestamp updatedAt = rs.getTimestamp("updatedAt");
+                while (resultSet.next()) {
+                    long id = resultSet.getLong("id");
+                    String langType = resultSet.getString("langType");
+                    long channelId = resultSet.getLong("channelId");
+                    long userId = resultSet.getLong("userId");
+                    long pluginId = resultSet.getLong("pluginId");
+                    String ticketStatus = resultSet.getString("ticketStatus");
+                    String ticketType = resultSet.getString("ticketType");
+                    Timestamp createdAt = resultSet.getTimestamp("createdAt");
+                    Timestamp updatedAt = resultSet.getTimestamp("updatedAt");
 
-                // Ticket ticket = new Ticket(id, langType, channelId, userId, ticketStatus, ticketType, createdAt, updatedAt);
-                // tickets.add(ticket);
+                    Ticket ticket = new Ticket(id, LangType.valueOf(langType), channelId, userId, createdAt.getTime(), updatedAt.getTime(), TicketStatus.valueOf(ticketStatus), TicketType.valueOf(ticketType), pluginId);
+                    tickets.add(ticket);
+                }
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+                System.out.println("Failed to select tickets from the database.");
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Failed to select tickets from the database.");
-        }
 
-        return tickets;
+            consumer.accept(tickets);
+        });
     }
 
     public void addMessageToTicket(Ticket ticket, Message message) {

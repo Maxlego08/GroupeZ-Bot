@@ -4,6 +4,7 @@ import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.lang.LangType;
 import fr.maxlego08.zsupport.utils.Constant;
 import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -61,5 +62,10 @@ public class TicketListener extends ListenerAdapter implements Constant {
 
             this.ticketManager.onMessage(event, event.getGuild());
         }
+    }
+
+    @Override
+    public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
+        this.ticketManager.userLeave(event.getGuild(), event.getUser());
     }
 }

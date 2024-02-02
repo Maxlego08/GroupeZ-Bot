@@ -40,6 +40,19 @@ public class Ticket extends ZUtils {
         this.updatedAt = System.currentTimeMillis();
     }
 
+    public Ticket(long id, LangType langType, long channelId, long userId, long createdAt, long updatedAt, TicketStatus ticketStatus, TicketType ticketType, long pluginId) {
+        this.langType = langType;
+        this.channelId = channelId;
+        this.userId = userId;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.id = id;
+        this.ticketStatus = ticketStatus;
+        this.ticketType = ticketType;
+        this.pluginId = pluginId;
+        this.ticketAction = ticketStatus.getAction();
+    }
+
     public long getId() {
         return id;
     }
