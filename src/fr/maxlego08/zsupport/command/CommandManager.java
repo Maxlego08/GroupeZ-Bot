@@ -7,6 +7,7 @@ import java.util.List;
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.command.commands.CommandClear;
+import fr.maxlego08.zsupport.command.commands.CommandClose;
 import fr.maxlego08.zsupport.command.commands.CommandCustomerVerify;
 import fr.maxlego08.zsupport.command.commands.CommandDocumentation;
 import fr.maxlego08.zsupport.command.commands.CommandLog;
@@ -51,6 +52,7 @@ public class CommandManager extends ZUtils implements Constant {
 		registetCommand("log", new CommandLog(this));
 		
 		registetCommand("customer-verify", new CommandCustomerVerify(this));		
+		registetCommand("close", new CommandClose(this));
 		// registetCommand("suggestion-traitment", new SuggestionTraitmentCommand(this), "st");
 	}
 

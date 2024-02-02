@@ -24,7 +24,7 @@ public enum TicketStatus {
     QUESTION,
     WAITING,
     OPEN(TicketOpen.class, "#%id%-%plugin%"),
-    CLOSE,
+    CLOSE("#%id%-close"),
 
     ;
 
@@ -39,6 +39,11 @@ public enum TicketStatus {
     TicketStatus(Class<? extends TicketAction> action) {
         this.action = action;
         this.channelName = null;
+    }
+
+    TicketStatus(String channelName) {
+        this.action = null;
+        this.channelName = channelName;
     }
 
     TicketStatus() {

@@ -37,7 +37,7 @@ public class CommandCustomerVerify extends VCommand {
         User user = this.event.getUser();
 
         VerifyManager manager = VerifyManager.getInstance();
-        manager.updateUserAsync(this.event, target, pluginId, null);
+        manager.updateUserAsync(this.event, this.event.getGuild(), target, pluginId, null);
 
         return CommandType.SUCCESS;
     }

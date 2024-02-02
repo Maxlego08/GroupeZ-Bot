@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.callbacks.IMessageEditCallback;
 
+import java.util.concurrent.TimeUnit;
+
 public class TicketPluginVerifyPurchase extends TicketAction {
 
     @Override
@@ -22,7 +24,7 @@ public class TicketPluginVerifyPurchase extends TicketAction {
         setEmbedFooter(this.guild, builder);
         setDescription(builder, ":gear: Check your purchase, please wait.");
 
-        event.editMessageEmbeds(builder.build()).setActionRow(createCloseButton()).queue(editMessage -> {
+        event.editMessageEmbeds(builder.build()).setActionRow(createCloseButton()).queueAfter(1, TimeUnit.SECONDS, editMessage -> {
 
             Plugin plugin = ticket.getPlugin();
 
@@ -46,8 +48,9 @@ public class TicketPluginVerifyPurchase extends TicketAction {
                 return;
             }
 
-            editMessage.deleteOriginal().queue();
-            processNextAction(TicketStatus.PLUGIN_INFORMATION);
+            editMessage.deleteOriginal().queueAfter(1, TimeUnit.SECONDS, r -> {
+                processNextAction(TicketStatus.PLUGIN_INFORMATION);
+            });
         });
     }
 

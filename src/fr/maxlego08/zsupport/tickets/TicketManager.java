@@ -11,12 +11,12 @@ import fr.maxlego08.zsupport.verify.VerifyManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -177,10 +177,29 @@ public class TicketManager extends ZUtils {
         if (optional.isPresent()) {
 
             Ticket ticket = optional.get();
+            this.sqlManager.addMessageToTicket(ticket, event.getMessage());
+
             TicketAction ticketAction = ticket.getTicketAction();
             if (ticketAction == null) return;
 
             ticketAction.preMessageAction(event, event.getMember(), guild, this, ticket);
+        }
+    }
+
+    public void closeTicket(SlashCommandInteractionEvent event, Guild guild, Member member) {
+
+        Optional<Ticket> optional = getByChannel(event.getChannel());
+
+        if (optional.isPresent()) {
+
+            Ticket ticket = optional.get();
+            ticket.close(guild);
+            this.sqlManager.updateTicket(ticket);
+
+            event.reply(":white_check_mark: " + member.getAsMention() + " just closed the ticket.").queue();
+
+        } else {
+            event.reply(":x: Unable to find the ticket, you cannot use this command.").setEphemeral(true).queue();
         }
     }
 }

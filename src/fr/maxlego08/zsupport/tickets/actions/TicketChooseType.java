@@ -3,6 +3,7 @@ package fr.maxlego08.zsupport.tickets.actions;
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.tickets.TicketStatus;
+import fr.maxlego08.zsupport.tickets.TicketType;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -11,14 +12,11 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
-import net.dv8tion.jda.api.interactions.callbacks.IMessageEditCallback;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 import net.dv8tion.jda.internal.interactions.component.ButtonImpl;
-
-import java.awt.*;
 
 public class TicketChooseType extends TicketAction {
 
@@ -34,6 +32,17 @@ public class TicketChooseType extends TicketAction {
             Emoji emoji = Config.getSpigotEmoji(guild);
             EmbedBuilder builder = this.createEmbed();
 
+            setDescription(builder,
+                    "**Please choose the type of your ticket**:",
+                    ":white_check_mark: To verify your purchase",
+                    ":question: To request help on a plugin",
+                    emoji.getFormatted()+ " To request access on spigot",
+                    ":wave: Questions before purchase",
+                    "",
+                    "```ansi\n" +
+                            "\u001B[2;31mPlease choose your ticket type correctly. Your ticket may be closed if your request does not match the ticket type.\u001B[0m\n" +
+                            "```"
+            );
             builder.setDescription(getMessage(this.ticket.getLangType(), Message.TICKET_CHOOSE, emoji.getFormatted()));
 
             MessageCreateAction action = textChannel.sendMessageEmbeds(builder.build());
@@ -74,8 +83,14 @@ public class TicketChooseType extends TicketAction {
 
         switch (buttonId) {
 
-            case BUTTON_CHOOSE_SUPPORT -> processNextAction(TicketStatus.CHOOSE_PLUGIN);
-            case BUTTON_CHOOSE_VERIFY -> processNextAction(TicketStatus.VERIFY_PURCHASE);
+            case BUTTON_CHOOSE_SUPPORT -> {
+                ticket.setTicketType(TicketType.PLUGIN);
+                processNextAction(TicketStatus.CHOOSE_PLUGIN);
+            }
+            case BUTTON_CHOOSE_VERIFY -> {
+                ticket.setTicketType(TicketType.VERIFICATION);
+                processNextAction(TicketStatus.VERIFY_PURCHASE);
+            }
 
             default -> event.reply("Impossible de trouver l'intéraction.").setEphemeral(true).queue();
         }

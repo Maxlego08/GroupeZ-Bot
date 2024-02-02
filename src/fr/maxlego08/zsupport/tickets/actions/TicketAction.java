@@ -181,7 +181,7 @@ public abstract class TicketAction extends ZUtils {
 
             Member target = this.guild.getMemberById(this.ticket.getUserId());
             VerifyManager manager = VerifyManager.getInstance();
-            manager.updateUserAsync(null, target, this.ticket.getPluginId(), event.getMessage());
+            manager.updateUserAsync(null, event.getGuild(), target, this.ticket.getPluginId(), event.getMessage());
 
         } else {
             event.reply(":x: You do not have permission to verify the purchase yourself. Please wait.").setEphemeral(true).queue();

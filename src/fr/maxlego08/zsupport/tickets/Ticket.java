@@ -7,9 +7,12 @@ import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.tickets.actions.TicketAction;
 import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.ZUtils;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 public class Ticket extends ZUtils {
 
@@ -130,5 +133,13 @@ public class Ticket extends ZUtils {
 
     public void update() {
         this.updatedAt = System.currentTimeMillis();
+    }
+
+    public void close(Guild guild) {
+        this.ticketStatus = TicketStatus.CLOSE;
+        TextChannel textChannel = getTextChannel(guild);
+        Member member = guild.getMemberById(this.userId);
+        PermissionOverrideAction permissionOverrideAction = textChannel.upsertPermissionOverride(member);
+        permissionOverrideAction.clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
     }
 }

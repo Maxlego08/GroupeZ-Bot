@@ -41,7 +41,7 @@ public class CommandListener extends ListenerAdapter implements Constant, Runnab
                 return;
             String cmd = command.getSubCommands().get(0);
             System.out.println("Enregistrement de la commande " + cmd + " (" + command.getDescription() + ")");
-            // guild.upsertCommand(cmd, command.getDescription()).queue();
+
             SlashCommandData commandData = Commands.slash(cmd, command.getDescription());
 
             command.getRequireArgs().forEach(commandArgument -> {

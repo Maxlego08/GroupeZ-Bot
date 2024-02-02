@@ -434,8 +434,8 @@ public class VerifyManager extends ZUtils {
         textChannel.sendMessageEmbeds(builder.build()).queue();
     }
 
-    public void updateUserAsync(IReplyCallback event, Member targetUser, long pluginId, Message message) {
-        SqlManager.service.execute(() -> this.updateUser(event, targetUser, pluginId, event.getGuild(), message));
+    public void updateUserAsync(IReplyCallback event, Guild guild, Member targetUser, long pluginId, Message message) {
+        SqlManager.service.execute(() -> this.updateUser(event, targetUser, pluginId, guild, message));
     }
 
     private void updateUser(IReplyCallback event, Member targetUser, long pluginId, Guild guild, Message message) {
