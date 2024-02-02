@@ -54,7 +54,7 @@ public class TicketPluginInformation extends TicketAction {
         TextInput problemDescription = TextInput.create("description", "Description of the problem", TextInputStyle.PARAGRAPH)
                 .setPlaceholder("Describe the problem you are experiencing")
                 .setMinLength(10)
-                .setMaxLength(10000)
+                .setMaxLength(4000)
                 .build();
 
         Modal modal = Modal.create(MODAL_PLUGIN_INFORMATIONS, "Informations")

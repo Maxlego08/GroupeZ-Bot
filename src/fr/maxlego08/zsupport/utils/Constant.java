@@ -19,12 +19,14 @@ public interface Constant {
 
     String MODAL_PLUGIN_INFORMATIONS = "pluginInformations";
     String MODAL_SPIGOT_INFORMATIONS = "spigotInformations";
+    String MODAL_QUESTION_INFORMATIONS = "questionInformations";
 
     String BUTTON_FR = "btn:FR";
     String BUTTON_EN = "btn:EN";
 
     String BUTTON_OPEN_MODAL_PLUGIN = "btn:open:plugin:modal";
     String BUTTON_OPEN_MODAL_SPIGOT = "btn:open:spigot:model";
+    String BUTTON_OPEN_MODAL_QUESTION = "btn:open:question:model";
     String BUTTON_CHOOSE_BEFORE_PURCHASE = "btn:purchase";
     String BUTTON_CHOOSE_SPIGOT = "btn:spigot";
     String BUTTON_CHOOSE_VERIFY = "btn:choose:verify";

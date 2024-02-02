@@ -95,8 +95,12 @@ public class TicketChooseType extends TicketAction {
                 ticket.setTicketType(TicketType.SPIGOT);
                 processNextAction(TicketStatus.SPIGOT_ACCESS_MODAL);
             }
+            case BUTTON_CHOOSE_BEFORE_PURCHASE -> {
+                ticket.setTicketType(TicketType.QUESTION);
+                processNextAction(TicketStatus.QUESTION_MODAL);
+            }
 
-            default -> event.reply("Impossible de trouver l'intéraction.").setEphemeral(true).queue();
+            default -> event.reply("We can’t find the button.").setEphemeral(true).queue();
         }
 
     }

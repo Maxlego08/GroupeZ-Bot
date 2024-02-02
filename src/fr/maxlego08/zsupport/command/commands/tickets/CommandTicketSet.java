@@ -41,7 +41,8 @@ public class CommandTicketSet extends VCommand {
                 "**Note**",
                 "**1.** Please provide as much information as possible about your problem.",
                 "**2.** Please do not mention the staff, wait for someone to answer you.",
-                "**3.** The GroupeZ team is located in the timezone Paris (UTC+1)"
+                "**3.** The GroupeZ team is located in the timezone Paris (UTC+1)",
+                "**4.** GroupeZ will save your messages in the ticket to keep a history."
         );
 
         builder.setImage("https://img.groupez.dev/groupez/link-discord.gif");
