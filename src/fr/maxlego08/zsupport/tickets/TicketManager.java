@@ -14,8 +14,13 @@ import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -71,6 +76,7 @@ public class TicketManager extends ZUtils {
         VerifyManager manager = VerifyManager.getInstance();
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("GroupeZ - Support");
+        setEmbedFooter(guild, builder, new Color(209, 130, 27));
         builder.setDescription(this.getMessage(langType, Message.TICKET_CREATE_WAIT));
         setEmbedFooter(guild, builder);
 
@@ -84,12 +90,12 @@ public class TicketManager extends ZUtils {
 
             manager.userIsLink(user, () -> {
                 Category category = getTicketCategory(guild);
-                category.createTextChannel("ticket-waiting").queue(ticketChannel -> createTicket(user, guild, langType, event, ticketChannel, errorRunnable));
+                category.createTextChannel("ticket-waiting").queue(ticketChannel -> createTicket(user, guild, langType, event, ticketChannel, errorRunnable, message));
             }, errorRunnable);
         });
     }
 
-    private void createTicket(User user, Guild guild, LangType langType, ButtonInteractionEvent event, TextChannel ticketChannel, Runnable errorRunnable) {
+    private void createTicket(User user, Guild guild, LangType langType, ButtonInteractionEvent event, TextChannel ticketChannel, Runnable errorRunnable, InteractionHook message) {
 
         // Création du nouveau ticket après la vérification de l'utilisateur
         Ticket ticket = new Ticket(langType, ticketChannel.getIdLong(), user.getIdLong(), TicketStatus.CHOOSE_TYPE, TicketType.WAITING);
@@ -100,6 +106,14 @@ public class TicketManager extends ZUtils {
             TicketAction action = TicketStatus.CHOOSE_TYPE.getAction();
             ticket.setTicketAction(action);
             action.preProcess(this, ticket, guild, ticketChannel, event.getMember(), event);
+
+            EmbedBuilder builderCreateChannel = new EmbedBuilder();
+            builderCreateChannel.setTitle("GroupeZ - Support");
+            builderCreateChannel.setDescription(this.getMessage(langType, Message.TICKET_CREATE_SUCCESS)
+                    + ticketChannel.getAsMention());
+            setEmbedFooter(guild, builderCreateChannel, new Color(45, 250, 45));
+            message.editOriginalEmbeds(builderCreateChannel.build()).queue();
+
         }, () -> {
 
             ticket.sendMessage(guild, "Unable to add ticket to database.");
@@ -112,9 +126,9 @@ public class TicketManager extends ZUtils {
         return guild.getCategoryById(Config.ticketCategoryId);
     }
 
-    public void buttonAction(ButtonInteractionEvent event, User user, Guild guild) {
+    public void buttonAction(ButtonInteractionEvent event, Guild guild) {
 
-        Optional<Ticket> optional = getByUser(user);
+        Optional<Ticket> optional = getByChannel(event.getChannel());
 
         if (optional.isPresent()) {
 
@@ -126,8 +140,8 @@ public class TicketManager extends ZUtils {
         }
     }
 
-    public void selectionAction(StringSelectInteractionEvent event, User user, Guild guild) {
-        Optional<Ticket> optional = getByUser(user);
+    public void selectionAction(StringSelectInteractionEvent event, Guild guild) {
+        Optional<Ticket> optional = getByChannel(event.getChannel());
 
         if (optional.isPresent()) {
 
@@ -135,11 +149,38 @@ public class TicketManager extends ZUtils {
             TicketAction ticketAction = ticket.getTicketAction();
             if (ticketAction == null) return;
 
-            ticketAction.preselectionAction(event, event.getMember(), guild, this, ticket);
+            ticketAction.preSelectionAction(event, event.getMember(), guild, this, ticket);
+        }
+    }
+
+    public void modalAction(ModalInteractionEvent event, Guild guild) {
+        Optional<Ticket> optional = getByChannel(event.getChannel());
+
+        if (optional.isPresent()) {
+
+            Ticket ticket = optional.get();
+            TicketAction ticketAction = ticket.getTicketAction();
+            if (ticketAction == null) return;
+
+            ticketAction.preModalAction(event, event.getMember(), guild, this, ticket);
         }
     }
 
     public void updateTicket(Ticket ticket) {
         this.sqlManager.updateTicket(ticket);
+    }
+
+    public void onMessage(MessageReceivedEvent event, Guild guild) {
+
+        Optional<Ticket> optional = getByChannel(event.getChannel());
+
+        if (optional.isPresent()) {
+
+            Ticket ticket = optional.get();
+            TicketAction ticketAction = ticket.getTicketAction();
+            if (ticketAction == null) return;
+
+            ticketAction.preMessageAction(event, event.getMember(), guild, this, ticket);
+        }
     }
 }

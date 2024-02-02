@@ -6,8 +6,10 @@ import fr.maxlego08.zsupport.tickets.TicketStatus;
 import fr.maxlego08.zsupport.utils.Plugin;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.callbacks.IMessageEditCallback;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
@@ -28,6 +30,7 @@ public class TicketSelectPlugin extends TicketAction {
         });
 
         selectionMenu.addOption(getMessage(this.ticket.getLangType(), Message.OTHER), "other", Emoji.fromUnicode("U+1F6AB"));
+        //selectionMenu.addOption("Close ticket", "close", Emoji.fromUnicode("U+0078"));
 
         EmbedBuilder builder = this.createEmbed();
 
@@ -55,11 +58,22 @@ public class TicketSelectPlugin extends TicketAction {
             Plugin plugin = Config.plugins.stream().filter(configPlugin -> configPlugin.getName().equals(pluginName)).findAny().orElse(Plugin.EMPTY);
 
             this.ticket.setPluginId(plugin.getPluginId());
-            processNextAction(TicketStatus.PLUGIN_INFORMATION);
+            // Si le plugin est premium, on va vérifier l'achat, sinon on demande directement les informations
+            processNextAction(plugin.isPremium() ? TicketStatus.PLUGIN_VERIFY_PURCHASE : TicketStatus.PLUGIN_INFORMATION);
 
         } else {
             event.reply(getMessage(this.ticket.getLangType(), Message.TICKET_PLUGIN_ERROR)).queue();
         }
+    }
+
+    @Override
+    public void onModal(ModalInteractionEvent event) {
+
+    }
+
+    @Override
+    public void onMessage(MessageReceivedEvent event) {
+
     }
 
     @Override

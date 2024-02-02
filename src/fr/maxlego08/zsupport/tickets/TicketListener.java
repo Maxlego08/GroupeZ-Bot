@@ -3,9 +3,11 @@ package fr.maxlego08.zsupport.tickets;
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.lang.LangType;
 import fr.maxlego08.zsupport.utils.Constant;
+import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
@@ -28,28 +30,34 @@ public class TicketListener extends ListenerAdapter implements Constant {
 
             LangType langType = Objects.equals(button.getId(), BUTTON_FR) ? LangType.FR : LangType.US;
             this.ticketManager.createTicket(event.getUser(), event.getGuild(), langType, event);
-        } else if (event.getChannel().getName().contains("ticket-") && !event.getUser().isBot()) {
+        } else if (event.getChannel() instanceof ICategorizableChannel iCategorizableChannel && iCategorizableChannel.getParentCategoryIdLong() == Config.ticketCategoryId && !event.getUser().isBot()) {
 
-            this.ticketManager.buttonAction(event, event.getUser(), event.getGuild());
+            this.ticketManager.buttonAction(event, event.getGuild());
         }
     }
 
     @Override
     public void onStringSelectInteraction(StringSelectInteractionEvent event) {
-        if (event.getChannel().getName().contains("ticket-") && !event.getUser().isBot()) {
+        if (event.getChannel() instanceof ICategorizableChannel iCategorizableChannel && iCategorizableChannel.getParentCategoryIdLong() == Config.ticketCategoryId && !event.getUser().isBot()) {
 
-            this.ticketManager.selectionAction(event, event.getUser(), event.getGuild());
+            this.ticketManager.selectionAction(event, event.getGuild());
         }
     }
 
     @Override
     public void onModalInteraction(ModalInteractionEvent event) {
-        if (event.getModalId().equals("modmail")) {
-            String subject = event.getValue("subject").getAsString();
-            String body = event.getValue("body").getAsString();
+        if (event.getChannel() instanceof ICategorizableChannel iCategorizableChannel && iCategorizableChannel.getParentCategoryIdLong() == Config.ticketCategoryId && !event.getUser().isBot()) {
 
-            // createSupportTicket(subject, body);
-            event.reply("Thanks for your request!").setEphemeral(true).queue();
+            this.ticketManager.modalAction(event, event.getGuild());
+        }
+    }
+
+    @Override
+    public void onMessageReceived(MessageReceivedEvent event) {
+
+        if (event.getChannel() instanceof ICategorizableChannel iCategorizableChannel && iCategorizableChannel.getParentCategoryIdLong() == Config.ticketCategoryId && !event.getAuthor().isBot()) {
+
+            this.ticketManager.onMessage(event, event.getGuild());
         }
     }
 }

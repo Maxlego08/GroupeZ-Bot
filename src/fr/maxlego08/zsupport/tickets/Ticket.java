@@ -1,9 +1,11 @@
 package fr.maxlego08.zsupport.tickets;
 
+import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.lang.LangType;
 import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.tickets.actions.TicketAction;
+import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -15,7 +17,7 @@ public class Ticket extends ZUtils {
     private final long channelId;
     private final long userId;
     private final long createdAt;
-    private final long updatedAt;
+    private long updatedAt;
     private long id;
     private TicketStatus ticketStatus;
     private TicketType ticketType;
@@ -120,5 +122,13 @@ public class Ticket extends ZUtils {
 
     public void setPluginId(long pluginId) {
         this.pluginId = pluginId;
+    }
+
+    public Plugin getPlugin() {
+        return Config.getPlugin((int) this.pluginId).orElse(Plugin.EMPTY);
+    }
+
+    public void update() {
+        this.updatedAt = System.currentTimeMillis();
     }
 }

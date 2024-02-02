@@ -11,6 +11,7 @@ import fr.maxlego08.zsupport.tickets.TicketManager;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.storage.Persist;
 import fr.maxlego08.zsupport.utils.storage.Savable;
+import gs.mclo.api.MclogsClient;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -36,11 +37,13 @@ public class ZSupport implements Constant {
     private final Persist persist;
     private final MemberListener memberListener;
     // private final XpListener xpListener;
+    private final MclogsClient mclogsClient;
 
     public ZSupport() throws LoginException {
 
         instance = this;
 
+        this.mclogsClient = new MclogsClient("GroupeZ-Bot", VERSION);
         this.gson = getGsonBuilder().create();
         this.persist = new Persist(this);
 
@@ -68,6 +71,7 @@ public class ZSupport implements Constant {
         list.add(GatewayIntent.GUILD_MESSAGE_REACTIONS);
         list.add(GatewayIntent.GUILD_MESSAGES);
         list.add(GatewayIntent.GUILD_MESSAGE_TYPING);
+        list.add(GatewayIntent.MESSAGE_CONTENT);
 
         JDABuilder builder = JDABuilder.create(Config.botToken, list);
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
@@ -169,5 +173,9 @@ public class ZSupport implements Constant {
 
     public TicketManager getTicketManager() {
         return ticketManager;
+    }
+
+    public MclogsClient getMclogsClient() {
+        return mclogsClient;
     }
 }

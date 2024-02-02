@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 
 public class SqlManager {
 
-    public final ExecutorService service = Executors.newFixedThreadPool(4);
+    public static final ExecutorService service = Executors.newFixedThreadPool(4);
     private final SqlConnection connection = new SqlConnection();
 
     private final String createRequest = "CREATE TABLE IF NOT EXISTS tickets ( id BIGINT AUTO_INCREMENT PRIMARY KEY, langType VARCHAR(255) NOT NULL, channelId BIGINT NOT NULL, userId BIGINT NOT NULL, ticketStatus VARCHAR(255) NOT NULL, ticketType VARCHAR(255) NOT NULL, pluginId BIGINT, createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);";
@@ -76,7 +76,8 @@ public class SqlManager {
     }
 
     public void updateTicket(Ticket ticket) {
-        this.service.execute(() -> {
+        ticket.update();
+        service.execute(() -> {
             try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(updateRequest)) {
 
                 preparedStatement.setString(1, ticket.getTicketStatus().name());

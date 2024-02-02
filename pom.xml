@@ -46,6 +46,11 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>8.0.33</version> <!-- Utilisez la version la plus récente ou celle qui est compatible avec votre version de MySQL -->
 		</dependency>
+		<dependency>
+			<groupId>gs.mclo</groupId>
+			<artifactId>api</artifactId>
+			<version>4.0.0</version>
+		</dependency>
 
 	</dependencies>
 </project>

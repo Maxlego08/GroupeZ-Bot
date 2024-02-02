@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 public class Plugin {
 
-    public final static Plugin EMPTY = new Plugin("Other", 0, 0, 0, 0, "");
+    public transient static Plugin EMPTY = new Plugin("Other", 0, 0, 0, 0, "");
 
     private final String name;
     private final long emoteId;

@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.lang.BasicMessage;
+import fr.maxlego08.zsupport.tickets.storage.SqlManager;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.ZUtils;
@@ -12,10 +13,12 @@ import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.awt.*;
@@ -206,6 +209,56 @@ public class VerifyManager extends ZUtils {
         }
     }
 
+    public void hasPurchasePlugin(User user, Plugin plugin, Consumer<Boolean> consumer) {
+        SqlManager.service.execute(() -> {
+            try {
+
+                URL url = new URL(String.format(Config.API_URL, user.getIdLong()));
+
+                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
+
+                // add request header
+                httpsURLConnection.setRequestMethod("POST");
+                httpsURLConnection.setRequestProperty("User-Agent", this.USER__AGENT);
+                httpsURLConnection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+                // Send post request
+                httpsURLConnection.setDoOutput(true);
+                DataOutputStream dataOutputStream = new DataOutputStream(httpsURLConnection.getOutputStream());
+                dataOutputStream.flush();
+                dataOutputStream.close();
+
+                int responseCode = httpsURLConnection.getResponseCode();
+
+                if (responseCode != 200) {
+                    consumer.accept(false);
+                    return;
+                }
+
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpsURLConnection.getInputStream()));
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+
+                while ((inputLine = bufferedReader.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                bufferedReader.close();
+
+                Gson gson = ZSupport.instance.getGson();
+
+                Map<String, Object> values = gson.fromJson(response.toString(), new TypeToken<Map<String, Object>>() {
+                }.getType());
+
+                List<GPlugin> pluginList = GPlugin.toList((List<Object>) values.get("plugins"));
+                consumer.accept(pluginList.stream().anyMatch(gPlugin -> gPlugin.getPluginId() == plugin.getPluginId()));
+
+            } catch (Exception exception) {
+                exception.printStackTrace();
+                consumer.accept(false);
+            }
+        });
+    }
+
     /**
      * @param user
      * @param textChannel
@@ -381,13 +434,11 @@ public class VerifyManager extends ZUtils {
         textChannel.sendMessageEmbeds(builder.build()).queue();
     }
 
-    public void updateUserAsync(User user, PlayerSender sender, SlashCommandInteractionEvent event, Member targetUser, long pluginId) {
-        new Thread(() -> this.updateUser(user, sender, event, targetUser, pluginId, event.getGuild())).start();
+    public void updateUserAsync(IReplyCallback event, Member targetUser, long pluginId, Message message) {
+        SqlManager.service.execute(() -> this.updateUser(event, targetUser, pluginId, event.getGuild(), message));
     }
 
-    private void updateUser(User user, PlayerSender sender, SlashCommandInteractionEvent event, Member targetUser, long pluginId,
-                            Guild guild) {
-
+    private void updateUser(IReplyCallback event, Member targetUser, long pluginId, Guild guild, Message message) {
         try {
 
             String urlAsString = String.format(Config.API_URL_VERIFY_CUSTOMER, targetUser.getIdLong(), pluginId);
@@ -420,8 +471,10 @@ public class VerifyManager extends ZUtils {
 
             // If the query returned an error
             if (responseCode != 200) {
-
-                event.reply("Erreur, impossible de faire ceci. (Client ou plugin introuvable)").setEphemeral(true).queue();
+                if (event == null) {
+                    message.reply("Erreur, impossible de faire ceci. (Client ou plugin introuvable)").queue();
+                } else
+                    event.reply("Erreur, impossible de faire ceci. (Client ou plugin introuvable)").setEphemeral(true).queue();
                 return;
             }
 
@@ -450,27 +503,38 @@ public class VerifyManager extends ZUtils {
                     Role role = guild.getRoleById(plugin.getRole());
 
                     if (role == null) {
-                        event.reply("Could’t find the rank").setEphemeral(true).queue();
+                        if (event == null) {
+                            message.reply("Could’t find the rank").queue();
+                        } else event.reply("Could’t find the rank").setEphemeral(true).queue();
                         return;
                     }
 
-                    event.reply(":white_check_mark: Confirmation of the plugin purchase **" + plugin.getName() + "** by the customer "
-                            + targetUser.getAsMention() + ", addition of the role " + role.getAsMention() + ".").queue();
+                    String messageReply = ":white_check_mark: Confirmation of the plugin purchase **" + plugin.getName() + "** by the customer "
+                            + targetUser.getAsMention() + ", addition of the role " + role.getAsMention() + ".";
+                    if (event == null) {
+                        message.reply(messageReply).queue();
+                    } else event.reply(messageReply).queue();
 
                     if (!hasRole(targetUser, plugin.getRole())) {
                         guild.addRoleToMember(targetUser, role).queue();
                         System.out.println("Ajout du rôle " + role.getName() + " à l'utilisateur " + targetUser.getUser().getName());
                     }
                 } else {
-                    event.reply("Unable to find plugin with ID " + pluginId).setEphemeral(true).queue();
+                    if (event == null) {
+                        message.reply("Unable to find plugin with ID " + pluginId).queue();
+                    } else event.reply("Unable to find plugin with ID " + pluginId).setEphemeral(true).queue();
                 }
 
             } else {
-                event.reply("Unable to add the plugin, the client must already have it.").setEphemeral(true).queue();
+                if (event == null) {
+                    message.reply("Unable to add the plugin, the client must already have it.").queue();
+                } else {
+                    event.reply("Unable to add the plugin, the client must already have it.").setEphemeral(true).queue();
+                }
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
     }
 
