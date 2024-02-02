@@ -1,5 +1,6 @@
 package fr.maxlego08.zsupport.tickets.actions;
 
+import fr.maxlego08.zsupport.plugins.PluginManager;
 import fr.maxlego08.zsupport.tickets.TicketStatus;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -101,12 +102,14 @@ public class TicketPluginInformation extends TicketAction {
                         "```"
         );
 
-        this.textChannel.sendMessageEmbeds(builder.build()).queue(message -> processNextAction(TicketStatus.OPEN));
+        this.textChannel.sendMessageEmbeds(builder.build()).setActionRow(createCloseButton()).queue(message -> processNextAction(TicketStatus.OPEN));
 
         event.reply("In order for the support response to be effective, please provide all the requested information.").setEphemeral(true).queue(response -> {
             Message message = event.getMessage();
             if (message != null) message.delete().queueAfter(3, TimeUnit.SECONDS);
         });
+
+        this.ticketManager.verifyVersion(this.ticket, this.textChannel, this.guild, pluginVersion);
     }
 
     @Override

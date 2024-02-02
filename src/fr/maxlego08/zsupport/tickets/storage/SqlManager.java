@@ -25,6 +25,7 @@ public class SqlManager {
 
     private final String createRequest = "CREATE TABLE IF NOT EXISTS tickets ( id BIGINT AUTO_INCREMENT PRIMARY KEY, langType VARCHAR(255) NOT NULL, channelId BIGINT NOT NULL, userId BIGINT NOT NULL, ticketStatus VARCHAR(255) NOT NULL, ticketType VARCHAR(255) NOT NULL, pluginId BIGINT, createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);";
     private final String createMessageRequest = "CREATE TABLE IF NOT EXISTS ticket_messages (id BIGINT AUTO_INCREMENT PRIMARY KEY, ticketId BIGINT NOT NULL, messageId BIGINT NOT NULL, userId BIGINT NOT NULL, messageText TEXT NOT NULL, createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (ticketId) REFERENCES tickets(id) ON DELETE CASCADE ON UPDATE CASCADE);";
+    private final String createPluginRequest = "CREATE TABLE IF NOT EXISTS ticket_plugins (id BIGINT AUTO_INCREMENT PRIMARY KEY, ticketId BIGINT NOT NULL, pluginVersion VARCHAR(255) NOT NULL,  isLastVersion BOOLEAN NOT NULL, createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (ticketId) REFERENCES tickets(id) ON DELETE CASCADE);";
     private final String insertRequest = "INSERT INTO tickets (langType, channelId, userId, ticketStatus, ticketType, pluginId) VALUES (?, ?, ?, ?, ?, ?)";
     private final String insertMessageRequest = "INSERT INTO ticket_messages (ticketId, messageId, userId, messageText) VALUES (?, ?, ?, ?)";
     private final String updateRequest = "UPDATE tickets SET ticketStatus = ?, ticketType = ?, pluginId = ?, updatedAt = NOW() WHERE id = ?";
@@ -39,20 +40,21 @@ public class SqlManager {
 
     public void createTable(Consumer<List<Ticket>> consumer) {
         service.execute(() -> {
-            try (PreparedStatement preparedStatement = this.connection.getConnection().prepareStatement(createRequest)) {
-                preparedStatement.execute();
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
 
-            try (PreparedStatement preparedStatement = this.connection.getConnection().prepareStatement(createMessageRequest)) {
-                preparedStatement.execute();
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
+            create(createRequest);
+            create(createMessageRequest);
+            create(createPluginRequest);
 
             selectTicketsNotClosed(consumer);
         });
+    }
+
+    private void create(String sql) {
+        try (PreparedStatement preparedStatement = this.connection.getConnection().prepareStatement(sql)) {
+            preparedStatement.execute();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     public void createTicket(Ticket ticket, Runnable runnable, Runnable errorRunnable) {
@@ -161,6 +163,30 @@ public class SqlManager {
             } catch (SQLException exception) {
                 exception.printStackTrace();
                 System.out.println("Failed to add a new message to the ticket in the database.");
+            }
+        });
+    }
+
+    public void insertPluginForTicket(long ticketId, String pluginVersion, boolean isLastVersion) {
+        service.execute(() -> {
+            String sql = "INSERT INTO ticket_plugins (ticketId, pluginVersion, isLastVersion) VALUES (?, ?, ?)";
+
+            try (Connection connection = getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+                preparedStatement.setLong(1, ticketId);
+                preparedStatement.setString(2, pluginVersion);
+                preparedStatement.setBoolean(3, isLastVersion);
+
+                int affectedRows = preparedStatement.executeUpdate();
+                if (affectedRows > 0) {
+                    System.out.println("A new plugin entry has been added successfully for ticket ID: " + ticketId);
+                } else {
+                    System.out.println("A problem occurred while adding a new plugin entry for the ticket.");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("Failed to add a new plugin entry for the ticket in the database.");
             }
         });
     }

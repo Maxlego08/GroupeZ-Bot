@@ -4,6 +4,7 @@ import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.lang.LangType;
 import fr.maxlego08.zsupport.lang.Message;
+import fr.maxlego08.zsupport.plugins.PluginManager;
 import fr.maxlego08.zsupport.tickets.actions.TicketAction;
 import fr.maxlego08.zsupport.tickets.storage.SqlManager;
 import fr.maxlego08.zsupport.utils.ZUtils;
@@ -276,5 +277,28 @@ public class TicketManager extends ZUtils {
             TextChannelManager channelManager = channel.getManager();
             channelManager.setName("user-leave").queue();
         }
+    }
+
+    public SqlManager getSqlManager() {
+        return sqlManager;
+    }
+
+    public void verifyVersion(Ticket ticket, TextChannel textChannel, Guild guild, String version) {
+        PluginManager.fetchResource(ticket.getPlugin(), resource -> {
+            boolean isLastVersion = version.equals(resource.getVersion().getVersion());
+
+            if (!isLastVersion) {
+                EmbedBuilder builder = new EmbedBuilder();
+                builder.setTitle("GroupeZ - Support");
+                setEmbedFooter(guild, builder, new Color(218, 8, 8));
+                setDescription(builder, "```ansi\n" +
+                        "\u001B[2;31mYou are not using the latest version of the plugin! Your problem will probably come from this. Please check if the latest version fixes your problem. Don’t forget to also read the changelogs. If your problem is known it will have been notified in a changelogs.\u001B[0m\n" +
+                        "```");
+
+                textChannel.sendMessageEmbeds(builder.build()).queue();
+            }
+
+            this.sqlManager.insertPluginForTicket(ticket.getId(), version, isLastVersion);
+        });
     }
 }

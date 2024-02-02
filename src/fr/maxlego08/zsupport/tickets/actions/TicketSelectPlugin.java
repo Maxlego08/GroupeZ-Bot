@@ -29,9 +29,6 @@ public class TicketSelectPlugin extends TicketAction {
 
         });
 
-        selectionMenu.addOption(getMessage(this.ticket.getLangType(), Message.OTHER), "other", Emoji.fromUnicode("U+1F6AB"));
-        //selectionMenu.addOption("Close ticket", "close", Emoji.fromUnicode("U+0078"));
-
         EmbedBuilder builder = this.createEmbed();
 
         StringBuilder stringBuilder = this.createDescription();

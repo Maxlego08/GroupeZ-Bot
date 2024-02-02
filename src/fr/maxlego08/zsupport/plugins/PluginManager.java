@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
+import fr.maxlego08.zsupport.tickets.Ticket;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.ZUtils;
@@ -27,7 +28,7 @@ import java.util.function.Consumer;
 
 public class PluginManager extends ZUtils implements Constant {
 
-    private static ExecutorService executor = Executors.newFixedThreadPool(2);
+    private static final ExecutorService executor = Executors.newFixedThreadPool(1);
 
     public static void fetchResource(Plugin plugin, Consumer<Resource> consumer) {
 
@@ -40,7 +41,6 @@ public class PluginManager extends ZUtils implements Constant {
 
                 HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
-                // add reuqest header
                 con.setRequestMethod("GET");
                 con.setRequestProperty("User-Agent", "Mozilla/5.0");
                 con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
@@ -54,7 +54,7 @@ public class PluginManager extends ZUtils implements Constant {
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
                 String inputLine;
-                StringBuffer response = new StringBuffer();
+                StringBuilder response = new StringBuilder();
 
                 while ((inputLine = in.readLine()) != null) {
                     response.append(inputLine);
@@ -78,7 +78,7 @@ public class PluginManager extends ZUtils implements Constant {
     }
 
     /**
-     * Display plugins informations
+     * Display plugins information
      *
      * @param guild
      */
