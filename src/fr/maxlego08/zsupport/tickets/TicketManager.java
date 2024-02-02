@@ -47,8 +47,11 @@ public class TicketManager extends ZUtils {
         this.sqlManager.getSqlConnection().disconnect();
     }
 
-    public void load() {
-        this.sqlManager.createTable(tickets -> this.tickets = tickets);
+    public void load(Runnable runnable) {
+        this.sqlManager.createTable(tickets -> {
+            this.tickets = tickets;
+            runnable.run();
+        });
     }
 
     public List<Ticket> getTickets() {
@@ -230,6 +233,13 @@ public class TicketManager extends ZUtils {
         net.dv8tion.jda.api.entities.Message message = event.getMessage();
         message.getAttachments().forEach(attachment -> {
 
+            SqlManager.service.execute(() -> {
+                if (attachment.getSize() < 16000000) {
+                    Optional<Ticket> optional = getByChannel(event.getChannel(), event.getGuild());
+                    optional.ifPresent(ticket -> attachment.getProxy().download().thenAccept(inputStream -> this.sqlManager.addAttachment(ticket.getId(), message.getIdLong(), inputStream)));
+                }
+            });
+
             if (attachment.isImage() || attachment.isVideo()) return;
 
             String fileExtension = attachment.getFileExtension();
@@ -248,6 +258,7 @@ public class TicketManager extends ZUtils {
                     } catch (Exception exception) {
                         exception.printStackTrace();
                     }
+
                 });
             }
         });

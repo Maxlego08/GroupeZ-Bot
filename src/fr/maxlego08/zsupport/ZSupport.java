@@ -3,6 +3,7 @@ package fr.maxlego08.zsupport;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import fr.maxlego08.zsupport.command.CommandManager;
+import fr.maxlego08.zsupport.faq.FaqManager;
 import fr.maxlego08.zsupport.listener.CommandListener;
 import fr.maxlego08.zsupport.listener.MemberListener;
 import fr.maxlego08.zsupport.role.RoleManager;
@@ -38,6 +39,7 @@ public class ZSupport implements Constant {
     private final MemberListener memberListener;
     // private final XpListener xpListener;
     private final MclogsClient mclogsClient;
+    private final FaqManager faqManager;
 
     public ZSupport() throws LoginException {
 
@@ -56,6 +58,7 @@ public class ZSupport implements Constant {
         this.commandManager = new CommandManager(this);
         this.commandListener = new CommandListener(this);
         this.memberListener = new MemberListener();
+        this.faqManager = new FaqManager(this.ticketManager.getSqlManager());
         // xpListener = new XpListener(this);
 
         Thread thread = new Thread(this.commandListener, "bot");
@@ -101,7 +104,9 @@ public class ZSupport implements Constant {
 
         System.out.println(PREFIX_CONSOLE + "Bot lancé avec succès !");
 
-        this.ticketManager.load();
+        this.ticketManager.load(() -> {
+            this.faqManager.selectFqa();
+        });
 
         Timer timer = new Timer();
         long period = 1000 * 60 * 30;
@@ -158,5 +163,9 @@ public class ZSupport implements Constant {
 
     public MclogsClient getMclogsClient() {
         return mclogsClient;
+    }
+
+    public FaqManager getFaqManager() {
+        return faqManager;
     }
 }
