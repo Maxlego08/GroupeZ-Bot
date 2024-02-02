@@ -220,16 +220,36 @@ public class SqlManager {
         });
     }
 
-    public void addFaq(String faqName, String faqAnswer) {
+    public void addFaq(Faq faq) {
         service.execute(() -> {
-            try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO faqs (faqName, faqAnswer) VALUES (?, ?)")) {
-                preparedStatement.setString(1, faqName);
-                preparedStatement.setString(2, faqAnswer);
+            try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO ticket_faqs (name, title, answer) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+                preparedStatement.setString(1, faq.getName());
+                preparedStatement.setString(2, faq.getTitle());
+                preparedStatement.setString(3, faq.getTitle());
+                try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        long faqId = generatedKeys.getLong(1);
+                        faq.setId(faqId);
+                    }
+                }
             } catch (SQLException exception) {
                 exception.printStackTrace();
             }
         });
     }
+
+    public void deleteFaqById(long faqId) {
+        service.execute(() -> {
+            try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM ticket_faqs WHERE id = ?")) {
+                preparedStatement.setLong(1, faqId);
+                preparedStatement.executeUpdate();
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            }
+        });
+    }
+
+
 
     public List<Faq> getAllFaqs() {
         List<Faq> faqs = new ArrayList<>();
