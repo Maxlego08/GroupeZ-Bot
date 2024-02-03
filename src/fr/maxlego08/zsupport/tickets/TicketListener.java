@@ -34,7 +34,9 @@ public class TicketListener extends ListenerAdapter implements Constant {
         if (event.getChannel().getIdLong() == Config.ticketChannel && !event.getUser().isBot()) {
 
             LangType langType = Objects.equals(button.getId(), BUTTON_FR) ? LangType.FR : LangType.US;
-            this.ticketManager.createTicket(event.getUser(), event.getGuild(), langType, event);
+            TicketStatus ticketStatus = button.getId().equals(BUTTON_ZMENU) ? TicketStatus.VERIFY_ZMENU_PURCHASE : TicketStatus.CHOOSE_TYPE;
+
+            this.ticketManager.createTicket(event.getUser(), event.getGuild(), langType, event, ticketStatus);
         } else if (event.getChannel() instanceof ICategorizableChannel iCategorizableChannel && iCategorizableChannel.getParentCategoryIdLong() == Config.ticketCategoryId && !event.getUser().isBot()) {
 
             this.ticketManager.buttonAction(event, event.getGuild());

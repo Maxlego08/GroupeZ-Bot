@@ -43,6 +43,8 @@ import java.util.concurrent.TimeUnit;
 
 public class TicketManager extends ZUtils {
 
+    public static ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
     private final ZSupport instance;
     private final SqlManager sqlManager = new SqlManager();
     private final ScheduledFuture<?> scheduledFuture;
@@ -51,7 +53,6 @@ public class TicketManager extends ZUtils {
 
     public TicketManager(ZSupport instance) {
         this.instance = instance;
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         this.scheduledFuture = scheduler.scheduleAtFixedRate(this::checkTickets, 1, 1, TimeUnit.MINUTES);
     }
 
@@ -126,7 +127,7 @@ public class TicketManager extends ZUtils {
         return tickets.stream().filter(ticket -> ticket.getChannelId() == channel.getIdLong()).findAny();
     }
 
-    public void createTicket(User user, Guild guild, LangType langType, ButtonInteractionEvent event) {
+    public void createTicket(User user, Guild guild, LangType langType, ButtonInteractionEvent event, TicketStatus ticketStatus) {
 
         Optional<Ticket> optional = getByUser(user, guild);
 
@@ -161,22 +162,25 @@ public class TicketManager extends ZUtils {
 
             manager.userIsLink(user, () -> {
                 Category category = getTicketCategory(guild);
-                category.createTextChannel("ticket-waiting").queue(ticketChannel -> createTicket(user, guild, langType, event, ticketChannel, errorRunnable, message));
+                category.createTextChannel("ticket-waiting").queue(ticketChannel -> createTicket(user, guild, langType, event, ticketChannel, errorRunnable, message, ticketStatus));
             }, errorRunnable);
         });
     }
 
-    private void createTicket(User user, Guild guild, LangType langType, ButtonInteractionEvent event, TextChannel ticketChannel, Runnable errorRunnable, InteractionHook message) {
+    private void createTicket(User user, Guild guild, LangType langType, ButtonInteractionEvent event, TextChannel ticketChannel, Runnable errorRunnable, InteractionHook message, TicketStatus ticketStatus) {
 
         // Création du nouveau ticket après la vérification de l'utilisateur
-        Ticket ticket = new Ticket(langType, ticketChannel.getIdLong(), user.getIdLong(), TicketStatus.CHOOSE_TYPE, TicketType.WAITING);
+        Ticket ticket = new Ticket(langType, ticketChannel.getIdLong(), user.getIdLong(), ticketStatus, TicketType.WAITING);
         ticket.setTextChannel(ticketChannel);
+        if (ticketStatus == TicketStatus.VERIFY_ZMENU_PURCHASE) ticket.setPluginId(Config.zMenu.getPluginId());
 
         this.sqlManager.createTicket(ticket, () -> {
 
-            TicketAction action = TicketStatus.CHOOSE_TYPE.getAction();
+            TicketAction action = ticketStatus.getAction();
             ticket.setTicketAction(action);
+
             action.preProcess(this, ticket, guild, ticketChannel, event.getMember(), event);
+            action.processChannelName(ticketStatus);
 
             EmbedBuilder builderCreateChannel = new EmbedBuilder();
             builderCreateChannel.setTitle("GroupeZ - Support");

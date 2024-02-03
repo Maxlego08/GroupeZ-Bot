@@ -1,5 +1,6 @@
 package fr.maxlego08.zsupport.command.commands.tickets;
 
+import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.command.CommandManager;
 import fr.maxlego08.zsupport.command.CommandType;
@@ -47,10 +48,11 @@ public class CommandTicketSet extends VCommand {
 
         builder.setImage("https://img.groupez.dev/groupez/link-discord.gif");
 
+        Button buttonZMenu = new ButtonImpl(BUTTON_ZMENU, "Create a ticket for zMenu", ButtonStyle.SECONDARY, false, guild.getEmojiById(Config.zMenuEmote));
         Button buttonFr = new ButtonImpl(BUTTON_FR, "Créer un ticket en Français", ButtonStyle.PRIMARY, false, Emoji.fromUnicode("U+1F1EB U+1F1F7"));
         Button buttonEn = new ButtonImpl(BUTTON_EN, "Create a ticket in English", ButtonStyle.SUCCESS, false, Emoji.fromUnicode("U+1F1FA U+1F1F8"));
 
-        this.textChannel.sendMessageEmbeds(builder.build()).setActionRow(buttonFr, buttonEn).queue(message -> {
+        this.textChannel.sendMessageEmbeds(builder.build()).setActionRow(buttonZMenu, buttonFr, buttonEn).queue(message -> {
             this.event.deferReply(true).setContent("Envoie de la commande effectué avec succès.").queue();
         });
 

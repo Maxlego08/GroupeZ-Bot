@@ -7,6 +7,10 @@ public interface Constant {
     String VERSION = "4.0.0";
     String PREFIX_CONSOLE = "[zSupport V" + VERSION + "] ";
     String COMMAND_PREFIX = "!";
+
+    int PREMIUM_POWER = 2;
+    int PRO_POWER = 3;
+
     long CHANNEL_ROBOT = 527778577245011988L;
     long ROLE_NOT_ROBOT = 527778142421647360L; /* IRobot */
     long ROLE_DEFAULT = 511544747572330506L; /* Simple Parleur */
@@ -23,6 +27,7 @@ public interface Constant {
 
     String BUTTON_FR = "btn:FR";
     String BUTTON_EN = "btn:EN";
+    String BUTTON_ZMENU = "btn:ZMENU";
 
     String BUTTON_OPEN_MODAL_PLUGIN = "btn:open:plugin:modal";
     String BUTTON_OPEN_MODAL_SPIGOT = "btn:open:spigot:model";

@@ -28,7 +28,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +55,7 @@ public class VerifyManager extends ZUtils {
      */
     private static volatile VerifyManager instance;
     private final String USER__AGENT = "Mozilla/5.0";
-    private Map<Long, GUser> users = new HashMap<Long, GUser>();
+    private final Map<Long, GUser> users = new HashMap<>();
 
     /**
      * Private constructor for singleton.
@@ -85,8 +90,7 @@ public class VerifyManager extends ZUtils {
      * @param sender
      * @param delete
      */
-    public void submitData(User user, TextChannel textChannel, PlayerSender sender, boolean delete,
-                           Consumer<GUser> consumer, SlashCommandInteractionEvent event) {
+    public void submitData(User user, TextChannel textChannel, PlayerSender sender, boolean delete, Consumer<GUser> consumer, SlashCommandInteractionEvent event) {
         new Thread(() -> this.sendData(user, textChannel, sender, delete, consumer, event)).start();
     }
 
@@ -158,8 +162,7 @@ public class VerifyManager extends ZUtils {
                 Map<String, Object> values = gson.fromJson(response.toString(), listType);
 
                 Map<String, Object> userAsMap = (Map<String, Object>) values.get("user");
-                GUser gUser = new GUser((String) userAsMap.get("name"), ((Number) userAsMap.get("id")).intValue(),
-                        (String) userAsMap.get("avatar"), new ArrayList<>());
+                GUser gUser = new GUser((String) userAsMap.get("name"), ((Number) userAsMap.get("id")).intValue(), (String) userAsMap.get("avatar"), new ArrayList<>());
 
                 this.users.put(userId, gUser);
                 consumer.accept(gUser);
@@ -259,17 +262,7 @@ public class VerifyManager extends ZUtils {
         });
     }
 
-    /**
-     * @param user
-     * @param textChannel
-     * @param sender
-     * @param delete
-     * @param event
-     * @throws Exception
-     */
-    @SuppressWarnings("unchecked")
-    private void sendData(User user, TextChannel textChannel, PlayerSender sender, boolean delete,
-                          Consumer<GUser> consumer, SlashCommandInteractionEvent event) {
+    private void sendData(User user, TextChannel textChannel, PlayerSender sender, boolean delete, Consumer<GUser> consumer, SlashCommandInteractionEvent event) {
 
         try {
 
@@ -318,8 +311,7 @@ public class VerifyManager extends ZUtils {
             Map<String, Object> userAsMap = (Map<String, Object>) values.get("user");
             List<GPlugin> list = GPlugin.toList((List<Object>) values.get("plugins"));
 
-            GUser gUser = new GUser((String) userAsMap.get("name"), ((Number) userAsMap.get("id")).intValue(),
-                    (String) userAsMap.get("avatar"), list);
+            GUser gUser = new GUser((String) userAsMap.get("name"), ((Number) userAsMap.get("id")).intValue(), (String) userAsMap.get("avatar"), list);
 
             this.users.put(user.getIdLong(), gUser);
 
@@ -399,16 +391,35 @@ public class VerifyManager extends ZUtils {
         }
     }
 
-    /**
-     * Send error message
-     *
-     * @param textChannel
-     * @param user
-     * @param guild
-     * @param basicMessage
-     */
-    private void sendErrorMessage(SlashCommandInteractionEvent event, TextChannel textChannel, User user, Guild guild,
-                                  BasicMessage basicMessage, GUser gUser) {
+    public void verifyMinecraftInventoryUser(User user, TextChannel textChannel, Consumer<MIB> consumer) {
+
+        try {
+
+            String urlAsString = String.format(Config.API_MIB_URL, user.getIdLong());
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder().uri(new URI(urlAsString)).GET().build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                consumer.accept(new MIB(false, 0));
+                return;
+            }
+            Gson gson = ZSupport.instance.getGson();
+
+            Map<String, Object> values = gson.fromJson(response.body(), new TypeToken<Map<String, Object>>() {
+            }.getType());
+
+            if (values.containsKey("can_open") && (boolean) values.get("can_open")) {
+                consumer.accept(new MIB(true, ((Number) values.get("power")).intValue()));
+            } else consumer.accept(new MIB(false, 0));
+
+        } catch (Exception exception) {
+            consumer.accept(new MIB(false, 0));
+            exception.printStackTrace();
+        }
+    }
+
+    private void sendErrorMessage(SlashCommandInteractionEvent event, TextChannel textChannel, User user, Guild guild, BasicMessage basicMessage, GUser gUser) {
         EmbedBuilder builder = new EmbedBuilder();
 
         builder.setColor(new Color(240, 10, 10));
@@ -459,7 +470,7 @@ public class VerifyManager extends ZUtils {
             con.setDoOutput(true);
 
             OutputStream os = con.getOutputStream();
-            byte[] input = jsonPayload.getBytes("utf-8");
+            byte[] input = jsonPayload.getBytes(StandardCharsets.UTF_8);
             os.write(input, 0, input.length);
 
             DataOutputStream wr = new DataOutputStream(os);
@@ -509,8 +520,7 @@ public class VerifyManager extends ZUtils {
                         return;
                     }
 
-                    String messageReply = ":white_check_mark: Confirmation of the plugin purchase **" + plugin.getName() + "** by the customer "
-                            + targetUser.getAsMention() + ", addition of the role " + role.getAsMention() + ".";
+                    String messageReply = ":white_check_mark: Confirmation of the plugin purchase **" + plugin.getName() + "** by the customer " + targetUser.getAsMention() + ", addition of the role " + role.getAsMention() + ".";
                     if (event == null) {
                         message.reply(messageReply).queue();
                     } else event.reply(messageReply).queue();

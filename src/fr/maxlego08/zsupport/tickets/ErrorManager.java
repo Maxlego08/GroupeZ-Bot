@@ -1,6 +1,7 @@
 package fr.maxlego08.zsupport.tickets;
 
 import fr.maxlego08.zsupport.Config;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -34,6 +35,8 @@ public class ErrorManager {
     }
 
     public void processMessage(MessageReceivedEvent event, Message message, User author) {
+
+        if (Objects.requireNonNull(event.getMember()).hasPermission(Permission.MESSAGE_MANAGE)) return;
 
         String messageContent = message.getContentRaw().replace("`", "");
 

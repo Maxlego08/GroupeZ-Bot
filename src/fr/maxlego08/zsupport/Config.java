@@ -27,9 +27,13 @@ public class Config implements Savable {
     public static long spigotEmote = 942107776883257364L;
     public static long generalChannel = 1202649374740447285L;
     public static long ticketLogChannel = 1202652708335788084L;
+    public static long zMenuPro = 1203351216130629693L;
+    public static long zMenuPremium = 1203351256811307069L;
+    public static long zMenuEmote = 1202652939567636501L;
 
-    public static String CUSTOM_KEY = "sdfsdkfsldkfsdfdsfkmsdlmf,mdslkflsdk;fk�ljzedioahrnduidgstjhqsbgvdiyqsdgqksjdzapo�fmazflpo�icjozefdpzokfdozpefijz,fkezfljsdklfzeoirfsndlkfjkezf6+ze5f+zef2+ezf5s3fzef2zef+zfe56z+etfg+rf4+sfg";
+    public static String CUSTOM_KEY = "sdfsdkfsldkfsdfdsfkmsdlmf,mdslkflsdk;fkljzedioahrnduidgstjhqsbgvdiyqsdgqksjdzapo�fmazflpo�icjozefdpzokfdozpefijz,fkezfljsdklfzeoirfsndlkfjkezf6+ze5f+zef2+ezf5s3fzef2zef+zfe56z+etfg+rf4+sfg";
     public static String API_URL = "https://groupez.dev/api/v1/discord/%s";
+    public static String API_MIB_URL = "https://minecraft-inventory-builder.com/api/v1/discord/user/%s";
     public static String API_URL_VERIFY_CUSTOMER = "https://groupez.dev/api/v1/discord/%s/apply/%s";
     public static String API_RESOURCE_URL = "https://groupez.dev/api/v1/resource/%s";
     public static String RESOURCE_URL = "https://groupez.dev/resources/%s";
@@ -41,6 +45,8 @@ public class Config implements Savable {
 
     public static SqlConfiguration sqlConfiguration = new SqlConfiguration("homestead", "secret", "192.168.10.10", "zsupport", 3306);
     public static long guildId = 1202649373465382923L;
+    public static Plugin zMenu = new Plugin("zMenu", 1202652939567636501L, 0, 253, 0.0, "zmenu");
+    public static long zMenuForum = 1202677084384665630l;
 
     /**
      * static Singleton instance.

@@ -4,6 +4,7 @@ import fr.maxlego08.zsupport.tickets.TicketStatus;
 import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.verify.VerifyManager;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -38,13 +39,11 @@ public class TicketPluginVerifyPurchase extends TicketAction {
                     if (!hasPurchase) {
                         editMessage.deleteOriginal().queue();
                         processNextAction(TicketStatus.PLUGIN_VERIFY_NEED_INFORMATION);
-                        return;
+                    } else {
+                        Role role = guild.getRoleById(plugin.getRole());
+                        if (role != null) guild.addRoleToMember(this.member, role).queue();
                     }
-
-                    System.out.println("Vous avez bien le plugin chef !");
                 });
-
-
                 return;
             }
 

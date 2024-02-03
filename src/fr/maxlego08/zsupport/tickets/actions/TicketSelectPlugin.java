@@ -22,7 +22,7 @@ public class TicketSelectPlugin extends TicketAction {
     public void process(Interaction interaction) {
 
         StringSelectMenu.Builder selectionMenu = StringSelectMenu.create(BUTTON_SELECT_PLUGIN);
-        Config.plugins.forEach(plugin -> {
+        Config.plugins.stream().filter(plugin -> plugin.getPluginId() != 253).forEach(plugin -> {
 
             Emoji emote = guild.getEmojiById(plugin.getEmoteId());
             selectionMenu.addOption(plugin.getName(), plugin.getName(), emote);

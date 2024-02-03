@@ -94,6 +94,12 @@ public abstract class TicketAction extends ZUtils {
         this.ticket.setTicketAction(ticketAction);
 
         this.ticketManager.updateTicket(ticket);
+        processChannelName(ticketStatus);
+
+        ticketAction.preProcess(this.ticketManager, this.ticket, this.guild, this.textChannel, this.member, this.event);
+    }
+
+    public void processChannelName(TicketStatus ticketStatus) {
         if (ticketStatus.getChannelName() != null) {
             TextChannelManager channelManager = this.textChannel.getManager();
             String channelName = ticketStatus.getChannelName();
@@ -101,8 +107,6 @@ public abstract class TicketAction extends ZUtils {
             channelName = channelName.replace("%plugin%", ticket.getPlugin().getName());
             channelManager.setName("ticket-" + channelName).queue();
         }
-
-        ticketAction.preProcess(this.ticketManager, this.ticket, this.guild, this.textChannel, this.member, this.event);
     }
 
     protected void replyModal(Modal modal) {
