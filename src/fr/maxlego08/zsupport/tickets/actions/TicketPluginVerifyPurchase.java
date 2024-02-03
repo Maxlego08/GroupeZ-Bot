@@ -42,14 +42,17 @@ public class TicketPluginVerifyPurchase extends TicketAction {
                     } else {
                         Role role = guild.getRoleById(plugin.getRole());
                         if (role != null) guild.addRoleToMember(this.member, role).queue();
+                        editMessage.deleteOriginal().queueAfter(1, TimeUnit.SECONDS, r -> {
+                            processNextAction(TicketStatus.PLUGIN_INFORMATION);
+                        });
                     }
                 });
-                return;
-            }
 
-            editMessage.deleteOriginal().queueAfter(1, TimeUnit.SECONDS, r -> {
-                processNextAction(TicketStatus.PLUGIN_INFORMATION);
-            });
+            } else {
+                editMessage.deleteOriginal().queueAfter(1, TimeUnit.SECONDS, r -> {
+                    processNextAction(TicketStatus.PLUGIN_INFORMATION);
+                });
+            }
         });
     }
 
