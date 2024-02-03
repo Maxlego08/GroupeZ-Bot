@@ -27,23 +27,32 @@ import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 
 import java.awt.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class TicketManager extends ZUtils {
 
     private final ZSupport instance;
     private final SqlManager sqlManager = new SqlManager();
+    private final ScheduledFuture<?> scheduledFuture;
     private List<Ticket> tickets = new ArrayList<>();
 
     public TicketManager(ZSupport instance) {
         this.instance = instance;
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        this.scheduledFuture = scheduler.scheduleAtFixedRate(this::checkTickets, 1, 1, TimeUnit.MINUTES);
     }
 
     public void save() {
+        this.scheduledFuture.cancel(true);
         this.sqlManager.getSqlConnection().disconnect();
     }
 
@@ -52,6 +61,51 @@ public class TicketManager extends ZUtils {
             this.tickets = tickets;
             runnable.run();
         });
+    }
+
+    private void checkTickets() {
+        List<Ticket> tickets = getTickets();
+        long now = Instant.now().toEpochMilli();
+        Iterator<Ticket> iterator = tickets.iterator();
+        Guild guild = instance.getJda().getGuildById(Config.guildId);
+
+        while (iterator.hasNext()) {
+            Ticket ticket = iterator.next();
+
+            if (ticket.getTicketStatus() == TicketStatus.CLOSE) continue;
+
+            long hoursSinceUpdate = (now - ticket.getUpdatedAt()) / (1000 * 60 * 60);
+
+            TextChannel channel = ticket.getTextChannel(guild);
+
+            if (hoursSinceUpdate > 72) {
+
+                iterator.remove();
+
+                ticket.setTicketStatus(TicketStatus.CLOSE);
+                this.sqlManager.updateTicket(ticket, true);
+
+                TextChannelManager channelManager = channel.getManager();
+                channelManager.setName("ticket-close").queue();
+
+                EmbedBuilder builder = new EmbedBuilder();
+                setEmbedFooter(guild, builder, new Color(204, 14, 14));
+                builder.setTitle("GroupeZ - Support");
+                setDescription(builder, "Ticket closed after 72 hours without response.");
+                channel.sendMessageEmbeds(builder.build()).queue();
+
+                System.out.println("Deleted channel for ticket ID: " + ticket.getId());
+
+            } else if (hoursSinceUpdate > 48 && !ticket.isNotificationSent()) {
+
+                ticket.setNotificationSent(true);
+                ticket.sendMessage(guild, "%user%, close your ticket in 24 hours if there is no answer.");
+                this.sqlManager.updateTicket(ticket, false);
+
+                System.out.println("Sent reminder for ticket ID: " + ticket.getId());
+            }
+
+        }
     }
 
     public List<Ticket> getTickets() {
@@ -148,14 +202,15 @@ public class TicketManager extends ZUtils {
 
             if (Objects.equals(event.getButton().getId(), BUTTON_CLOSE)) {
                 TicketAction action = ticket.getTicketAction();
-                if (action != null) action.startConfirmClose();
+                if (action != null)
+                    action.startConfirmClose(event, guild, event.getMember(), ticket.getTextChannel(guild), ticket);
                 event.reply(":warning: Please confirm that the ticket is closed.").setEphemeral(true).queue();
                 return;
             }
 
             if (Objects.equals(event.getButton().getId(), BUTTON_CLOSE_CONFIRM)) {
                 ticket.close(guild);
-                this.sqlManager.updateTicket(ticket);
+                this.sqlManager.updateTicket(ticket, true);
                 event.reply(event.getUser().getAsMention() + " just closed the ticket.").queue();
                 return;
             }
@@ -194,7 +249,7 @@ public class TicketManager extends ZUtils {
     }
 
     public void updateTicket(Ticket ticket) {
-        this.sqlManager.updateTicket(ticket);
+        this.sqlManager.updateTicket(ticket, true);
     }
 
     public void onMessage(MessageReceivedEvent event, Guild guild) {
@@ -204,7 +259,10 @@ public class TicketManager extends ZUtils {
         if (optional.isPresent()) {
 
             Ticket ticket = optional.get();
+            ticket.setNotificationSent(false);
+
             this.sqlManager.addMessageToTicket(ticket, event.getMessage());
+            this.sqlManager.updateTicket(ticket, true);
 
             TicketAction ticketAction = ticket.getTicketAction();
             if (ticketAction == null) return;
@@ -221,7 +279,7 @@ public class TicketManager extends ZUtils {
 
             Ticket ticket = optional.get();
             TicketAction action = ticket.getTicketAction();
-            if (action != null) action.startConfirmClose();
+            if (action != null) action.startConfirmClose(event, guild, member, ticket.getTextChannel(guild), ticket);
             event.reply(":warning: Please confirm that the ticket is closed.").setEphemeral(true).queue();
         } else {
 
@@ -270,7 +328,7 @@ public class TicketManager extends ZUtils {
             Ticket ticket = ticketIterator.next();
             if (ticket.getTextChannel(guild) == null) {
                 ticket.setTicketStatus(TicketStatus.CLOSE);
-                this.sqlManager.updateTicket(ticket);
+                this.sqlManager.updateTicket(ticket, true);
                 ticketIterator.remove();
             }
         }
@@ -282,7 +340,7 @@ public class TicketManager extends ZUtils {
 
             Ticket ticket = optional.get();
             ticket.setTicketStatus(TicketStatus.CLOSE);
-            this.sqlManager.updateTicket(ticket);
+            this.sqlManager.updateTicket(ticket, true);
 
             TextChannel channel = ticket.getTextChannel(guild);
             TextChannelManager channelManager = channel.getManager();

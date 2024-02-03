@@ -26,7 +26,7 @@ public class Ticket extends ZUtils {
     private TicketStatus ticketStatus;
     private TicketType ticketType;
     private long pluginId;
-
+    private boolean notificationSent;
     private TextChannel textChannel;
     private TicketAction ticketAction;
 
@@ -40,7 +40,7 @@ public class Ticket extends ZUtils {
         this.updatedAt = System.currentTimeMillis();
     }
 
-    public Ticket(long id, LangType langType, long channelId, long userId, long createdAt, long updatedAt, TicketStatus ticketStatus, TicketType ticketType, long pluginId) {
+    public Ticket(long id, LangType langType, long channelId, long userId, long createdAt, long updatedAt, TicketStatus ticketStatus, TicketType ticketType, long pluginId, boolean notificationSent) {
         this.langType = langType;
         this.channelId = channelId;
         this.userId = userId;
@@ -51,6 +51,7 @@ public class Ticket extends ZUtils {
         this.ticketType = ticketType;
         this.pluginId = pluginId;
         this.ticketAction = ticketStatus.getAction();
+        this.notificationSent = notificationSent;
     }
 
     public long getId() {
@@ -158,5 +159,13 @@ public class Ticket extends ZUtils {
 
         TextChannelManager manager = textChannel.getManager();
         manager.setName("ticket-close").queue();
+    }
+
+    public boolean isNotificationSent() {
+        return notificationSent;
+    }
+
+    public void setNotificationSent(boolean notificationSent) {
+        this.notificationSent = notificationSent;
     }
 }

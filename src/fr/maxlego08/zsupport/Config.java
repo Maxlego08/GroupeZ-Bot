@@ -72,6 +72,7 @@ public class Config implements Savable {
         documentations.put("zShop", "https://zshop.groupez.dev/");
         documentations.put("zKoth", "https://zkoth.groupez.dev/");
         documentations.put("zDrawer", "https://zdrawer.groupez.dev/");
+        documentations.put("zScheduler", "https://scheduler.groupez.dev/");
     }
 
     /**

@@ -198,7 +198,12 @@ public abstract class TicketAction extends ZUtils {
         permissionOverrideAction.setAllowed(permission).queue(consumer);
     }
 
-    public void startConfirmClose() {
+    public void startConfirmClose(Interaction event, Guild guild, Member member, TextChannel textChannel, Ticket ticket) {
+        this.event = event;
+        this.guild = guild;
+        this.member = member;
+        this.textChannel = textChannel;
+        this.ticket = ticket;
 
         EmbedBuilder builder = createEmbed();
         setDescription(builder, ":warning: Do you really want to close the ticket ?");
@@ -207,7 +212,7 @@ public abstract class TicketAction extends ZUtils {
         this.textChannel.sendMessageEmbeds(builder.build()).setActionRow(buttonConfirm).queue(message -> {
             schedule(10000, () -> {
                 // The user has not closed the ticket.
-                if (ticket.getTicketStatus() != TicketStatus.CLOSE) message.delete().queue();
+                if (this.ticket.getTicketStatus() != TicketStatus.CLOSE) message.delete().queue();
             });
         });
     }
