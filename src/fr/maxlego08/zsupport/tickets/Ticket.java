@@ -4,240 +4,168 @@ import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.lang.LangType;
 import fr.maxlego08.zsupport.lang.Message;
+import fr.maxlego08.zsupport.tickets.actions.TicketAction;
 import fr.maxlego08.zsupport.utils.Plugin;
 import fr.maxlego08.zsupport.utils.ZUtils;
-import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 public class Ticket extends ZUtils {
 
-	private final LangType type;
-	private long channelId;
-	private final long guildId;
-	private final long userId;
-	private boolean isWaiting = true;
-	private boolean isClose = false;
-	private String name;
-	private TicketStep ticketStep;
-	private String pluginName;
+    private final LangType langType;
+    private final long channelId;
+    private final long userId;
+    private final long createdAt;
+    private long updatedAt;
+    private long id;
+    private TicketStatus ticketStatus;
+    private TicketType ticketType;
+    private long pluginId;
+    private boolean notificationSent;
+    private TextChannel textChannel;
+    private TicketAction ticketAction;
 
-	private transient TextChannel textChannel;
-	private transient Step step;
+    public Ticket(LangType langType, long channelId, long userId, TicketStatus ticketStatus, TicketType ticketType) {
+        this.langType = langType;
+        this.channelId = channelId;
+        this.userId = userId;
+        this.ticketStatus = ticketStatus;
+        this.ticketType = ticketType;
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = System.currentTimeMillis();
+    }
 
-	/**
-	 * @param lang
-	 * @param channelId
-	 * @param guildId
-	 * @param userId
-	 */
-	public Ticket(LangType lang, long guildId, long userId, String name) {
-		super();
-		this.type = lang;
-		this.guildId = guildId;
-		this.userId = userId;
-		this.name = name;
-	}
+    public Ticket(long id, LangType langType, long channelId, long userId, long createdAt, long updatedAt, TicketStatus ticketStatus, TicketType ticketType, long pluginId, boolean notificationSent) {
+        this.langType = langType;
+        this.channelId = channelId;
+        this.userId = userId;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.id = id;
+        this.ticketStatus = ticketStatus;
+        this.ticketType = ticketType;
+        this.pluginId = pluginId;
+        this.ticketAction = ticketStatus.getAction();
+        this.notificationSent = notificationSent;
+    }
 
-	/**
-	 * @return the isClose
-	 */
-	public boolean isClose() {
-		return isClose;
-	}
+    public long getId() {
+        return id;
+    }
 
-	/**
-	 * @param isClose
-	 *            the isClose to set
-	 */
-	public void setClose(boolean isClose) {
-		this.isClose = isClose;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-	/**
-	 * @return the type
-	 */
-	public LangType getType() {
-		return this.type;
-	}
+    public LangType getLangType() {
+        return langType;
+    }
 
-	/**
-	 * @return the isWaiting
-	 */
-	public boolean isWaiting() {
-		return this.isWaiting;
-	}
+    public long getChannelId() {
+        return channelId;
+    }
 
-	/**
-	 * @param isWaiting
-	 *            the isWaiting to set
-	 */
-	public void setWaiting() {
-		this.isWaiting = false;
-	}
+    public long getUserId() {
+        return userId;
+    }
 
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
+    public TicketStatus getTicketStatus() {
+        return ticketStatus;
+    }
 
-	/**
-	 * @return the lang
-	 */
-	public LangType getLang() {
-		return this.type;
-	}
+    public void setTicketStatus(TicketStatus ticketStatus) {
+        this.ticketStatus = ticketStatus;
+    }
 
-	/**
-	 * @return the ticketStep
-	 */
-	public TicketStep getTicketStep() {
-		return this.ticketStep;
-	}
+    public TicketType getTicketType() {
+        return ticketType;
+    }
 
-	/**
-	 * @return the step
-	 */
-	public Step getStep() {
-		return this.step;
-	}
+    public void setTicketType(TicketType ticketType) {
+        this.ticketType = ticketType;
+    }
 
-	/**
-	 * @param channelId
-	 *            the channelId to set
-	 */
-	public void setChannelId(long channelId) {
-		this.channelId = channelId;
-	}
+    public long getCreatedAt() {
+        return createdAt;
+    }
 
-	/**
-	 * @param isWaiting
-	 *            the isWaiting to set
-	 */
-	public void setWaiting(boolean isWaiting) {
-		this.isWaiting = isWaiting;
-	}
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
 
-	/**
-	 * @param ticketStep
-	 *            the ticketStep to set
-	 */
-	public void setTicketStep(TicketStep ticketStep) {
-		this.ticketStep = ticketStep;
-	}
+    public void sendMessage(Guild guild, Message message) {
+        sendMessage(guild, getMessage(this.langType, message));
+    }
 
-	/**
-	 * @param step
-	 *            the step to set
-	 */
-	public void setStep(Step step) {
-		this.step = step;
-		this.ticketStep = step.getStep();
-	}
+    public void sendMessage(Guild guild, String message) {
 
-	/**
-	 * @return the channelId
-	 */
-	public long getChannelId() {
-		return this.channelId;
-	}
+        TextChannel channel = guild.getTextChannelById(this.channelId);
+        if (channel == null) return;
 
-	/**
-	 * @return the guildId
-	 */
-	public long getGuildId() {
-		return this.guildId;
-	}
+        message = message.replace("%user%", getUser().getAsMention());
+        channel.sendMessage(message).queue();
+    }
 
-	public void setTextChannel(TextChannel textChannel) {
-		this.textChannel = textChannel;
-		this.channelId = textChannel.getIdLong();
-	}
+    public User getUser() {
+        return ZSupport.instance.getJda().getUserById(this.userId);
+    }
 
-	public TextChannel getTextChannel() {
-		return this.textChannel;
-	}
+    public TextChannel getTextChannel(Guild guild) {
+        if (this.textChannel == null) {
+            this.textChannel = guild.getTextChannelById(this.channelId);
+        }
+        return this.textChannel;
+    }
 
-	public TextChannel getTextChannel(Guild guild) {
-		if (this.textChannel == null) {
-			this.textChannel = guild.getTextChannelById(this.channelId);
-		}
-		return this.textChannel;
-	}
+    public void setTextChannel(TextChannel textChannel) {
+        this.textChannel = textChannel;
+    }
 
-	/**
-	 * @return the userId
-	 */
-	public long getUserId() {
-		return this.userId;
-	}
+    public TicketAction getTicketAction() {
+        return ticketAction;
+    }
 
-	public String getName() {
-		return this.name;
-	}
+    public void setTicketAction(TicketAction ticketAction) {
+        this.ticketAction = ticketAction;
+    }
 
-	public void setPlugin(Plugin plugin) {
-		this.pluginName = plugin.getName();
-	}
+    public long getPluginId() {
+        return pluginId;
+    }
 
-	public Plugin getPlugin() {
-		return Config.plugins.stream().filter(e -> e.getName().equals(this.pluginName)).findFirst()
-				.orElse(new Plugin(this.pluginName, 0, 0, 0, 0));
-	}
+    public void setPluginId(long pluginId) {
+        this.pluginId = pluginId;
+    }
 
-	/**
-	 * 
-	 * @param message
-	 * @return
-	 */
-	public String getMessage(Message message, Object... args) {
-		return super.getMessage(this.type, message, args);
-	}
+    public Plugin getPlugin() {
+        return Config.getPlugin((int) this.pluginId).orElse(Plugin.EMPTY);
+    }
 
-	/**
-	 * 
-	 * @param message
-	 */
-	public void message(Message message) {
-		message(getMessage(message));
-	}
+    public void update() {
+        this.updatedAt = System.currentTimeMillis();
+    }
 
-	public void message(String message) {
+    public void close(Guild guild) {
+        this.ticketStatus = TicketStatus.CLOSE;
+        TextChannel textChannel = getTextChannel(guild);
+        Member member = guild.getMemberById(this.userId);
+        PermissionOverrideAction permissionOverrideAction = textChannel.upsertPermissionOverride(member);
+        permissionOverrideAction.clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
 
-		ZSupport instance = ZSupport.instance;
-		JDA jda = instance.getJda();
-		Guild guild = jda.getGuildById(this.guildId);
-		TextChannel channel = guild.getTextChannelById(this.channelId);
+        TextChannelManager manager = textChannel.getManager();
+        manager.setName("ticket-close").queue();
+    }
 
-		message = message.replace("%user%", jda.getUserById(this.userId).getAsMention());
+    public boolean isNotificationSent() {
+        return notificationSent;
+    }
 
-		channel.sendMessage(message).queue();
-
-	}
-
-	public boolean isValid() {
-		if (this.isClose){
-			return false;
-		}
-		ZSupport instance = ZSupport.instance;
-		JDA jda = instance.getJda();
-		Guild guild = jda.getGuildById(this.guildId);
-		return guild != null ? guild.getTextChannelById(this.channelId) != null ? true : false : false;
-	}
-
-	public void step(TicketManager manager) {
-		if (this.ticketStep == null) {
-			System.out.println("Le step est null!");
-			return;
-		}
-		this.step = this.ticketStep.getStep();
-		this.step.manager = manager;
-		this.step.ticket = this;
-
-		System.out.println(this.step);
-	}
-
+    public void setNotificationSent(boolean notificationSent) {
+        this.notificationSent = notificationSent;
+    }
 }

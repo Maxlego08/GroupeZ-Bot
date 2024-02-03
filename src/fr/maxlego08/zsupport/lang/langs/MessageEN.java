@@ -50,23 +50,58 @@ public class MessageEN {
 				"In order to place an order you must provide all the information about the project." + "\n"
 						+ "For example:" + "\n" + "- The name of your server" + "\n" + "- The version of your server"
 						+ "\n" + "- Delivery time" + "\n" + "- The complete description of your plugin" + "\n" + "\n"
-						+ "Informations:" + "\n" + "Rate: **20€/h**" + "\n"
-						+ "Purchase of the source code: **50%** of the price (for example, for a 100€ plugin the sources will be sold at 50€)"
+						+ "Informations:" + "\n" + "Rate: **20â‚¬/h**" + "\n"
+						+ "Purchase of the source code: **50%** of the price (for example, for a 100â‚¬ plugin the sources will be sold at 50â‚¬)"
 						+ "\n" + "Siret: 88761749600013");
 
 		usMessage.put(Message.TICKET_CHOOSE,
 				"Please choose the type of your ticket:" + "\n" + "\n" + ":dollar: To take an order" + "\n"
-						+ ":question: To request help on a plugin" + "\n" + "%s To request access on spigot" + "\n");
+						+ ":question: To request help on a plugin" + "\n" + "%s To request access on spigot" + "\n"
+						+ ":wave: Questions before purchase" + "\n");
 
 		usMessage.put(Message.TICKET_CHOOSE_ORDER, "Take an order");
 		usMessage.put(Message.TICKET_CHOOSE_PLUGIN, "Plugin support");
 		usMessage.put(Message.TICKET_CHOOSE_SPIGOT, "Request access on spigot");
+		usMessage.put(Message.TICKET_CHOOSE_BEFORE_PURCHASE, "Questions before buying");
 
 		usMessage.put(Message.TICKET_SPIGOT,
 				"To request access you need to provide the name of your spigot account as well as the list of plugins where you want access.");
 
 		usMessage.put(Message.TICKET_HOUR,
 				":exclamation: Attention, it is currently **%s:%s** in France. The support is available only between **9 hours** and **20 hours** every day. However the support reserves the right to be less active during the weekends.");
+
+		usMessage.put(Message.TICKET_PLUGIN_VERSION_COMMAND,
+				"To speed up support, please write the version of the plugin. To get the version of the plugin do the following command: /%s version"
+						+ "\n" + "\n"
+						+ "For example, in the image below, the version is 3.1.0.7, so you should write just the version: ``3.1.0.7``.");
+
+		usMessage.put(Message.TICKET_PLUGIN_VERSION_CONSOLE,
+				"To speed up support, please write the plugin version. To get the plugin version look in the console."
+						+ "\n" + "\n"
+						+ "For example, in the image below, the version is 3.1.0.7, so you should write just the version: ``3.1.0.7``.");
+		
+		usMessage.put(Message.TICKET_PLUGIN_VERSION_READ,
+				":arrow_up: Please read the message above correctly and follow the instructions ! You will be able to write the plugin version in **15 seconds**.");
+
+		usMessage.put(Message.TICKET_PLUGIN_VERSION_ERROR,
+				":x: You are not using the latest version of the plugin." + "\n"
+						+ "Update the plugin, check if your problem is still present." + "\n"
+						+ "If so, then you must write the correct version of the plugin.");
+
+		usMessage.put(Message.TICKET_PLUGIN_RULES, "\n"
+				+ "Please do not **mention** the GroupeZ team under penalty of punishment." + "\n"
+				+ "Don't forget to disable mentions when you make a reply!" + "\n" + "\n"
+				+ "If your ticket does not receive any messages after **4 days**, it will be automatically closed !");
+
+		usMessage.put(Message.TICKET_QUESTION,
+				"You can ask questions before purchasing a plugin. You cannot request support in this ticket.");
+
+		usMessage.put(Message.TICKET_PLUGIN_INFO,
+				"To help with the support, please provide as much information as possible:" + "\n"
+						+ "- The version of the plugin" + "\n" + "- The version of your server" + "\n"
+						+ "- The list of your plugins" + "\n" + "- Logs, if you have errors" + "\n"
+						+ "- Your configuration files, if you have a configuration problem" + "\n\n"
+						+ "To share your files or logs you can use https://pastebin.com/");
 
 		return usMessage;
 

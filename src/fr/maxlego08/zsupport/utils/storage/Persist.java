@@ -134,6 +134,7 @@ public class Persist {
 	
 	public <T> T load(Class<T> clazz, File file)
 	{
+		System.out.println("File: " + file.getAbsolutePath());
 		String content = DiscUtil.readCatch(file);
 		if (content == null)
 		{

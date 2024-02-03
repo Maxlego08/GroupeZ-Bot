@@ -1,9 +1,6 @@
 package fr.maxlego08.zsupport.listener;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-
+import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.api.DiscordConsoleSender;
 import fr.maxlego08.zsupport.api.DiscordPlayer;
@@ -14,102 +11,120 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class CommandListener extends ListenerAdapter implements Constant, Runnable {
 
-	private final ZSupport instance;
-	private boolean isRunning;
-	private final Scanner scanner = new Scanner(System.in);
+    private final ZSupport instance;
+    private final Scanner scanner = new Scanner(System.in);
+    private boolean isRunning;
 
-	public CommandListener(ZSupport instance) {
-		super();
-		this.instance = instance;
-	}
+    public CommandListener(ZSupport instance) {
+        super();
+        this.instance = instance;
+    }
 
-	@Override
-	public void onGuildReady(GuildReadyEvent event) {
-		Guild guild = event.getGuild();
-		List<CommandData> commands = new ArrayList<>();
-		this.instance.getCommandManager().getCommands().forEach(command -> {
-			if (!command.isPlayerCanUse()) return;
-			String cmd = command.getSubCommands().get(0);
-			System.out.println("Enregistrement de la commande " + cmd + " (" + command.getDescription() + ")");
-			// guild.upsertCommand(cmd, command.getDescription()).queue();
-			commands.add(new CommandData(cmd, command.getDescription()));
-		});
-		
-		guild.updateCommands().addCommands(commands).queue();
-	}
-	
-	@Override
-	public void onSlashCommand(SlashCommandEvent event) {
-		String commandString = event.getCommandPath();
-		
-		User user = event.getUser();
-		Member member = event.getMember();
-		
-		PlayerSender sender = new DiscordPlayer(user, member, event.getTextChannel());
-		this.instance.getCommandManager().onCommand(sender, commandString, new String[0], event);
-	}
+    @Override
+    public void onGuildReady(GuildReadyEvent event) {
+        Guild guild = event.getGuild();
 
-	/*@Override
-	public void onMessageReceived(MessageReceivedEvent event) {
+        if (guild.getIdLong() != Config.guildId) return;
 
-		User user = event.getAuthor();
-		Member member = event.getMember();
-		Message message = event.getMessage();
-		String command = message.getContentDisplay();
+        this.instance.getCommandManager().setGuild(guild);
 
-		if (command.startsWith(COMMAND_PREFIX)) {
+        List<CommandData> commands = new ArrayList<>();
+        this.instance.getCommandManager().getCommands().forEach(command -> {
 
-			command = command.replaceFirst(COMMAND_PREFIX, "");
+            if (!command.isPlayerCanUse()) return;
 
-			String commands = command.split(" ")[0];
-			command = command.replaceFirst(commands, "");
-			String[] args = command.length() != 0 ? get(command.split(" ")) : new String[0];
-			PlayerSender sender = new DiscordPlayer(user, member, event.getTextChannel());
-			this.instance.getCommandManager().onCommand(sender, commands, args, event);
-		}
+            String cmd = command.getSubCommands().get(0);
+            System.out.println("Enregistrement de la commande " + cmd + " (" + command.getDescription() + ")");
+            commands.add(command.toCommandData());
+        });
 
-	}*/
+        guild.updateCommands().addCommands(commands).queue();
+    }
 
-	@SuppressWarnings("unused")
-	private String[] get(String[] tableau) {
-		List<String> test = new ArrayList<>();
-		for (int a = 1; a != tableau.length; a++)
-			test.add(tableau[a]);
-		return test.toArray(new String[0]);
-	}
+    @Override
+    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+        String commandString = event.getName();
 
-	public void onDisable() {
-		this.instance.onDisable();
-		this.isRunning = false;
-	}
+        User user = event.getUser();
+        Member member = event.getMember();
 
-	@Override
-	public void run() {
-		isRunning = true;
+        PlayerSender sender = new DiscordPlayer(user, member, event.getChannel());
 
-		while (isRunning) {
-			if (scanner.hasNextLine()) {
+        this.instance.getCommandManager().onCommand(sender, commandString, new String[0], event);
+    }
 
-				String message = scanner.nextLine();
-				String commande = message.split(" ")[0];
-				message = message.replaceFirst(message.split(" ")[0], "");
+    /*
+     * @Override public void onMessageReceived(MessageReceivedEvent event) {
+     *
+     * User user = event.getAuthor(); Member member = event.getMember(); Message
+     * message = event.getMessage(); String command =
+     * message.getContentDisplay();
+     *
+     * if (command.startsWith(COMMAND_PREFIX)) {
+     *
+     * command = command.replaceFirst(COMMAND_PREFIX, "");
+     *
+     * String commands = command.split(" ")[0]; command =
+     * command.replaceFirst(commands, ""); String[] args = command.length() != 0
+     * ? get(command.split(" ")) : new String[0]; PlayerSender sender = new
+     * DiscordPlayer(user, member, event.getTextChannel());
+     * this.instance.getCommandManager().onCommand(sender, commands, args,
+     * event); }
+     *
+     * }
+     */
 
-				String[] args = message.length() != 0 ? message.split(" ") : new String[0];
-				ConsoleSender sender = new DiscordConsoleSender();
-				instance.getCommandManager().onCommand(sender, commande, args, null);
-			}
-		}
+    @SuppressWarnings("unused")
+    private String[] get(String[] tableau) {
+        List<String> test = new ArrayList<>();
+        for (int a = 1; a != tableau.length; a++)
+            test.add(tableau[a]);
+        return test.toArray(new String[0]);
+    }
 
-		scanner.close();
+    public void onDisable() {
+        this.instance.onDisable();
+        this.isRunning = false;
+    }
 
-		System.out.println(PREFIX_CONSOLE + "Disconnect !");
-		System.exit(0);
-	}
+    @Override
+    public void run() {
+        isRunning = true;
+
+        while (isRunning) {
+            if (scanner.hasNextLine()) {
+
+                String message = scanner.nextLine();
+                String commande = message.split(" ")[0];
+                message = message.replaceFirst(message.split(" ")[0], "");
+
+                String[] args = message.length() != 0 ? message.split(" ") : new String[0];
+                ConsoleSender sender = new DiscordConsoleSender();
+                instance.getCommandManager().onCommand(sender, commande, args, null);
+            }
+        }
+
+        scanner.close();
+
+        System.out.println(PREFIX_CONSOLE + "Disconnect !");
+        System.exit(0);
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
 
 }

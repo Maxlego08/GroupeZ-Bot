@@ -7,6 +7,7 @@ import fr.maxlego08.zsupport.command.VCommand;
 import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import fr.maxlego08.zsupport.verify.VerifyManager;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class CommandVerify extends VCommand {
 
@@ -25,7 +26,7 @@ public class CommandVerify extends VCommand {
 		User user = playerSender.getUser();
 
 		VerifyManager manager = VerifyManager.getInstance();
-		manager.submitData(user, this.textChannel, this.player, true, this.event);
+		manager.submitData(user, (TextChannel) this.textChannel, this.player, true, this.event);
 
 		return CommandType.SUCCESS;
 	}

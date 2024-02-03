@@ -2,73 +2,86 @@ package fr.maxlego08.zsupport.tickets;
 
 import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.lang.LangType;
+import fr.maxlego08.zsupport.utils.ChannelType;
 import fr.maxlego08.zsupport.utils.Constant;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
+import java.util.Objects;
 
 public class TicketListener extends ListenerAdapter implements Constant {
 
-	private final TicketManager manager;
+    private final TicketManager ticketManager;
+    private final ErrorManager manager = new ErrorManager();
 
-	public TicketListener(TicketManager manager) {
-		super();
-		this.manager = manager;
-	}
+    public TicketListener(TicketManager ticketManager) {
+        this.ticketManager = ticketManager;
+    }
 
-	@Override
-	public void onSelectionMenu(SelectionMenuEvent event) {
-		if (event.getChannel().getName().contains("ticket-") && !event.getUser().isBot()) {
+    @Override
+    public void onButtonInteraction(ButtonInteractionEvent event) {
 
-			this.manager.stepSelectionMenu(event, event.getUser(), event.getGuild(), event.getChannel());
-			
-		}
-	}
+        Button button = event.getButton();
 
-	@Override
-	public void onMessageReceived(MessageReceivedEvent event) {
-		// 	
-		if (event.getChannel().getName().contains("ticket-") && !event.getAuthor().isBot()) {
+        if (event.getChannel().getIdLong() == Config.ticketChannel && !event.getUser().isBot()) {
 
-			this.manager.sendInformations(event, event.getTextChannel(), event.getAuthor());
-			
-		} else if (event.getChannel().getIdLong() == Config.generalChannel && !event.getAuthor().isBot()) {
-			
-			this.manager.sendTicketUse(event, event.getTextChannel());
-			
-		}
-	}
-	
-	@Override
-	public void onButtonClick(ButtonClickEvent event) {
+            LangType langType = Objects.equals(button.getId(), BUTTON_FR) ? LangType.FR : LangType.US;
+            TicketStatus ticketStatus = button.getId().equals(BUTTON_ZMENU) ? TicketStatus.VERIFY_ZMENU_PURCHASE : TicketStatus.CHOOSE_TYPE;
 
-		Button button = event.getButton();
+            this.ticketManager.createTicket(event.getUser(), event.getGuild(), langType, event, ticketStatus);
+        } else if (event.getChannel() instanceof ICategorizableChannel iCategorizableChannel && iCategorizableChannel.getParentCategoryIdLong() == Config.ticketCategoryId && !event.getUser().isBot()) {
 
-		if (event.getChannel().getIdLong() == Config.ticketChannel && !event.getUser().isBot()) {
+            this.ticketManager.buttonAction(event, event.getGuild());
+        }
+    }
 
-			LangType langType = button.getId().equals(BUTTON_FR) ? LangType.FR : LangType.US;
-			this.manager.createTicket(event.getUser(), event.getGuild(), langType, event.getChannel(), event);
+    @Override
+    public void onStringSelectInteraction(StringSelectInteractionEvent event) {
+        if (event.getChannel() instanceof ICategorizableChannel iCategorizableChannel && iCategorizableChannel.getParentCategoryIdLong() == Config.ticketCategoryId && !event.getUser().isBot()) {
 
-		} else if (event.getChannel().getName().contains("ticket-") && !event.getUser().isBot()) {
+            this.ticketManager.selectionAction(event, event.getGuild());
+        }
+    }
 
-			this.manager.stepButton(event, event.getUser(), event.getGuild(), event.getChannel());
+    @Override
+    public void onModalInteraction(ModalInteractionEvent event) {
+        if (event.getChannel() instanceof ICategorizableChannel iCategorizableChannel && iCategorizableChannel.getParentCategoryIdLong() == Config.ticketCategoryId && !event.getUser().isBot()) {
 
-		}
+            this.ticketManager.modalAction(event, event.getGuild());
+        }
+    }
 
-	}
+    @Override
+    public void onMessageReceived(MessageReceivedEvent event) {
 
-	@Override
-	public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
+        MessageChannel channel = event.getChannel();
 
-		User user = event.getUser();
-		Guild guild = event.getGuild();
-		this.manager.userLeave(guild, user);
-		
-	}
+        if (channel.getIdLong() == Config.generalChannel && !event.getAuthor().isBot()){
+            this.manager.processMessage(event, event.getMessage(), event.getAuthor());
+        }
 
+        if (!event.getAuthor().isBot()) this.ticketManager.processMessageUpload(event);
+
+        if (event.getChannel() instanceof ICategorizableChannel iCategorizableChannel && iCategorizableChannel.getParentCategoryIdLong() == Config.ticketCategoryId && !event.getAuthor().isBot()) {
+
+            this.ticketManager.onMessage(event, event.getGuild());
+        } else if (!event.getAuthor().isBot() && Config.channelsWithInformations.containsKey(channel.getIdLong()) && channel instanceof TextChannel textChannel) {
+
+            ChannelType channelType = Config.channelsWithInformations.get(channel.getIdLong());
+            this.ticketManager.sendChannelInformations(event, textChannel, channelType);
+        }
+    }
+
+    @Override
+    public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
+        this.ticketManager.userLeave(event.getGuild(), event.getUser());
+    }
 }

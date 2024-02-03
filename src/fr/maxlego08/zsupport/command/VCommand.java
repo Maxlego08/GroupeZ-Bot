@@ -1,8 +1,5 @@
 package fr.maxlego08.zsupport.command;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.utils.Constant;
 import fr.maxlego08.zsupport.utils.commands.Arguments;
@@ -10,339 +7,326 @@ import fr.maxlego08.zsupport.utils.commands.PlayerSender;
 import fr.maxlego08.zsupport.utils.commands.Sender;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class VCommand extends Arguments implements Constant {
 
-	public VCommand(CommandManager commandManager) {
-		super();
-		this.commandManager = commandManager;
-	}
+    private final CommandManager commandManager;
+    /**
+     * Permission used for the command, if it is a null then everyone can
+     * execute the command
+     */
+    protected Permission permission;
+    protected VCommand parent;
+    protected List<String> subCommands = new ArrayList<>();
+    protected List<VCommand> subVCommands = new ArrayList<>();
+    protected List<CommandArgument> requireArgs = new ArrayList<>();
+    protected List<CommandArgument> optionalArgs = new ArrayList<>();
+    protected boolean consoleCanUse = true;
+    protected boolean playerCanUse = true;
+    protected boolean ignoreParent = false;
+    protected boolean ignoreArgs = false;
+    protected boolean onlyInCommandChannel = false;
+    protected boolean DEBUG = true;
+    protected Sender sender;
+    protected PlayerSender player;
+    protected String syntaxe;
+    protected String description;
+    protected int argsMinLength;
+    protected int argsMaxLength;
+    protected ZSupport instance;
+    protected SlashCommandInteractionEvent event;
+    protected MessageChannelUnion textChannel;
+    protected Guild guild;
+    private SlashCommandData commandData;
 
-	/**
-	 * Permission used for the command, if it is a null then everyone can
-	 * execute the command
-	 */
-	protected Permission permission;
-	protected VCommand parent;
-	protected List<String> subCommands = new ArrayList<String>();
-	protected List<VCommand> subVCommands = new ArrayList<VCommand>();
-	protected List<String> requireArgs = new ArrayList<String>();
-	protected List<String> optionalArgs = new ArrayList<String>();
-	protected boolean consoleCanUse = true;
-	protected boolean playerCanUse = true;
-	protected boolean ignoreParent = false;
-	protected boolean ignoreArgs = false;
-	protected boolean onlyInCommandChannel = false;
-	protected boolean DEBUG = true;
-	protected Sender sender;
-	protected PlayerSender player;
-	protected String syntaxe;
-	protected String description;
-	protected int argsMinLength;
-	protected int argsMaxLength;
-	private CommandManager commandManager;
-	protected ZSupport instance;
+    public VCommand(CommandManager commandManager) {
+        super();
+        this.commandManager = commandManager;
+    }
 
-	protected SlashCommandEvent event;
-	protected TextChannel textChannel;
-	protected Guild guild;
+    public boolean isOnlyInCommandChannel() {
+        return onlyInCommandChannel;
+    }
 
-	public boolean isOnlyInCommandChannel() {
-		return onlyInCommandChannel;
-	}
+    /**
+     * Permet de savoir le nombre de parent de faï¿½on rï¿½cursive
+     *
+     * @param defaultParent
+     * @return
+     */
+    private int parentCount(int defaultParent) {
+        return parent == null ? defaultParent : parent.parentCount(defaultParent + 1);
+    }
 
-	/**
-	 * Permet de savoir le nombre de parent de façon récursive
-	 * 
-	 * @param defaultParent
-	 * @return
-	 */
-	private int parentCount(int defaultParent) {
-		return parent == null ? defaultParent : parent.parentCount(defaultParent + 1);
-	}
+    /**
+     * @param main
+     * @param commandSender
+     * @param args
+     * @return {@link CommandType}
+     */
+    public CommandType prePerform(ZSupport main, Sender commandSender, String[] args, SlashCommandInteractionEvent event) {
 
-	/**
-	 * 
-	 * @param main
-	 * @param commandSender
-	 * @param args
-	 * @return {@link CommandType}
-	 */
-	public CommandType prePerform(ZSupport main, Sender commandSender, String[] args, SlashCommandEvent event) {
+        // We update the number of arguments according to the number of parents
 
-		// We update the number of arguments according to the number of parents
+        this.parentCount = parentCount(0);
+        this.argsMaxLength = this.requireArgs.size() + this.optionalArgs.size() + this.parentCount;
+        this.argsMinLength = this.requireArgs.size() + this.parentCount;
 
-		this.parentCount = parentCount(0);
-		this.argsMaxLength = this.requireArgs.size() + this.optionalArgs.size() + this.parentCount;
-		this.argsMinLength = this.requireArgs.size() + this.parentCount;
+        // We generate the basic syntax if it is impossible to find it
+        if (this.syntaxe == null) {
+            this.syntaxe = "";
+        }
 
-		// We generate the basic syntax if it is impossible to find it
-		if (this.syntaxe == null) {
-			this.syntaxe = generateDefaultSyntaxe("");
-		}
+        this.args = args;
 
-		this.args = args;
+        String defaultString = argAsString(0);
 
-		String defaultString = argAsString(0);
+        if (defaultString != null) {
+            for (VCommand subCommand : subVCommands) {
+                if (subCommand.getSubCommands().contains(defaultString.toLowerCase())) return CommandType.CONTINUE;
+            }
+        }
 
-		if (defaultString != null) {
-			for (VCommand subCommand : subVCommands) {
-				if (subCommand.getSubCommands().contains(defaultString.toLowerCase()))
-					return CommandType.CONTINUE;
-			}
-		}
-
-		if (this.argsMinLength != 0 && this.argsMaxLength != 0
+		/*if (this.argsMinLength != 0 && this.argsMaxLength != 0
 				&& !(args.length >= this.argsMinLength && args.length <= this.argsMaxLength)) {
 			return CommandType.SYNTAX_ERROR;
-		}
+		}*/
 
-		this.sender = commandSender;
-		if (this.sender instanceof PlayerSender) {
-			this.player = (PlayerSender) commandSender;
-		}
+        this.sender = commandSender;
+        if (this.sender instanceof PlayerSender) {
+            this.player = (PlayerSender) commandSender;
+        }
 
-		this.event = event;
-		if (event != null) {
-			this.textChannel = event.getTextChannel();
-			this.guild = event.getGuild();
-		}
+        this.event = event;
+        if (event != null) {
+            this.textChannel = event.getChannel();
+            this.guild = event.getGuild();
+        }
 
-		try {
-			return perform(main);
-		} catch (Exception e) {
-			if (this.DEBUG) {
-				System.out.println(PREFIX_CONSOLE + "Commands: " + toString());
-				System.out.println(PREFIX_CONSOLE + "Error:");
-				e.printStackTrace();
-			}
-			return CommandType.SYNTAX_ERROR;
-		}
-	}
+        try {
+            return perform(main);
+        } catch (Exception e) {
+            if (this.DEBUG) {
+                System.out.println(PREFIX_CONSOLE + "Commands: " + this);
+                System.out.println(PREFIX_CONSOLE + "Error:");
+                e.printStackTrace();
+            }
+            return CommandType.SYNTAX_ERROR;
+        }
+    }
 
-	protected TextChannel getChannel(long id) {
-		return this.guild.getTextChannelById(id);
-	}
+    protected TextChannel getChannel(long id) {
+        return this.guild.getTextChannelById(id);
+    }
 
-	/**
-	 * method that allows you to execute the command
-	 */
-	protected abstract CommandType perform(ZSupport main);
+    /**
+     * method that allows you to execute the command
+     */
+    protected abstract CommandType perform(ZSupport main);
 
-	public boolean isPlayerCanUse() {
-		return this.playerCanUse;
-	}
+    public boolean isPlayerCanUse() {
+        return this.playerCanUse;
+    }
 
-	/**
-	 * @return the permission
-	 */
-	public Permission getPermission() {
-		return permission;
-	}
+    /**
+     * @return the permission
+     */
+    public Permission getPermission() {
+        return permission;
+    }
 
-	/**
-	 * @return the parent
-	 */
-	public VCommand getParent() {
-		return parent;
-	}
+    /**
+     * @return the parent
+     */
+    public VCommand getParent() {
+        return parent;
+    }
 
-	/**
-	 * @return the subCommands
-	 */
-	public List<String> getSubCommands() {
-		return subCommands;
-	}
+    /**
+     * @return the subCommands
+     */
+    public List<String> getSubCommands() {
+        return subCommands;
+    }
 
-	/**
-	 * @return the subVCommands
-	 */
-	public List<VCommand> getSubVCommands() {
-		return subVCommands;
-	}
+    /**
+     * @return the subVCommands
+     */
+    public List<VCommand> getSubVCommands() {
+        return subVCommands;
+    }
 
-	/**
-	 * @return the requireArgs
-	 */
-	public List<String> getRequireArgs() {
-		return requireArgs;
-	}
+    /**
+     * @return the requireArgs
+     */
+    public List<CommandArgument> getRequireArgs() {
+        return requireArgs;
+    }
 
-	/**
-	 * @return the optionalArgs
-	 */
-	public List<String> getOptionalArgs() {
-		return optionalArgs;
-	}
+    /**
+     * @return the optionalArgs
+     */
+    public List<CommandArgument> getOptionalArgs() {
+        return optionalArgs;
+    }
 
-	/**
-	 * @return the consoleCanUse
-	 */
-	public boolean isConsoleCanUse() {
-		return consoleCanUse;
-	}
+    /**
+     * @return the consoleCanUse
+     */
+    public boolean isConsoleCanUse() {
+        return consoleCanUse;
+    }
 
-	/**
-	 * @return the ignoreParent
-	 */
-	public boolean isIgnoreParent() {
-		return ignoreParent;
-	}
+    /**
+     * @return the ignoreParent
+     */
+    public boolean isIgnoreParent() {
+        return ignoreParent;
+    }
 
-	/**
-	 * @return the ignoreArgs
-	 */
-	public boolean isIgnoreArgs() {
-		return ignoreArgs;
-	}
+    /**
+     * @return the ignoreArgs
+     */
+    public boolean isIgnoreArgs() {
+        return ignoreArgs;
+    }
 
-	/**
-	 * @return the dEBUG
-	 */
-	public boolean isDEBUG() {
-		return DEBUG;
-	}
+    /**
+     * @return the dEBUG
+     */
+    public boolean isDEBUG() {
+        return DEBUG;
+    }
 
-	/**
-	 * @return the sender
-	 */
-	public Sender getSender() {
-		return sender;
-	}
+    /**
+     * @return the sender
+     */
+    public Sender getSender() {
+        return sender;
+    }
 
-	/**
-	 * @return the player
-	 */
-	public PlayerSender getPlayer() {
-		return player;
-	}
+    /**
+     * @return the player
+     */
+    public PlayerSender getPlayer() {
+        return player;
+    }
 
-	/**
-	 * @return the syntaxe
-	 */
-	public String getSyntaxe() {
-		if (syntaxe == null) {
-			syntaxe = generateDefaultSyntaxe("");
-		}
-		return syntaxe;
-	}
+    /**
+     * @return the syntaxe
+     */
+    public String getSyntaxe() {
+        return syntaxe;
+    }
 
-	/**
-	 * @return the description
-	 */
-	public String getDescription() {
-		return description == null ? "No description" : description;
-	}
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description == null ? "No description" : description;
+    }
 
-	/**
-	 * @return the argsMinLength
-	 */
-	public int getArgsMinLength() {
-		return argsMinLength;
-	}
+    /**
+     * @return the argsMinLength
+     */
+    public int getArgsMinLength() {
+        return argsMinLength;
+    }
 
-	/**
-	 * @return the argsMaxLength
-	 */
-	public int getArgsMaxLength() {
-		return argsMaxLength;
-	}
+    /**
+     * @return the argsMaxLength
+     */
+    public int getArgsMaxLength() {
+        return argsMaxLength;
+    }
 
-	/**
-	 * @return the instance
-	 */
-	public ZSupport getInstance() {
-		return instance;
-	}
+    /**
+     * @return the instance
+     */
+    public ZSupport getInstance() {
+        return instance;
+    }
 
-	/*
-	 * Ajouter un argument obligatoire
-	 */
-	protected void addRequireArg(String message) {
-		this.requireArgs.add(message);
-		this.ignoreParent = parent == null ? true : false;
-		this.ignoreArgs = true;
-	}
+    /*
+     * Ajouter un argument obligatoire
+     */
+    protected void addRequireArg(OptionType optionType, String name, String description) {
+        this.addRequireArg(optionType, name, description, new ArrayList<>());
+    }
 
-	/**
-	 * Ajouter un argument optionel
-	 * 
-	 * @param message
-	 */
-	protected void addOptionalArg(String message) {
-		this.optionalArgs.add(message);
-		this.ignoreParent = parent == null ? true : false;
-		this.ignoreArgs = true;
-	}
+    protected void addRequireArg(OptionType optionType, String name, String description, List<CommandChoice> choices) {
+        this.requireArgs.add(new CommandArgument(optionType, name, description, choices));
+        this.ignoreParent = parent == null;
+        this.ignoreArgs = true;
+    }
 
-	/**
-	 * Adds sub orders
-	 * 
-	 * @param subCommand
-	 * @return this
-	 */
-	public VCommand addSubCommand(String subCommand) {
-		this.subCommands.add(subCommand);
-		return this;
-	}
+    protected void addOptionalArg(CommandArgument commandArgument) {
+        this.optionalArgs.add(commandArgument);
+        this.ignoreParent = parent == null;
+        this.ignoreArgs = true;
+    }
 
-	/**
-	 * Adds sub orders
-	 * 
-	 * @param subCommand
-	 * @return this
-	 */
-	public VCommand addSubCommand(VCommand command) {
-		command.parent = this;
-		commandManager.addCommand(command);
-		this.subVCommands.add(command);
-		return this;
-	}
+    /**
+     * Adds sub orders
+     *
+     * @param subCommand
+     * @return this
+     */
+    public VCommand addSubCommand(String subCommand) {
+        this.subCommands.add(subCommand);
+        return this;
+    }
 
-	/**
-	 * Permet de générer la syntaxe de la commande manuellement Mais vous pouvez
-	 * la mettre vous même avec le setSyntaxe()
-	 * 
-	 * @param syntaxe
-	 * @return generate syntaxe
-	 */
-	private String generateDefaultSyntaxe(String syntaxe) {
+    /**
+     * Adds sub orders
+     *
+     * @param command
+     * @return this
+     */
+    public VCommand addSubCommand(VCommand command) {
+        command.parent = this;
+        commandManager.addCommand(command);
+        this.subVCommands.add(command);
+        return this;
+    }
 
-		String tmpString = subCommands.get(0);
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "VCommand [permission=" + permission + ", parent=" + parent + ", subCommands=" + subCommands + ", requireArgs=" + requireArgs + ", optionalArgs=" + optionalArgs + ", consoleCanUse=" + consoleCanUse + ", ignoreParent=" + ignoreParent + ", ignoreArgs=" + ignoreArgs + ", syntaxe=" + syntaxe + ", description=" + description + ", argsMinLength=" + argsMinLength + ", argsMaxLength=" + argsMaxLength + "]";
+    }
 
-		if (requireArgs.size() != 0 && syntaxe.equals(""))
-			for (String requireArg : requireArgs) {
-				requireArg = "<" + requireArg + ">";
-				syntaxe += " " + requireArg;
-			}
-		if (optionalArgs.size() != 0 && syntaxe.equals(""))
-			for (String optionalArg : optionalArgs) {
-				optionalArg = "[<" + optionalArg + ">]";
-				syntaxe += " " + optionalArg;
-			}
+    public SlashCommandData toCommandData() {
+        this.commandData = Commands.slash(this.getSubCommands().get(0), this.getDescription());
 
-		tmpString += syntaxe;
+        this.getRequireArgs().forEach(commandArgument -> {
+            OptionData optionData = new OptionData(commandArgument.optionType(), commandArgument.name(), commandArgument.description());
+            commandArgument.choices().forEach(choice -> optionData.addChoice(choice.name(), choice.value()));
+            this.commandData.addOptions(optionData);
+        });
 
-		if (parent == null)
-			return "/" + tmpString;
+        this.getOptionalArgs().forEach(commandArgument -> {
+            this.commandData.addOption(commandArgument.optionType(), commandArgument.name(), commandArgument.description(), false);
+        });
+        return this.commandData;
+    }
 
-		return parent.generateDefaultSyntaxe(" " + tmpString);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "VCommand [permission=" + permission + ", parent=" + parent + ", subCommands=" + subCommands
-				+ ", requireArgs=" + requireArgs + ", optionalArgs=" + optionalArgs + ", consoleCanUse=" + consoleCanUse
-				+ ", ignoreParent=" + ignoreParent + ", ignoreArgs=" + ignoreArgs + ", syntaxe=" + syntaxe
-				+ ", description=" + description + ", argsMinLength=" + argsMinLength + ", argsMaxLength="
-				+ argsMaxLength + "]";
-	}
-
+    public SlashCommandData getCommandData() {
+        return commandData;
+    }
 }
