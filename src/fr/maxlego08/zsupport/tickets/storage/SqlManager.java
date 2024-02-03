@@ -25,13 +25,13 @@ public class SqlManager {
     public static final ExecutorService service = Executors.newFixedThreadPool(4);
     private final SqlConnection connection = new SqlConnection();
 
-    private final String createRequest = "CREATE TABLE IF NOT EXISTS tickets ( id BIGINT AUTO_INCREMENT PRIMARY KEY, langType VARCHAR(255) NOT NULL, channelId BIGINT NOT NULL, userId BIGINT NOT NULL, ticketStatus VARCHAR(255) NOT NULL, ticketType VARCHAR(255) NOT NULL, pluginId BIGINT, notificationSent BOOLEAN NOT NULL DEFAULT FALSE, createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);";
-    private final String createMessageRequest = "CREATE TABLE IF NOT EXISTS ticket_messages (id BIGINT AUTO_INCREMENT PRIMARY KEY, ticketId BIGINT NOT NULL, messageId BIGINT NOT NULL, userId BIGINT NOT NULL, messageText TEXT NOT NULL, createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (ticketId) REFERENCES tickets(id) ON DELETE CASCADE ON UPDATE CASCADE);";
+    private final String createRequest = "CREATE TABLE IF NOT EXISTS tickets ( id BIGINT AUTO_INCREMENT PRIMARY KEY, langType VARCHAR(255) NOT NULL, channelId BIGINT NOT NULL, userId BIGINT NOT NULL, ticketStatus VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL, ticketType VARCHAR(255) NOT NULL, pluginId BIGINT, notificationSent BOOLEAN NOT NULL DEFAULT FALSE, createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);";
+    private final String createMessageRequest = "CREATE TABLE IF NOT EXISTS ticket_messages (id BIGINT AUTO_INCREMENT PRIMARY KEY, ticketId BIGINT NOT NULL, messageId BIGINT NOT NULL, userId BIGINT NOT NULL, username VARCHAR(255) NOT NULL, messageText TEXT NOT NULL, createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (ticketId) REFERENCES tickets(id) ON DELETE CASCADE ON UPDATE CASCADE);";
     private final String createPluginRequest = "CREATE TABLE IF NOT EXISTS ticket_plugins (id BIGINT AUTO_INCREMENT PRIMARY KEY, ticketId BIGINT NOT NULL, pluginVersion VARCHAR(255) NOT NULL,  isLastVersion BOOLEAN NOT NULL, createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (ticketId) REFERENCES tickets(id) ON DELETE CASCADE);";
     private final String createAttachementRequest = "CREATE TABLE IF NOT EXISTS ticket_attachments (id BIGINT AUTO_INCREMENT PRIMARY KEY, ticketId BIGINT NOT NULL, messageId BIGINT NOT NULL, fileContent LONGBLOB NOT NULL, createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (ticketId) REFERENCES tickets(id) ON DELETE CASCADE);";
     private final String createFAQRequest = "CREATE TABLE IF NOT EXISTS ticket_faqs (id BIGINT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL, title VARCHAR(255) NOT NULL, answer TEXT NOT NULL);";
-    private final String insertRequest = "INSERT INTO tickets (langType, channelId, userId, ticketStatus, ticketType, pluginId) VALUES (?, ?, ?, ?, ?, ?)";
-    private final String insertMessageRequest = "INSERT INTO ticket_messages (ticketId, messageId, userId, messageText) VALUES (?, ?, ?, ?)";
+    private final String insertRequest = "INSERT INTO tickets (langType, channelId, userId, ticketStatus, ticketType, pluginId, username) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private final String insertMessageRequest = "INSERT INTO ticket_messages (ticketId, messageId, userId, messageText, username) VALUES (?, ?, ?, ?, ?)";
     private final String updateRequest = "UPDATE tickets SET ticketStatus = ?, ticketType = ?, pluginId = ?, notificationSent = ?, updatedAt = NOW() WHERE id = ?";
 
     public SqlConnection getSqlConnection() {
@@ -63,7 +63,7 @@ public class SqlManager {
         }
     }
 
-    public void createTicket(Ticket ticket, Runnable runnable, Runnable errorRunnable) {
+    public void createTicket(Ticket ticket, String userName, Runnable runnable, Runnable errorRunnable) {
         service.execute(() -> {
             try (Connection connection = getConnection()) {
 
@@ -74,6 +74,7 @@ public class SqlManager {
                 preparedStatement.setString(4, ticket.getTicketStatus().name());
                 preparedStatement.setString(5, ticket.getTicketType().name());
                 preparedStatement.setLong(6, ticket.getPluginId());
+                preparedStatement.setString(7, userName);
 
                 int affectedRows = preparedStatement.executeUpdate();
                 if (affectedRows > 0) {
@@ -150,6 +151,7 @@ public class SqlManager {
                 preparedStatement.setLong(2, message.getIdLong());
                 preparedStatement.setLong(3, message.getAuthor().getIdLong());
                 preparedStatement.setString(4, message.getContentRaw());
+                preparedStatement.setString(5, message.getAuthor().getName());
 
                 preparedStatement.executeUpdate();
             } catch (SQLException exception) {

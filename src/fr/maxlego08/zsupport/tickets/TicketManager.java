@@ -174,7 +174,7 @@ public class TicketManager extends ZUtils {
         ticket.setTextChannel(ticketChannel);
         if (ticketStatus == TicketStatus.VERIFY_ZMENU_PURCHASE) ticket.setPluginId(Config.zMenu.getPluginId());
 
-        this.sqlManager.createTicket(ticket, () -> {
+        this.sqlManager.createTicket(ticket, user.getName(), () -> {
 
             TicketAction action = ticketStatus.getAction();
             ticket.setTicketAction(action);
