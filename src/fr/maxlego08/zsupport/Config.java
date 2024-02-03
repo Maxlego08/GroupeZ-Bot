@@ -17,19 +17,16 @@ import java.util.Optional;
 public class Config implements Savable {
 
     public static String botToken = "groupez.dev.token.secret";
-    public static int ticketNumber = 1;
-    public static long ticketCategoryId = 1202650515377360897L;
-    public static long ticketChannel = 1202650530845823027L;
-    public static long ticketOrderChannel = 937373283911872542L;
-    public static long commandChannel = 1202650480363311104L;
+    public static long ticketCategoryId = 511517312067829766L;
+    public static long ticketChannel = 712305238748692572L;
+    public static long commandChannel = 714518716943171605L;
     public static long pluginsChannel = 941739992139579523L;
-    public static long groupezEmote = 710806746779615233L;
+    public static long groupezEmote = 710806857593389067L;
     public static long spigotEmote = 942107776883257364L;
-    public static long generalChannel = 1202649374740447285L;
-    public static long ticketLogChannel = 1202652708335788084L;
-    public static long zMenuPro = 1203351216130629693L;
-    public static long zMenuPremium = 1203351256811307069L;
-    public static long zMenuEmote = 1202652939567636501L;
+    public static long generalChannel = 511516467615760407L;
+    public static long zMenuPro = 1203368206337708113L;
+    public static long zMenuPremium = 1203368378581000192L;
+    public static long zMenuEmote = 1117502546811048098L;
 
     public static String CUSTOM_KEY = "sdfsdkfsldkfsdfdsfkmsdlmf,mdslkflsdk;fkljzedioahrnduidgstjhqsbgvdiyqsdgqksjdzapo�fmazflpo�icjozefdpzokfdozpefijz,fkezfljsdklfzeoirfsndlkfjkezf6+ze5f+zef2+ezf5s3fzef2zef+zfe56z+etfg+rf4+sfg";
     public static String API_URL = "https://groupez.dev/api/v1/discord/%s";
@@ -42,11 +39,10 @@ public class Config implements Savable {
 
     public static List<Plugin> plugins = new ArrayList<>();
     public static Map<Long, ChannelType> channelsWithInformations = new HashMap<>();
-
     public static SqlConfiguration sqlConfiguration = new SqlConfiguration("homestead", "secret", "192.168.10.10", "zsupport", 3306);
-    public static long guildId = 1202649373465382923L;
-    public static Plugin zMenu = new Plugin("zMenu", 1202652939567636501L, 0, 253, 0.0, "zmenu");
-    public static long zMenuForum = 1202677084384665630l;
+    public static long guildId = 511516467615760405L;
+    public static Plugin zMenu = new Plugin("zMenu", 1117502546811048098L, 0, 253, 0.0, "zmenu");
+    public static long zMenuForum = 1024590761750184016L;
 
     /**
      * static Singleton instance.
@@ -67,7 +63,9 @@ public class Config implements Savable {
         plugins.add(new Plugin("zMobFighter", 843564378946273350L, 843564877611794482L, 41, 8, "zmobfighter"));
         plugins.add(new Plugin("zAuctionHouse Redis", 941723116873326623L, 941723181348192277L, 210, 15, null));
         plugins.add(new Plugin("zVoteParty", 879471509930926121L, 0L, 124, 0, "zvoteparty"));
-        plugins.add(new Plugin("zOldEnchant", 941724257132634152L, 0L, 221, 0, null));
+        plugins.add(new Plugin("zOldEnchant", 941724257132634152L, 0L, 221, 0, "zoldenchant"));
+        plugins.add(new Plugin("zMenu", 1117502546811048098L, 0L, 253, 0, "zmenu"));
+        plugins.add(new Plugin("zDrawer", 1200185398274568222L, 1200136527171293235L, 313, 0, "zdrawer"));
 
         channelsWithInformations.put(774320653892976692L, ChannelType.FREE);
         channelsWithInformations.put(879813851959427112L, ChannelType.FREE);
