@@ -7,6 +7,7 @@ import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.plugins.PluginManager;
 import fr.maxlego08.zsupport.tickets.actions.TicketAction;
 import fr.maxlego08.zsupport.tickets.storage.SqlManager;
+import fr.maxlego08.zsupport.utils.ChannelType;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.verify.VerifyManager;
 import gs.mclo.api.MclogsClient;
@@ -29,8 +30,10 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import java.awt.*;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -43,6 +46,7 @@ public class TicketManager extends ZUtils {
     private final ZSupport instance;
     private final SqlManager sqlManager = new SqlManager();
     private final ScheduledFuture<?> scheduledFuture;
+    private final Map<Long, ChannelInfo> channelInfoMap = new HashMap<>();
     private List<Ticket> tickets = new ArrayList<>();
 
     public TicketManager(ZSupport instance) {
@@ -360,14 +364,59 @@ public class TicketManager extends ZUtils {
                 EmbedBuilder builder = new EmbedBuilder();
                 builder.setTitle("GroupeZ - Support");
                 setEmbedFooter(guild, builder, new Color(218, 8, 8));
-                setDescription(builder, "```ansi\n" +
-                        "\u001B[2;31mYou are not using the latest version of the plugin! Your problem will probably come from this. Please check if the latest version fixes your problem. Don’t forget to also read the changelogs. If your problem is known it will have been notified in a changelogs.\u001B[0m\n" +
-                        "```");
+                setDescription(builder, "```ansi\n" + "\u001B[2;31mYou are not using the latest version of the plugin! Your problem will probably come from this. Please check if the latest version fixes your problem. Don’t forget to also read the changelogs. If your problem is known it will have been notified in a changelogs.\u001B[0m\n" + "```");
 
                 textChannel.sendMessageEmbeds(builder.build()).queue();
             }
 
             this.sqlManager.insertPluginForTicket(ticket.getId(), version, isLastVersion);
         });
+    }
+
+    private ChannelInfo getInfo(ISnowflake channel) {
+        return channelInfoMap.computeIfAbsent(channel.getIdLong(), id -> new ChannelInfo());
+    }
+
+    public void sendChannelInformations(MessageReceivedEvent event, TextChannel textChannel, ChannelType channelType, ChannelInfo channelInfo) {
+
+        if (channelType == ChannelType.GENERAL) return;
+
+        if (channelInfo.getMessageAt() > System.currentTimeMillis()) return;
+
+        channelInfo.setMessageAt(System.currentTimeMillis() + (1000 * 60 * 15));
+
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setTitle(channelType.getTitle());
+        setEmbedFooter(event.getGuild(), builder, new Color(186, 8, 8));
+
+        TextChannel ticketChannel = textChannel.getGuild().getTextChannelById(Config.ticketChannel);
+        builder.setDescription(String.format(channelType.getDescription(), ticketChannel.getAsMention()));
+
+        textChannel.sendMessageEmbeds(builder.build()).queue(message -> channelInfo.setMessageId(message.getIdLong()));
+    }
+
+    public void sendChannelInformations(MessageReceivedEvent event, TextChannel textChannel, ChannelType channelType) {
+
+        ChannelInfo channelInfo = getInfo(textChannel);
+
+        if (channelInfo.getMessageId() == 0) {
+
+            sendChannelInformations(event, textChannel, channelType, channelInfo);
+
+        } else {
+
+            textChannel.getHistoryAround(channelInfo.getMessageId(), 99).queue(history -> {
+                net.dv8tion.jda.api.entities.Message message = history.getMessageById(channelInfo.getMessageId());
+                if (message != null) {
+                    if (System.currentTimeMillis() > channelInfo.getMessageAt()) {
+                        channelInfo.setMessageId(0);
+                        message.delete().queue(s -> sendChannelInformations(event, textChannel, channelType, channelInfo));
+                        return;
+                    }
+                }
+                sendChannelInformations(event, textChannel, channelType, channelInfo);
+            });
+        }
+
     }
 }
