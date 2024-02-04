@@ -41,7 +41,11 @@ public class CommandManager extends ZUtils implements Constant {
     public CommandManager(ZSupport support) {
         super();
         this.support = support;
+        registerCommands();
+    }
 
+    public void registerCommands(){
+        commands.clear();
         registerCommand("stop", new CommandStop(this), "end");
         registerCommand("ticketset", new CommandTicketSet(this));
         registerCommand("server", new CommandServer(this));
@@ -56,7 +60,6 @@ public class CommandManager extends ZUtils implements Constant {
 
         registerCommand("customer-verify", new CommandCustomerVerify(this));
         registerCommand("close", new CommandClose(this));
-        // registetCommand("suggestion-traitment", new SuggestionTraitmentCommand(this), "st");
     }
 
     public void addCommand(VCommand command) {
@@ -67,15 +70,13 @@ public class CommandManager extends ZUtils implements Constant {
         command.subCommands.add(cmd);
         command.subCommands.addAll(Arrays.asList(strings));
         this.commands.add(command);
-
-        if (this.guild != null) registerDiscordCommand(command);
     }
 
-    private void registerDiscordCommand(VCommand command) {
+    /*private void registerDiscordCommand(VCommand command) {
         String cmd = command.getSubCommands().get(0);
         System.out.println("Enregistrement de la commande " + cmd + " (" + command.getDescription() + "), après le chargement du bot !");
         guild.updateCommands().addCommands(command.toCommandData()).queue();
-    }
+    }*/
 
     /**
      * @param sender

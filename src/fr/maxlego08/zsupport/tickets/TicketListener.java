@@ -4,6 +4,7 @@ import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.lang.LangType;
 import fr.maxlego08.zsupport.utils.ChannelType;
 import fr.maxlego08.zsupport.utils.Constant;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -64,8 +65,12 @@ public class TicketListener extends ListenerAdapter implements Constant {
 
         MessageChannel channel = event.getChannel();
 
-        if (channel.getIdLong() == Config.generalChannel && !event.getAuthor().isBot()){
+        if (channel.getIdLong() == Config.generalChannel && !event.getAuthor().isBot()) {
             this.manager.processMessage(event, event.getMessage(), event.getAuthor());
+        }
+
+        if (!event.getAuthor().isBot() && event.getMessage().getMentions().getMembers().stream().anyMatch(e -> e.hasPermission(Permission.MESSAGE_MANAGE)) && !event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
+            event.getMessage().reply(":rage: Please respect the rules and do not mention the team members.").queue();
         }
 
         if (!event.getAuthor().isBot()) this.ticketManager.processMessageUpload(event);

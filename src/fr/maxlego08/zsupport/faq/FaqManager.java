@@ -1,5 +1,6 @@
 package fr.maxlego08.zsupport.faq;
 
+import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.ZSupport;
 import fr.maxlego08.zsupport.command.CommandChoice;
 import fr.maxlego08.zsupport.command.CommandManager;
@@ -12,6 +13,7 @@ import fr.maxlego08.zsupport.utils.ZUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -70,13 +72,16 @@ public class FaqManager extends ZUtils {
      */
     public void selectFqa() {
         SqlManager.service.execute(() -> {
-
             this.faqs = this.sqlManager.getAllFaqs();
-            CommandManager commandManager = ZSupport.instance.getCommandManager();
-            commandManager.registerCommand("faq", this.faqCommand = new CommandFaq(commandManager, this));
-            commandManager.registerCommand("fcreate", new CommandFaqRegister(commandManager, this));
-            commandManager.registerCommand("fdelete", new CommandFaqDelete(commandManager, this));
+            registerCommands();
         });
+    }
+
+    private void registerCommands() {
+        CommandManager commandManager = ZSupport.instance.getCommandManager();
+        commandManager.registerCommand("faq", this.faqCommand = new CommandFaq(commandManager, this));
+        commandManager.registerCommand("fcreate", new CommandFaqRegister(commandManager, this));
+        commandManager.registerCommand("fdelete", new CommandFaqDelete(commandManager, this));
     }
 
     /**
@@ -96,7 +101,9 @@ public class FaqManager extends ZUtils {
         EmbedBuilder builder = new EmbedBuilder();
         setEmbedFooter(Objects.requireNonNull(event.getGuild()), builder, new Color(18, 230, 69));
         builder.setTitle(faq.getTitle());
-        builder.setDescription(faq.getAnswer());
+        String answer = faq.getAnswer();
+        answer = answer.replace("%ticket%", event.getGuild().getTextChannelById(Config.ticketChannel).getAsMention());
+        builder.setDescription(answer);
 
         event.replyEmbeds(builder.build()).queue();
     }
@@ -126,15 +133,18 @@ public class FaqManager extends ZUtils {
     }
 
     private void updateFaq(Guild guild) {
-        guild.upsertCommand(this.faqCommand.getCommandData()).queue(command -> {
-            guild.deleteCommandById(command.getIdLong()).queue(s -> {
-                CommandManager commandManager = ZSupport.instance.getCommandManager();
-                this.faqCommand = new CommandFaq(commandManager, this);
-                this.faqCommand.addSubCommand("faq");
-                System.out.println("Mise à jour de la commande FAQ");
-                guild.updateCommands().addCommands(this.faqCommand.toCommandData()).queue();
-            });
+        CommandManager commandManager = ZSupport.instance.getCommandManager();
+
+        commandManager.registerCommands();
+        registerCommands();
+
+        List<CommandData> commands = new ArrayList<>();
+        commandManager.getCommands().forEach(command -> {
+            if (!command.isPlayerCanUse()) return;
+            commands.add(command.toCommandData());
         });
+
+        guild.updateCommands().addCommands(commands).queue();
     }
 
     /**
