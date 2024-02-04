@@ -16,8 +16,10 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -160,10 +162,14 @@ public class TicketManager extends ZUtils {
                 message.editOriginalEmbeds(builder.build()).queue();
             };
 
-            manager.userIsLink(user, () -> {
+            Runnable successRunnable = () -> {
                 Category category = getTicketCategory(guild);
                 category.createTextChannel("ticket-waiting").queue(ticketChannel -> createTicket(user, guild, langType, event, ticketChannel, errorRunnable, message, ticketStatus));
-            }, errorRunnable);
+            };
+
+            // if its zmenu, skip groupez verification
+            if (ticketStatus == TicketStatus.VERIFY_ZMENU_PURCHASE) successRunnable.run();
+            else manager.userIsLink(user, successRunnable, errorRunnable);
         });
     }
 
@@ -421,6 +427,43 @@ public class TicketManager extends ZUtils {
                 sendChannelInformations(event, textChannel, channelType, channelInfo);
             });
         }
+    }
 
+    public void processZMenuForumMessage(MessageReceivedEvent event) {
+        if (event.getChannel() instanceof ThreadChannel threadChannel) {
+
+            Channel parentChannel = threadChannel.getParentChannel();
+
+            if (parentChannel.getIdLong() == Config.zMenuForum) {
+
+                event.getChannel().getHistoryFromBeginning(5).queue(history -> {
+                    // The channel has just been created
+                    if (history.size() == 1) {
+
+                        EmbedBuilder builder = new EmbedBuilder();
+                        setEmbedFooter(event.getGuild(), builder, new Color(23, 195, 26));
+                        setDescription(builder,
+                                ":wave: Welcome to the zMenu Community Forum.",
+                                "You can ask for help on your configurations or for bug reports.",
+                                "",
+                                ":information_source: Rules:",
+                                "1. Be respectful with the users who will help you.",
+                                "2. Give as much information as possible about your problem. You must give the version of your server and the version of the plugin.",
+                                "3. Do not mention the GroupeZ staff",
+                                "4. Give as much information as possible so that we can quickly help you.",
+                                "",
+                                ":flag_us: Documentation: https://zmenu.groupez.dev/",
+                                ":flag_fr: Documentation en français: https://docs.zmenu.dev/v/fr/",
+                                "",
+                                "**Want personality support per ticket?**",
+                                "Upgrade your premium account to open tickets for zMenu:",
+                                "https://minecraft-inventory-builder.com/account-upgrade"
+                        );
+                        threadChannel.sendMessageEmbeds(builder.build()).queue();
+
+                    }
+                });
+            }
+        }
     }
 }
