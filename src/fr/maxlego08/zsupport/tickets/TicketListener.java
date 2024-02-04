@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.channel.forum.ForumTagAddEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -15,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -64,21 +66,25 @@ public class TicketListener extends ListenerAdapter implements Constant {
     public void onMessageReceived(MessageReceivedEvent event) {
 
         MessageChannel channel = event.getChannel();
+        if (event.getAuthor().isBot()) return;
 
-        if (channel.getIdLong() == Config.generalChannel && !event.getAuthor().isBot()) {
+        // General help
+        if (channel.getIdLong() == Config.generalChannel) {
             this.manager.processMessage(event, event.getMessage(), event.getAuthor());
         }
 
-        if (!event.getAuthor().isBot() && event.getMessage().getMentions().getMembers().stream().anyMatch(e -> e.hasPermission(Permission.MESSAGE_MANAGE)) && !event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
+        // DONT PING STAFF OMG
+        if (event.getMessage().getMentions().getMembers().stream().anyMatch(e -> e.hasPermission(Permission.MESSAGE_MANAGE)) && !event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
             event.getMessage().reply(":rage: Please respect the rules and do not mention the team members.").queue();
         }
 
-        if (!event.getAuthor().isBot()) this.ticketManager.processMessageUpload(event);
+        this.ticketManager.processMessageUpload(event);
+        this.ticketManager.processZMenuForumMessage(event);
 
-        if (event.getChannel() instanceof ICategorizableChannel iCategorizableChannel && iCategorizableChannel.getParentCategoryIdLong() == Config.ticketCategoryId && !event.getAuthor().isBot()) {
+        if (event.getChannel() instanceof ICategorizableChannel iCategorizableChannel && iCategorizableChannel.getParentCategoryIdLong() == Config.ticketCategoryId) {
 
             this.ticketManager.onMessage(event, event.getGuild());
-        } else if (!event.getAuthor().isBot() && Config.channelsWithInformations.containsKey(channel.getIdLong()) && channel instanceof TextChannel textChannel) {
+        } else if (Config.channelsWithInformations.containsKey(channel.getIdLong()) && channel instanceof TextChannel textChannel) {
 
             ChannelType channelType = Config.channelsWithInformations.get(channel.getIdLong());
             this.ticketManager.sendChannelInformations(event, textChannel, channelType);
