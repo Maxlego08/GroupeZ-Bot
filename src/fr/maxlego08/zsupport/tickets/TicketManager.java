@@ -315,7 +315,7 @@ public class TicketManager extends ZUtils {
             if (attachment.isImage() || attachment.isVideo()) return;
 
             String fileExtension = attachment.getFileExtension();
-            if (fileExtension != null && (fileExtension.equals("yml") || fileExtension.equals("log") || fileExtension.equals("txt"))) {
+            if (fileExtension != null && (fileExtension.equals("yml") || fileExtension.equals("log") || fileExtension.equals("txt") || fileExtension.equals("json"))) {
                 SqlManager.service.execute(() -> {
                     String content = readContentFromURL(attachment.getProxy().getUrl());
                     try {
