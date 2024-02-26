@@ -12,6 +12,7 @@ import fr.maxlego08.zsupport.tickets.actions.TicketSelectPlugin;
 import fr.maxlego08.zsupport.tickets.actions.TicketSpigotModal;
 import fr.maxlego08.zsupport.tickets.actions.TicketSpigotOpen;
 import fr.maxlego08.zsupport.tickets.actions.TicketVerification;
+import fr.maxlego08.zsupport.tickets.actions.TicketVerificationPlugin;
 import fr.maxlego08.zsupport.tickets.actions.TicketZMenuClose;
 import fr.maxlego08.zsupport.tickets.actions.TicketZMenuVerification;
 
@@ -23,6 +24,7 @@ public enum TicketStatus {
     PLUGIN_INFORMATION(TicketPluginInformation.class),
     PLUGIN_VERIFY_NEED_INFORMATION(TicketPluginNeedVerification.class),
     VERIFY_PURCHASE(TicketVerification.class, "#%id%-verify"),
+    VERIFY_PURCHASE_PLUGIN(TicketVerificationPlugin.class),
     VERIFY_ZMENU_PURCHASE(TicketZMenuVerification.class, "#%id%-zmenu"),
     VERIFY_ZMENU_CLOSE(TicketZMenuClose.class),
     SPIGOT_ACCESS_MODAL(TicketSpigotModal.class, "#%id%-spigot"),

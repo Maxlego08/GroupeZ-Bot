@@ -32,6 +32,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import java.awt.*;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -85,7 +86,7 @@ public class TicketManager extends ZUtils {
 
             TextChannel channel = ticket.getTextChannel(guild);
 
-            if (hoursSinceUpdate > 72) {
+            if (hoursSinceUpdate > 48) {
 
                 iterator.remove();
 
@@ -98,15 +99,15 @@ public class TicketManager extends ZUtils {
                 EmbedBuilder builder = new EmbedBuilder();
                 setEmbedFooter(guild, builder, new Color(204, 14, 14));
                 builder.setTitle("GroupeZ - Support");
-                setDescription(builder, "Ticket closed after 72 hours without response.");
+                setDescription(builder, "Ticket closed after 48 hours without response.");
                 channel.sendMessageEmbeds(builder.build()).queue();
 
                 System.out.println("Deleted channel for ticket ID: " + ticket.getId());
 
-            } else if (hoursSinceUpdate > 48 && !ticket.isNotificationSent()) {
+            } else if (hoursSinceUpdate > 24 && !ticket.isNotificationSent()) {
 
                 ticket.setNotificationSent(true);
-                ticket.sendMessage(guild, "%user%, close your ticket in 24 hours if there is no answer.");
+                ticket.sendMessage(guild, "%user%, Your ticket will be closed in 24 hours, if there is no answer.");
                 this.sqlManager.updateTicket(ticket, false);
 
                 System.out.println("Sent reminder for ticket ID: " + ticket.getId());
@@ -282,6 +283,19 @@ public class TicketManager extends ZUtils {
             if (ticketAction == null) return;
 
             ticketAction.preMessageAction(event, event.getMember(), guild, this, ticket);
+
+            Calendar calendar = Calendar.getInstance();
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+
+            if (hour < 9 || hour >= 20) {
+
+                if (ticket.getLastMessageHourInformation() > System.currentTimeMillis()) return;
+                ticket.setLastMessageHourInformation(System.currentTimeMillis() + (1000 * 60 * 10));
+
+                String response = getMessage(ticket.getLangType(), Message.TICKET_HOUR, hour, calendar.get(Calendar.MINUTE));
+                net.dv8tion.jda.api.entities.Message message = event.getMessage();
+                message.reply(response).queue();
+            }
         }
     }
 

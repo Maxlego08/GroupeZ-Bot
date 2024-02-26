@@ -5,6 +5,7 @@ import fr.maxlego08.zsupport.lang.Message;
 import fr.maxlego08.zsupport.tickets.TicketStatus;
 import fr.maxlego08.zsupport.utils.Plugin;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -13,11 +14,12 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.Interaction;
 import net.dv8tion.jda.api.interactions.callbacks.IMessageEditCallback;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.requests.restaction.PermissionOverrideAction;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-public class TicketSelectPlugin extends TicketAction {
-
+public class TicketVerificationPlugin extends TicketAction {
     @Override
     public void process(Interaction interaction) {
 
@@ -46,6 +48,7 @@ public class TicketSelectPlugin extends TicketAction {
 
     @Override
     public void onSelect(StringSelectInteractionEvent event) {
+
         List<String> strings = event.getValues();
 
         if (strings.size() == 1) {
@@ -54,12 +57,12 @@ public class TicketSelectPlugin extends TicketAction {
             Plugin plugin = Config.plugins.stream().filter(configPlugin -> configPlugin.getName().equals(pluginName)).findAny().orElse(Plugin.EMPTY);
 
             this.ticket.setPluginId(plugin.getPluginId());
-            // Si le plugin est premium, on va vérifier l'achat, sinon on demande directement les informations
-            processNextAction(plugin.isPremium() ? TicketStatus.PLUGIN_VERIFY_PURCHASE : TicketStatus.PLUGIN_INFORMATION);
+            processNextAction(TicketStatus.VERIFY_PURCHASE);
 
         } else {
             event.reply(getMessage(this.ticket.getLangType(), Message.TICKET_PLUGIN_ERROR)).queue();
         }
+
     }
 
     @Override
@@ -74,6 +77,6 @@ public class TicketSelectPlugin extends TicketAction {
 
     @Override
     public TicketStatus getTicketStatus() {
-        return TicketStatus.CHOOSE_PLUGIN;
+        return TicketStatus.VERIFY_PURCHASE_PLUGIN;
     }
 }

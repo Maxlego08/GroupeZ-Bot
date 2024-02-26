@@ -3,6 +3,7 @@ package fr.maxlego08.zsupport.tickets.actions;
 import fr.maxlego08.zsupport.tickets.Ticket;
 import fr.maxlego08.zsupport.tickets.TicketManager;
 import fr.maxlego08.zsupport.tickets.TicketStatus;
+import fr.maxlego08.zsupport.tickets.TicketType;
 import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.verify.VerifyManager;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -188,6 +189,10 @@ public abstract class TicketAction extends ZUtils {
             VerifyManager manager = VerifyManager.getInstance();
             manager.updateUserAsync(null, event.getGuild(), target, this.ticket.getPluginId(), event.getMessage());
 
+            if (ticket.getTicketType() == TicketType.VERIFICATION) {
+                ticket.close(guild);
+                this.ticketManager.getSqlManager().updateTicket(ticket, true);
+            }
         } else {
             event.reply(":x: You do not have permission to verify the purchase yourself. Please wait.").setEphemeral(true).queue();
         }
@@ -220,6 +225,5 @@ public abstract class TicketAction extends ZUtils {
             });
         });
     }
-
 
 }

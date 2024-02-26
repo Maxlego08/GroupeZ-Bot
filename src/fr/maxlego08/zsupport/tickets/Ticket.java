@@ -29,6 +29,7 @@ public class Ticket extends ZUtils {
     private boolean notificationSent;
     private TextChannel textChannel;
     private TicketAction ticketAction;
+    private long lastMessageHourInformation;
 
     public Ticket(LangType langType, long channelId, long userId, TicketStatus ticketStatus, TicketType ticketType) {
         this.langType = langType;
@@ -167,5 +168,13 @@ public class Ticket extends ZUtils {
 
     public void setNotificationSent(boolean notificationSent) {
         this.notificationSent = notificationSent;
+    }
+
+    public long getLastMessageHourInformation() {
+        return lastMessageHourInformation;
+    }
+
+    public void setLastMessageHourInformation(long lastMessageHourInformation) {
+        this.lastMessageHourInformation = lastMessageHourInformation;
     }
 }
