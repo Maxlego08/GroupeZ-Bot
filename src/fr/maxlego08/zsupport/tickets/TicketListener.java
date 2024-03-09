@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.channel.forum.ForumTagAddEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -16,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -74,7 +72,7 @@ public class TicketListener extends ListenerAdapter implements Constant {
         }
 
         // DONT PING STAFF OMG
-        if (event.getMessage().getMentions().getMembers().stream().anyMatch(e -> e.hasPermission(Permission.MESSAGE_MANAGE)) && !event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
+        if (event.getMessage().getMentions().getMembers().stream().anyMatch(e -> e.hasPermission(Permission.MESSAGE_MANAGE) && !e.getUser().isBot()) && !event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
             event.getMessage().reply(":rage: Please respect the rules and do not mention the team members.").queue();
         }
 

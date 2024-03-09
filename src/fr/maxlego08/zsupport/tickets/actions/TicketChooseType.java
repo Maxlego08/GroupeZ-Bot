@@ -89,7 +89,7 @@ public class TicketChooseType extends TicketAction {
             }
             case BUTTON_CHOOSE_VERIFY -> {
                 ticket.setTicketType(TicketType.VERIFICATION);
-                processNextAction(TicketStatus.VERIFY_PURCHASE);
+                processNextAction(TicketStatus.VERIFY_PURCHASE_PLUGIN);
             }
             case BUTTON_CHOOSE_SPIGOT -> {
                 ticket.setTicketType(TicketType.SPIGOT);
