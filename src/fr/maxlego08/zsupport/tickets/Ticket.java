@@ -123,6 +123,10 @@ public class Ticket extends ZUtils {
         return this.textChannel;
     }
 
+    public boolean isValid(Guild guild){
+        return guild.getTextChannelById(this.channelId) != null;
+    }
+
     public void setTextChannel(TextChannel textChannel) {
         this.textChannel = textChannel;
     }

@@ -354,7 +354,7 @@ public class TicketManager extends ZUtils {
         Iterator<Ticket> ticketIterator = this.tickets.iterator();
         while (ticketIterator.hasNext()) {
             Ticket ticket = ticketIterator.next();
-            if (ticket.getTextChannel(guild) == null) {
+            if (!ticket.isValid(guild)) {
                 ticket.setTicketStatus(TicketStatus.CLOSE);
                 this.sqlManager.updateTicket(ticket, true);
                 ticketIterator.remove();
