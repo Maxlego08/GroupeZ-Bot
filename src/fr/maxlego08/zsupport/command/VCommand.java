@@ -60,7 +60,7 @@ public abstract class VCommand extends Arguments implements Constant {
     }
 
     /**
-     * Permet de savoir le nombre de parent de fa�on r�cursive
+     * Permet de savoir le nombre de parent de fa§on r§cursive
      *
      * @param defaultParent
      * @return

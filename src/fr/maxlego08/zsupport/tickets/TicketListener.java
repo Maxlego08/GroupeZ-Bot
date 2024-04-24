@@ -5,6 +5,8 @@ import fr.maxlego08.zsupport.lang.LangType;
 import fr.maxlego08.zsupport.utils.ChannelType;
 import fr.maxlego08.zsupport.utils.Constant;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.attribute.ICategorizableChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -16,10 +18,15 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class TicketListener extends ListenerAdapter implements Constant {
 
+    private final Map<Long, Integer> pingAmounts = new HashMap<>();
     private final TicketManager ticketManager;
     private final ErrorManager manager = new ErrorManager();
 
@@ -64,16 +71,31 @@ public class TicketListener extends ListenerAdapter implements Constant {
     public void onMessageReceived(MessageReceivedEvent event) {
 
         MessageChannel channel = event.getChannel();
-        if (event.getAuthor().isBot()) return;
+        Message message = event.getMessage();
+        Member member = event.getMember();
+
+        if (event.getAuthor().isBot() || member == null) return;
 
         // General help
         if (channel.getIdLong() == Config.generalChannel) {
-            this.manager.processMessage(event, event.getMessage(), event.getAuthor());
+            this.manager.processMessage(event, message, event.getAuthor());
         }
 
         // DONT PING STAFF OMG
-        if (event.getMessage().getMentions().getMembers().stream().anyMatch(e -> e.hasPermission(Permission.MESSAGE_MANAGE) && !e.getUser().isBot()) && !event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-            event.getMessage().reply(":rage: Please respect the rules and do not mention the team members.").queue();
+        if (message.getMentions().getMembers().stream().anyMatch(e -> e.hasPermission(Permission.MESSAGE_MANAGE) && !e.getUser().isBot()) && !member.hasPermission(Permission.MESSAGE_MANAGE)) {
+
+            if (member.getRoles().stream().anyMatch(role -> role.getIdLong() == 1203368378581000192L || role.getIdLong() == 1203368206337708113L || role.getIdLong() == 1186657702076743770L || role.getIdLong() == 511544969245491223L || role.getIdLong() == 1094539124200976508L || role.getIdLong() == 1223998091968118855L)) {
+                return;
+            }
+
+            int amount = this.pingAmounts.getOrDefault(member.getIdLong(), 0) + 1;
+
+            long duration = 2L * amount;
+
+            message.reply(":rage: Please respect the rules and refrain from mentioning the team members. You just timeout " + duration + " minutes ! (x" + amount + ")").queue(m -> m.delete().queueAfter(30, TimeUnit.SECONDS));
+            event.getGuild().timeoutFor(member, Duration.ofMinutes(duration)).queue();
+
+            this.pingAmounts.put(member.getIdLong(), amount);
         }
 
         this.ticketManager.processMessageUpload(event);

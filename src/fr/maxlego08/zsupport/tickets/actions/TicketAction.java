@@ -31,6 +31,7 @@ import net.dv8tion.jda.internal.interactions.component.ButtonImpl;
 
 import java.awt.*;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public abstract class TicketAction extends ZUtils {
@@ -192,6 +193,7 @@ public abstract class TicketAction extends ZUtils {
             if (ticket.getTicketType() == TicketType.VERIFICATION) {
                 ticket.close(guild);
                 this.ticketManager.getSqlManager().updateTicket(ticket, true);
+                event.getChannel().delete().queueAfter(3, TimeUnit.SECONDS);
             }
         } else {
             event.reply(":x: You do not have permission to verify the purchase yourself. Please wait.").setEphemeral(true).queue();

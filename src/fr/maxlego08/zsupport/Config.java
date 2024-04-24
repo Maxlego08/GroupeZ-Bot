@@ -28,7 +28,7 @@ public class Config implements Savable {
     public static long zMenuPremium = 1203368378581000192L;
     public static long zMenuEmote = 1117502546811048098L;
 
-    public static String CUSTOM_KEY = "sdfsdkfsldkfsdfdsfkmsdlmf,mdslkflsdk;fkljzedioahrnduidgstjhqsbgvdiyqsdgqksjdzapo�fmazflpo�icjozefdpzokfdozpefijz,fkezfljsdklfzeoirfsndlkfjkezf6+ze5f+zef2+ezf5s3fzef2zef+zfe56z+etfg+rf4+sfg";
+    public static String CUSTOM_KEY = "sdfsdkfsldkfsdfdsfkmsdlmf,mdslkflsdk;fkljzedioahrnduidgstjhqsbgvdiyqsdgqksjdzapo§fmazflpo§icjozefdpzokfdozpefijz,fkezfljsdklfzeoirfsndlkfjkezf6+ze5f+zef2+ezf5s3fzef2zef+zfe56z+etfg+rf4+sfg";
     public static String API_URL = "https://groupez.dev/api/v1/discord/%s";
     public static String API_MIB_URL = "https://minecraft-inventory-builder.com/api/v1/discord/user/%s";
     public static String API_URL_VERIFY_CUSTOMER = "https://groupez.dev/api/v1/discord/%s/apply/%s";

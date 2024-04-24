@@ -176,7 +176,7 @@ public class VerifyManager extends ZUtils {
     }
 
     /**
-     * Permet de v�rifier si l'utilisateur peut cr�er un ticket
+     * Permet de v§rifier si l'utilisateur peut cr§er un ticket
      *
      * @param user
      * @param runnableSuccess
@@ -353,7 +353,7 @@ public class VerifyManager extends ZUtils {
 
             roles.forEach(role -> {
                 guild.addRoleToMember(member, role).queue();
-                System.out.println("Ajout du r�le " + roles.get(0).getName() + " � l'utilisateur " + user.getName());
+                System.out.println("Ajout du r§le " + roles.get(0).getName() + " § l'utilisateur " + user.getName());
             });
 
             if (consumer != null) {
