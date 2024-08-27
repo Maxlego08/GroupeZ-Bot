@@ -1,5 +1,6 @@
 package fr.maxlego08.zsupport.tickets.actions;
 
+import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.tickets.Ticket;
 import fr.maxlego08.zsupport.tickets.TicketManager;
 import fr.maxlego08.zsupport.tickets.TicketStatus;
@@ -226,6 +227,16 @@ public abstract class TicketAction extends ZUtils {
                 if (this.ticket.getTicketStatus() != TicketStatus.CLOSE) message.delete().queue();
             });
         });
+    }
+
+    protected void sendVacationInformation() {
+        var now = System.currentTimeMillis();
+        var vacation = Config.vacation;
+        if (vacation == null) return;
+
+        if (now >= vacation.getStartAt() && now <= vacation.getEndAt()) {
+            textChannel.sendMessage(member.getAsMention() + ", **Maxlego08** is currently on **vacation**, the response time will be longer than usual, please wait!").queueAfter(1, TimeUnit.SECONDS);
+        }
     }
 
 }

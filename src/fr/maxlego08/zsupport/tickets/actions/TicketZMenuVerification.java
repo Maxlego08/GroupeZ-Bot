@@ -53,6 +53,7 @@ public class TicketZMenuVerification extends TicketAction {
             });
         }, Permission.VIEW_CHANNEL);
 
+        sendVacationInformation();
     }
 
     @Override

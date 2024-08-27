@@ -24,6 +24,8 @@ public class TicketVerification extends TicketAction {
         setDescription(builder, ":warning: Please send **proof of purchase** in this channel. A screenshot from the page where you purchased the plugin is enough. We need to see the entire page with your username and date.", "Please wait for someone to verify your purchase.\n\nIf you need help after your verification, please create a new ticket.\n\nCheck for the plugin: " + ticket.getPlugin().getName());
 
         ((IMessageEditCallback) this.event).editMessageEmbeds(builder.build()).setActionRow(createCloseButton()).queue(r -> updatePermission(null, Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL));
+
+        sendVacationInformation();
     }
 
     @Override

@@ -84,15 +84,24 @@ public class TicketListener extends ListenerAdapter implements Constant {
         // DONT PING STAFF OMG
         if (message.getMentions().getMembers().stream().anyMatch(e -> e.hasPermission(Permission.MESSAGE_MANAGE) && !e.getUser().isBot()) && !member.hasPermission(Permission.MESSAGE_MANAGE)) {
 
-            if (member.getRoles().stream().anyMatch(role -> role.getIdLong() == 1203368378581000192L || role.getIdLong() == 1203368206337708113L || role.getIdLong() == 1186657702076743770L || role.getIdLong() == 511544969245491223L || role.getIdLong() == 1094539124200976508L || role.getIdLong() == 1223998091968118855L)) {
+            if (member.getRoles().stream().anyMatch(role ->
+                    role.getIdLong() == 1203368378581000192L
+                            || role.getIdLong() == 1203368206337708113L
+                            || role.getIdLong() == 1186657702076743770L
+                            || role.getIdLong() == 511544969245491223L
+                            || role.getIdLong() == 1094539124200976508L
+                            || role.getIdLong() == 1223998091968118855L
+                            || role.getIdLong() == 1276921293995905096L // Friendly developer
+            )) {
                 return;
             }
 
             int amount = this.pingAmounts.getOrDefault(member.getIdLong(), 0) + 1;
 
             long duration = 2L * amount;
+            var ruleChannel = event.getGuild().getTextChannelById(Config.ruleChannel);
 
-            message.reply(":rage: Please respect the rules and refrain from mentioning the team members. You just timeout " + duration + " minutes ! (x" + amount + ")").queue(m -> m.delete().queueAfter(30, TimeUnit.SECONDS));
+            message.reply(":rage: Please respect the discord " + (ruleChannel == null ? "rules" : ruleChannel.getAsMention()) + " ! You must not ping a team member. You just timeout " + duration + " minutes ! (x" + amount + ")").queue(m -> m.delete().queueAfter(30, TimeUnit.SECONDS));
             event.getGuild().timeoutFor(member, Duration.ofMinutes(duration)).queue();
 
             this.pingAmounts.put(member.getIdLong(), amount);
