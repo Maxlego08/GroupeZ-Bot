@@ -1,5 +1,6 @@
 package fr.maxlego08.zsupport;
 
+import fr.maxlego08.zsupport.api.Vacation;
 import fr.maxlego08.zsupport.tickets.storage.SqlConfiguration;
 import fr.maxlego08.zsupport.utils.ChannelType;
 import fr.maxlego08.zsupport.utils.Plugin;
@@ -18,6 +19,7 @@ public class Config implements Savable {
 
     public static String botToken = "groupez.dev.token.secret";
     public static long ticketCategoryId = 511517312067829766L;
+    public static long ruleChannel = 765577829122572318L;
     public static long ticketChannel = 712305238748692572L;
     public static long commandChannel = 714518716943171605L;
     public static long pluginsChannel = 941739992139579523L;
@@ -28,7 +30,7 @@ public class Config implements Savable {
     public static long zMenuPremium = 1203368378581000192L;
     public static long zMenuEmote = 1117502546811048098L;
 
-    public static String CUSTOM_KEY = "sdfsdkfsldkfsdfdsfkmsdlmf,mdslkflsdk;fkljzedioahrnduidgstjhqsbgvdiyqsdgqksjdzapo�fmazflpo�icjozefdpzokfdozpefijz,fkezfljsdklfzeoirfsndlkfjkezf6+ze5f+zef2+ezf5s3fzef2zef+zfe56z+etfg+rf4+sfg";
+    public static String CUSTOM_KEY = "sdfsdkfsldkfsdfdsfkmsdlmf,mdslkflsdk;fkljzedioahrnduidgstjhqsbgvdiyqsdgqksjdzapo§fmazflpo§icjozefdpzokfdozpefijz,fkezfljsdklfzeoirfsndlkfjkezf6+ze5f+zef2+ezf5s3fzef2zef+zfe56z+etfg+rf4+sfg";
     public static String API_URL = "https://groupez.dev/api/v1/discord/%s";
     public static String API_MIB_URL = "https://minecraft-inventory-builder.com/api/v1/discord/user/%s";
     public static String API_URL_VERIFY_CUSTOMER = "https://groupez.dev/api/v1/discord/%s/apply/%s";
@@ -43,6 +45,7 @@ public class Config implements Savable {
     public static long guildId = 511516467615760405L;
     public static Plugin zMenu = new Plugin("zMenu", 1117502546811048098L, 0, 253, 0.0, "zmenu");
     public static long zMenuForum = 1024590761750184016L;
+    public static Vacation vacation = null;
 
     /**
      * static Singleton instance.

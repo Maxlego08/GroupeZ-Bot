@@ -13,6 +13,7 @@ import fr.maxlego08.zsupport.command.commands.CommandRoles;
 import fr.maxlego08.zsupport.command.commands.CommandRules;
 import fr.maxlego08.zsupport.command.commands.CommandServer;
 import fr.maxlego08.zsupport.command.commands.CommandStop;
+import fr.maxlego08.zsupport.command.commands.CommandVacation;
 import fr.maxlego08.zsupport.command.commands.CommandVerify;
 import fr.maxlego08.zsupport.command.commands.tickets.CommandTicketSet;
 import fr.maxlego08.zsupport.lang.BasicMessage;
@@ -57,6 +58,7 @@ public class CommandManager extends ZUtils implements Constant {
         registerCommand("plugins", new CommandPlugins(this));
         registerCommand("rules", new CommandRules(this));
         registerCommand("log", new CommandLog(this));
+        registerCommand("setvacation", new CommandVacation(this));
 
         registerCommand("customer-verify", new CommandCustomerVerify(this));
         registerCommand("close", new CommandClose(this));

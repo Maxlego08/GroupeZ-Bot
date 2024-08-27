@@ -13,6 +13,7 @@ public class TicketQuestionOpen extends TicketAction {
     @Override
     public void process(Interaction interaction) {
         updatePermission(null, Permission.MESSAGE_SEND, Permission.VIEW_CHANNEL);
+        sendVacationInformation();
     }
 
     @Override

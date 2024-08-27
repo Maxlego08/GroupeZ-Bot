@@ -12,6 +12,7 @@ import fr.maxlego08.zsupport.utils.ZUtils;
 import fr.maxlego08.zsupport.verify.VerifyManager;
 import gs.mclo.api.MclogsClient;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
@@ -287,7 +288,7 @@ public class TicketManager extends ZUtils {
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
 
-            if (hour < 9 || hour >= 20) {
+            if (hour < 9 || hour >= 20 && !event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
 
                 if (ticket.getLastMessageHourInformation() > System.currentTimeMillis()) return;
                 ticket.setLastMessageHourInformation(System.currentTimeMillis() + (1000 * 60 * 10));

@@ -1,5 +1,6 @@
 package fr.maxlego08.zsupport.tickets.actions;
 
+import fr.maxlego08.zsupport.Config;
 import fr.maxlego08.zsupport.tickets.Ticket;
 import fr.maxlego08.zsupport.tickets.TicketManager;
 import fr.maxlego08.zsupport.tickets.TicketStatus;
@@ -31,6 +32,7 @@ import net.dv8tion.jda.internal.interactions.component.ButtonImpl;
 
 import java.awt.*;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public abstract class TicketAction extends ZUtils {
@@ -192,6 +194,7 @@ public abstract class TicketAction extends ZUtils {
             if (ticket.getTicketType() == TicketType.VERIFICATION) {
                 ticket.close(guild);
                 this.ticketManager.getSqlManager().updateTicket(ticket, true);
+                event.getChannel().delete().queueAfter(3, TimeUnit.SECONDS);
             }
         } else {
             event.reply(":x: You do not have permission to verify the purchase yourself. Please wait.").setEphemeral(true).queue();
@@ -224,6 +227,16 @@ public abstract class TicketAction extends ZUtils {
                 if (this.ticket.getTicketStatus() != TicketStatus.CLOSE) message.delete().queue();
             });
         });
+    }
+
+    protected void sendVacationInformation() {
+        var now = System.currentTimeMillis();
+        var vacation = Config.vacation;
+        if (vacation == null) return;
+
+        if (now >= vacation.getStartAt() && now <= vacation.getEndAt()) {
+            textChannel.sendMessage(member.getAsMention() + ", **Maxlego08** is currently on **vacation**, the response time will be longer than usual, please wait!").queueAfter(1, TimeUnit.SECONDS);
+        }
     }
 
 }

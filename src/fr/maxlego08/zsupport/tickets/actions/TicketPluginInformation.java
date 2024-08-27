@@ -110,6 +110,8 @@ public class TicketPluginInformation extends TicketAction {
         });
 
         this.ticketManager.verifyVersion(this.ticket, this.textChannel, this.guild, pluginVersion);
+
+        sendVacationInformation();
     }
 
     @Override

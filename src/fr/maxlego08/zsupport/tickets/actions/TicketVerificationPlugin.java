@@ -39,6 +39,8 @@ public class TicketVerificationPlugin extends TicketAction {
         builder.setDescription(stringBuilder.toString());
 
         ((IMessageEditCallback) this.event).editMessageEmbeds(builder.build()).setActionRow(selectionMenu.build()).queue();
+
+        sendVacationInformation();
     }
 
     @Override
